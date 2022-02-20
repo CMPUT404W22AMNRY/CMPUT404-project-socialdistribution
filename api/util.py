@@ -1,5 +1,16 @@
-import json
+from collections import OrderedDict
 from rest_framework import renderers
+from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+
+
+class Pagination(PageNumberPagination):
+    page_size_query_param = 'size'
+
+    def get_paginated_response(self, data):
+        return Response(OrderedDict([
+            ('items', data)
+        ]))
 
 
 def getNamedRenderer(resource_type: str) -> renderers.JSONRenderer:
