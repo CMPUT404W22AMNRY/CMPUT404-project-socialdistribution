@@ -9,3 +9,4 @@ class AuthorViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('id')
     serializer_class = AuthorSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get']

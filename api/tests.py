@@ -15,3 +15,8 @@ class AuthorTests(TestCase):
     def test_authors_require_login(self):
         res = self.client.get('/api/v1/authors/')
         self.assertEqual(res.status_code, 403)
+
+    def test_create_author(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.post('/api/v1/authors/', {'username': 'alice', 'password': 'password'})
+        self.assertEqual(res.status_code, 405)
