@@ -14,6 +14,7 @@ class AuthorTests(TestCase):
         self.assertEqual(res.status_code, 200)
         body = json.loads(res.content.decode('utf-8'))
         self.assertEqual(body['type'], 'authors')
+        self.assertEqual(len(body['items']), 1)
 
     def test_authors_require_login(self):
         res = self.client.get('/api/v1/authors/')
