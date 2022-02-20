@@ -4,18 +4,14 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
 
-class Pagination(PageNumberPagination):
-    page_size_query_param = 'size'
+def page_number_pagination_class_factory(additional_fields: list[tuple[str, str]]) -> PageNumberPagination:
+    class Pagination(PageNumberPagination):
+        page_size_query_param = 'size'
 
-    def get_paginated_response(self, data):
-        return Response(OrderedDict([
-            ('items', data)
-        ]))
-
-
-def getNamedRenderer(resource_type: str) -> renderers.JSONRenderer:
-    class NamedJsonRenderer(renderers.JSONRenderer):
-        def render(self, data, accepted_media_type=None, renderer_context=None):
-            data['type'] = resource_type
-            return super().render(data, accepted_media_type, renderer_context)
-    return NamedJsonRenderer
+        # Override the default JSON fields
+        # By Alasdair on Aug 23, 2015 at 19:19
+        # https://stackoverflow.com/questions/32170442/remove-count-next-previous-from-response-in-django-rest-framework
+        def get_paginated_response(self, data):
+            additional_fields.append(('items', data))
+            return Response(OrderedDict(additional_fields))
+    return Pagination
