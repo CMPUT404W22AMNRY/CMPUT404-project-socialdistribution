@@ -1,6 +1,6 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import ModelForm
 from django.views.generic.edit import CreateView
-
 from posts.models import Post
 
 
@@ -10,7 +10,7 @@ class PostForm(ModelForm):
         exclude = ['author', 'categories']
 
 
-class CreatePostView(CreateView):
+class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
 
