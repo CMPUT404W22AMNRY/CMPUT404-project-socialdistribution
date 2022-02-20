@@ -20,8 +20,7 @@ class CreatePostView(LoginRequiredMixin, FormView):
     form_class = PostForm
     template_name = 'posts/post.html'
 
-    def form_valid(self, form: PostForm)-> HttpResponse:
-        form.full_clean()
+    def form_valid(self, form: PostForm) -> HttpResponse:
         form.instance.author = self.request.user
 
         with transaction.atomic():
@@ -30,4 +29,4 @@ class CreatePostView(LoginRequiredMixin, FormView):
                 db_category = Category.objects.get_or_create(category=category)[0]
                 form.instance.categories.add(db_category)
             form.save()
-        return redirect('/') # TODO: Update this when we have the post page
+        return redirect('/')  # TODO: Update this when we have the post page
