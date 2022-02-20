@@ -28,4 +28,4 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     date_published = models.DateTimeField(auto_now_add=True)
     unlisted = models.BooleanField()
-    categories = models.ManyToManyField(Category)
+    categories = models.ManyToManyField(Category, blank=True)
