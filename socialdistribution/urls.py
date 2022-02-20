@@ -26,6 +26,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('signup', SignUpView.as_view(), name='signup'),
     path('login', LoginView.as_view(template_name='auth/login.html'), name='login'),
-    path('admin/', admin.site.urls),
     path('api/v1/', include('api.urls')),
 ]
