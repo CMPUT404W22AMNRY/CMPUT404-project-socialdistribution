@@ -18,8 +18,6 @@ class Post(models.Model):
         FRIENDS = "FRIENDS", _('PUBLIC')
 
     title = models.CharField(max_length=STR_MAX_LENGTH)
-    source = models.CharField(max_length=STR_MAX_LENGTH)
-    origin = models.CharField(max_length=STR_MAX_LENGTH)
     description = models.CharField(max_length=STR_MAX_LENGTH)
     content_type = models.CharField(max_length=18, default=ContentType.PLAIN, choices=ContentType.choices)
     content = models.TextField()
