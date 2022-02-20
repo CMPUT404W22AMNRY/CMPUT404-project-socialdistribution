@@ -5,6 +5,10 @@ from django.utils.translation import gettext_lazy as _
 STR_MAX_LENGTH = 512
 
 
+class Category(models.Model):
+    category = models.CharField(max_length=STR_MAX_LENGTH)
+
+
 class Post(models.Model):
     class ContentType(models.TextChoices):
         MARKDOWN = 'text/markdown', _('text/markdown')
@@ -24,8 +28,4 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     date_published = models.DateTimeField(auto_now_add=True)
     unlisted = models.BooleanField()
-
-
-class Category(models.Model):
-    category = models.CharField(max_length=STR_MAX_LENGTH)
-    posts = models.ManyToManyField(Post)
+    categories = models.ManyToManyField(Category)
