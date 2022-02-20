@@ -1,3 +1,4 @@
+import json
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 
@@ -11,6 +12,8 @@ class AuthorTests(TestCase):
         self.client.login(username='bob', password='password')
         res = self.client.get('/api/v1/authors/')
         self.assertEqual(res.status_code, 200)
+        body = json.loads(res.content.decode('utf-8'))
+        self.assertEqual(body['type'], 'authors')
 
     def test_authors_require_login(self):
         res = self.client.get('/api/v1/authors/')
