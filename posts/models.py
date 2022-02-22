@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 STR_MAX_LENGTH = 512
@@ -25,7 +25,7 @@ class Post(models.Model):
     description = models.CharField(max_length=STR_MAX_LENGTH)
     content_type = models.CharField(max_length=18, default=ContentType.PLAIN, choices=ContentType.choices)
     content = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     date_published = models.DateTimeField(auto_now_add=True)
     unlisted = models.BooleanField()
     categories = models.ManyToManyField(Category, blank=True)
