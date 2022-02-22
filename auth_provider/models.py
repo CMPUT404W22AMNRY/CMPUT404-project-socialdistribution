@@ -1,8 +1,9 @@
 from django.db import models
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
+
+from .constants import CHAR_FIELD_MAX_LENGTH
 
 
-class Author(models.Model):
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
-    github_url = models.CharField(max_length=512, blank=True)
-    profile_image_url = models.CharField(max_length=512, blank=True)
+class User(AbstractUser):
+    github_url = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
+    profile_image_url = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
