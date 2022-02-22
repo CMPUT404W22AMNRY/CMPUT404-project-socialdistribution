@@ -23,31 +23,31 @@ class CreatePostTests(TestCase):
 
     def test_new_post_page(self):
         self.client.login(username='bob', password='password')
-        res = self.client.get('/posts/new')
+        res = self.client.get(reverse('posts:new'))
         self.assertEqual(res.status_code, 200)
         self.assertTemplateUsed('posts/create_post.html')
 
     def test_new_post_require_login(self):
-        res = self.client.get('/posts/new')
+        res = self.client.get(reverse('posts:new'))
         self.assertEqual(res.status_code, 302)
 
     def test_new_post_require_csrf(self):
         csrf_client = Client(enforce_csrf_checks=True)
         csrf_client.login(username='bob', password='password')
-        res = csrf_client.post('/posts/new', data=POST_DATA)
+        res = csrf_client.post(reverse('posts:new'), data=POST_DATA)
         self.assertEqual(res.status_code, 403)
 
     def test_new_post(self):
         self.client.login(username='bob', password='password')
         initial_post_count = len(Post.objects.all())
-        self.client.post('/posts/new', data=POST_DATA)
+        self.client.post(reverse('posts:new'), data=POST_DATA)
         self.assertEqual(len(Post.objects.all()), initial_post_count + 1)
 
     def test_categories_not_duplicated(self):
         self.client.login(username='bob', password='password')
         Category.objects.create(category='web')
         initial_post_count = len(Post.objects.all())
-        self.client.post('/posts/new', data=POST_DATA)
+        self.client.post(reverse('posts:new'), data=POST_DATA)
         self.assertEqual(len(Category.objects.all()), 2)
         self.assertEqual(len(Post.objects.all()), initial_post_count + 1)
 
