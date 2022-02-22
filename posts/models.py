@@ -11,15 +11,15 @@ class Category(models.Model):
 
 class Post(models.Model):
     class ContentType(models.TextChoices):
-        MARKDOWN = 'text/markdown', _('text/markdown')
-        PLAIN = 'text/plain', _('text/plain')
-        BASE64 = 'application/base64', _('application/base64')
-        PNG = 'image/png;base64', _('image/png;base64')
-        JPG = 'image/jpeg;base64', _('image/jpeg;base64')
+        MARKDOWN = 'text/markdown', _('Commonmark')
+        PLAIN = 'text/plain', _('Plaintext')
+        BASE64 = 'application/base64', _('Base64Encoded')
+        PNG = 'image/png;base64', _('PNG')
+        JPG = 'image/jpeg;base64', _('JPEG')
 
     class Visibility(models.TextChoices):
-        PUBLIC = "PUBLIC", _('PUBLIC')
-        FRIENDS = "FRIENDS", _('PUBLIC')
+        PUBLIC = "PUBLIC"
+        FRIENDS = "FRIENDS"
 
     title = models.CharField(max_length=STR_MAX_LENGTH)
     description = models.CharField(max_length=STR_MAX_LENGTH)
