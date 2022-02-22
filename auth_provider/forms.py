@@ -4,7 +4,6 @@ from .models import User
 
 
 class SignUpForm(UserCreationForm):
-
     class Meta(UserCreationForm.Meta):
         model = User
         fields = UserCreationForm.Meta.fields + ('github_url', 'profile_image_url')
