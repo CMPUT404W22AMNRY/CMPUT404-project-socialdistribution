@@ -18,7 +18,7 @@ class PostForm(ModelForm):
 
 class CreatePostView(LoginRequiredMixin, FormView):
     form_class = PostForm
-    template_name = 'posts/post.html'
+    template_name = 'posts/create_post.html'
 
     def form_valid(self, form: PostForm) -> HttpResponse:
         form.instance.author = self.request.user
