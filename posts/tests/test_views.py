@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from posts.models import Post, Category
 
 POST_DATA = {
@@ -15,7 +15,7 @@ POST_DATA = {
 class PostTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
-        User.objects.create_user(username='bob', password='password')
+        get_user_model().objects.create_user(username='bob', password='password')
 
     def test_new_post_page(self):
         self.client.login(username='bob', password='password')
