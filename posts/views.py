@@ -8,14 +8,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from posts.models import Post, Category
 
 
+class PostForm(ModelForm):
+    class Meta:
+        model = Post
+        exclude = ['author', 'categories']
+
+    categories = forms.CharField(max_length=256)
+
+
 class CreatePostView(LoginRequiredMixin, FormView):
-    class PostForm(ModelForm):
-        class Meta:
-            model = Post
-            exclude = ['author', 'categories']
-
-        categories = forms.CharField(max_length=256)
-
     form_class = PostForm
     template_name = 'posts/create_post.html'
 
@@ -25,7 +26,7 @@ class CreatePostView(LoginRequiredMixin, FormView):
         with transaction.atomic():
             form.save()
             for category in form.cleaned_data['categories'].split(','):
-                db_category = Category.objects.get_or_create(category=category)[0]
+                db_category = Category.objects.get_or_create(category=category.strip())[0]
                 form.instance.categories.add(db_category)
             form.save()
         return redirect('/')  # TODO: Update this when we have the post page
