@@ -24,6 +24,7 @@ class Post(models.Model):
     title = models.CharField(max_length=STR_MAX_LENGTH)
     description = models.CharField(max_length=STR_MAX_LENGTH)
     content_type = models.CharField(max_length=18, default=ContentType.PLAIN, choices=ContentType.choices)
+    visibility = models.CharField(max_length=7, default=Visibility.PUBLIC, choices=Visibility.choices)
     content = models.TextField()
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     date_published = models.DateTimeField(auto_now_add=True)
