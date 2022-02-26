@@ -1,12 +1,12 @@
 import json
 from django.test import TestCase, Client
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 
 class AuthorTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
-        User.objects.create_user(username='bob', password='password')
+        get_user_model().objects.create_user(username='bob', password='password')
 
     def test_authors(self):
         self.client.login(username='bob', password='password')
