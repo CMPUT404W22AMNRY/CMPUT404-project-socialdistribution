@@ -4,8 +4,6 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.utils import timezone
 
-from friend.views import friend 
-
 class FriendList(models.Model):
     author = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="author")
     friends = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name="friends")
