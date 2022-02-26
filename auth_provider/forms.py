@@ -6,7 +6,7 @@ from .models import User
 class SignUpForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = UserCreationForm.Meta.fields + ('github_url', 'profile_image_url')
+        fields = UserCreationForm.Meta.fields + ('first_name', 'last_name', 'github_url', 'profile_image_url')
 
     def save(self, commit=True):
         user = super().save(commit)
