@@ -11,8 +11,6 @@ POST_DATA = {
 }
 
 COMMENT_DATA = {
-    'content': 'Sick Olde English',
-    'description': 'This post discusses stuff -- brief',
+    'comment': 'Sick Olde English',
     'content_type': ContentType.PLAIN,
-
 }

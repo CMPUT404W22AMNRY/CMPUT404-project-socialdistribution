@@ -65,7 +65,7 @@ class CommentTests(TestCase):
 
     def test_post_association(self):
         Comment.objects.create(
-            comment=COMMENT_DATA['content'],
+            comment=COMMENT_DATA['comment'],
             author_id=self.post.id,
             post_id=self.post.id,
             content_type=COMMENT_DATA['content_type'],
