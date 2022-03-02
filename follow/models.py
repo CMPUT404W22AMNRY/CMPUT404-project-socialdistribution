@@ -110,11 +110,18 @@ class Follow(models.Model):
         unique_together = ("followee", "follower")
 
     def __str__(self):
-        return f"{self.followee.Username} is followed by {self.follower.Username}"
+        return f"{self.followee} is followed by {self.follower}"
 
     def save(self, *args, **kwargs):
         if self.followee == self.follower:
             raise ValidationError("User cannot follow themselves.")
+        try:
+            follow_reverse = Follow.objects.get(follower=self.followee, followee=self.follower)
+            self.true_friend = True
+            follow_reverse.true_friend = True
+            follow_reverse.save()
+        except Follow.DoesNotExist:
+            pass
         super().save(*args, **kwargs)
 
 
@@ -127,13 +134,23 @@ class Request(models.Model):
         unique_together = ("from_user", "to_user")
 
     def __str__(self):
-        return f"{self.from_user.Username}'s request to follow {self.to_user.Username}"
+        return f"{self.from_user}'s request to follow {self.to_user}"
+
+    def save(self, *args, **kwargs):
+        if self.from_user == self.to_user:
+            raise ValidationError("User cannot request to follow themselves.")
+        try:
+            follow_check = Follow.objects.get(follower=self.from_user, followee=self.to_user)
+            raise ValidationError("User have already followed.")
+        except Follow.DoesNotExist:
+            pass
+        super().save(*args, **kwargs)
 
     def accept(self):
         relation, created = Follow.objects.get_or_create(follower=self.from_user, followee=self.to_user)
 
         if created is False:
-            raise AlreadyExistsError(f"{self.from_user.Username} has already followed {self.to_user.Username}")
+            raise AlreadyExistsError(f"{self.from_user} has already followed {self.to_user}")
 
         request_accept.send(sender=self, from_user=self.from_user, to_user=self.to_user)
 
