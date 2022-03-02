@@ -55,7 +55,7 @@ class EditPostView(LoginRequiredMixin, UpdateView):
         return redirect(form.instance.get_absolute_url())
 
 
-class PostDetailView(DetailView):
+class PostDetailView(LoginRequiredMixin, DetailView):
     model = Post
 
 
