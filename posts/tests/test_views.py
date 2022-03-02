@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
-from posts.models import Post, Category, ContentType
+from posts.models import Post, Category, ContentType, Comment
 from django.urls import reverse
 
 from .constants import COMMENT_DATA, POST_DATA
@@ -89,6 +89,47 @@ class EditPostTests(TestCase):
         self.client.login(username='bob', password='password')
         res = self.client.post(reverse('posts:edit', kwargs={'pk': 900}), data=EDITED_POST_DATA)
         self.assertEqual(res.status_code, 404)
+
+
+class PostDetailViewTests(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.user = get_user_model().objects.create_user(username='bob', password='password')
+        self.post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=True)
+        self.post.save()
+
+    def test_detail_view_page(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.get(reverse('posts:detail', kwargs={'pk': self.post.id}))
+        self.assertEqual(res.status_code, 200)
+        self.assertTemplateUsed(res, 'posts/post_detail.html')
+        self.assertContains(res, self.post.title)
+        self.assertContains(res, self.post.author.get_full_name())
+        self.assertContains(res, self.post.content)
+        for category in self.post.categories.all():
+            self.assertContains(res, category.category)
+
+    def test_comments_section(self):
+        for _ in range(3):
+            comment = Comment.objects.create(
+                comment=COMMENT_DATA['comment'],
+                author=self.user,
+                content_type=COMMENT_DATA['content_type'],
+                post=self.post,
+            )
+            comment.save()
+
+        self.client.login(username='bob', password='password')
+        res = self.client.get(reverse('posts:detail', kwargs={'pk': self.post.id}))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'Comments')
+        self.assertContains(res, COMMENT_DATA['comment'], count=3)
 
 
 class CreateCommentTests(TestCase):
