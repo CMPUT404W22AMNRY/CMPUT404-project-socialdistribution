@@ -67,7 +67,7 @@ class CommentForm(ModelForm):
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
     form_class = CommentForm
-    template_name = 'posts/create_post.html'
+    template_name = 'comments/create_comment.html'
 
     def form_valid(self, form: PostForm) -> HttpResponse:
         post = Post.objects.get(pk=self.kwargs['pk'])
