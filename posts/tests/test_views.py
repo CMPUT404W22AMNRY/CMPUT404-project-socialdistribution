@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from posts.models import Post, Category, ContentType
 from django.urls import reverse
 
-from .constants import POST_DATA
+from .constants import COMMENT_DATA, POST_DATA
 
 EDITED_POST_DATA = POST_DATA.copy()
 EDITED_POST_DATA['content_type'] = ContentType.MARKDOWN
@@ -89,3 +89,40 @@ class EditPostTests(TestCase):
         self.client.login(username='bob', password='password')
         res = self.client.post(reverse('posts:edit', kwargs={'pk': 900}), data=EDITED_POST_DATA)
         self.assertEqual(res.status_code, 404)
+
+
+class CreateCommentTests(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.user = get_user_model().objects.create_user(username='bob', password='password')
+        self.post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=True)
+        self.post.save()
+
+    def test_new_comment_page(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.get(reverse('posts:new-comment', kwargs={'pk': self.post.id}))
+        self.assertEqual(res.status_code, 200)
+        self.assertTemplateUsed(res, 'comments/create_comment.html')
+
+    def test_new_comment(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.post(reverse('posts:new-comment', kwargs={'pk': self.post.id}), data=COMMENT_DATA)
+        self.assertEqual(res.status_code, 302)
+        self.assertRedirects(res, reverse('posts:detail', kwargs={'pk': self.post.id}))
+        self.assertEqual(len(self.post.comment_set.all()), 1)
+
+    def test_new_comment_require_login(self):
+        res = self.client.get(reverse('posts:edit', kwargs={'pk': self.post.id}))
+        self.assertEqual(res.status_code, 302)
+
+    def test_new_comment_require_csrf(self):
+        csrf_client = Client(enforce_csrf_checks=True)
+        csrf_client.login(username='bob', password='password')
+        res = csrf_client.post(reverse('posts:new-comment', kwargs={'pk': self.post.id}), data=COMMENT_DATA)
+        self.assertEqual(res.status_code, 403)
