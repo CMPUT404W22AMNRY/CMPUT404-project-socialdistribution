@@ -1,12 +1,10 @@
 {% extends "base.html" %} {% block content %}
 <h1>New comment</h1>
-<form method="post">
-  {% csrf_token %}
+<div class="container">
+  <form method="post">
+    {% csrf_token %} {{ form.as_table }}
 
-  <table>
-    {{ form.as_table }}
-  </table>
-
-  <input type="submit" value="Comment" />
-</form>
+    <input type="submit" class="primarybtn" value="Comment" />
+  </form>
+</div>
 {% endblock %}
