@@ -9,8 +9,11 @@ from follow.signals import (
     request_cancel,
     request_accept,
 )
+
+
 class AlreadyExistsError(IntegrityError):
     pass
+
 
 class FollowManager(models.Manager):
     def followings(self, user):
@@ -31,16 +34,16 @@ class FollowManager(models.Manager):
 
         return list(set(friend1 + friend2))
 
-    def request(self,user):
+    def request(self, user):
         qs = (Request.objects.select_related("from_user", "to_user").filter(to_user=user).all())
         requests = list(qs)
         return requests
 
-    def sent_request(self,user):
+    def sent_request(self, user):
         qs = (Request.objects.select_related("from_user", "to_user").filter(from_user=user).all())
         requests = list(qs)
         return requests
-    
+
     def follow_request(self, from_user, to_user):
         '''create follow request'''
         if from_user == to_user:
@@ -48,8 +51,9 @@ class FollowManager(models.Manager):
 
         if self.check_follow(from_user, to_user):
             raise AlreadyExistsError("Users has already followed.")
-        
-        if Request.objects.filter(from_user = from_user, to_user = to_user).exists():
+
+        if Request.objects.filter(from_user = from_user, 
+        to_user = to_user).exists():
             raise AlreadyExistsError("User has sent the follow request.")
         
         request, created = Request.objects.get_or_create(from_user=from_user, to_user=to_user)
@@ -58,7 +62,7 @@ class FollowManager(models.Manager):
 
         request_create.send(sender=request)
         return request
-    
+
     def unfollow(self, follower, followee):
         try:
             relation = Follow.objects.get(follower=follower, followee=followee)
@@ -73,19 +77,27 @@ class FollowManager(models.Manager):
             return True
         except Follow.DoesNotExist:
             return False
-    
+
     def check_follow(self, follower, followee):
         try:
             relation = Follow.objects.get(follower=follower, followee=followee)
             return True
         except Follow.DoesNotExist:
             return False
-    
+
     def check_true_friend(self, follower, followee):
-        if Follow.objects.filter(follower=follower, followee=followee, true_friend=True).exists() and Follow.objects.filter(follower=followee, followee=follower, true_friend=True).exists():
+        if Follow.objects.filter(
+            follower=follower, 
+            followee=followee, 
+            true_friend=True).exists() and Follow.objects.filter(
+                follower=followee, 
+                followee=follower, 
+                true_friend=True).exists():
             return True
-        else: return False
-        
+        else: 
+            return False
+
+
 class Follow(models.Model):
     followee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="followee")
     follower = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="follower")
@@ -95,15 +107,16 @@ class Follow(models.Model):
 
     class Meta:
         unique_together = ("followee", "follower")
-    
+
     def __str__(self):
         return f"{self.followee.Username} is followed by {self.follower.Username}"
-    
+
     def save(self, *args, **kwargs):
         if self.followee == self.follower:
             raise ValidationError("User cannot follow themselves.")
         super().save(*args, **kwargs)
-            
+
+
 class Request(models.Model):
     from_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="from_user")
     to_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="to_user")
@@ -114,7 +127,6 @@ class Request(models.Model):
 
     def __str__(self):
         return f"{self.from_user.Username}'s request to follow {self.to_user.Username}"
-
 
     def accept(self):
         relation, created = Follow.objects.get_or_create(follower=self.from_user, followee=self.to_user)
@@ -132,17 +144,16 @@ class Request(models.Model):
             relation.save()
         except Follow.DoesNotExist:
             pass
-        
+
         self.delete()
         return True
-    
+
     def reject(self):
         self.delete()
         request_reject.send(sender=self)
         return True
-    
+
     def cancel(self):
         request_cancel.send(sender=self)
         self.delete()
         return True
-
