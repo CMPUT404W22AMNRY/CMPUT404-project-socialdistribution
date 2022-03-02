@@ -53,8 +53,8 @@ class FollowManager(models.Manager):
             raise AlreadyExistsError("Users has already followed.")
 
         if Request.objects.filter(
-                from_user = from_user,
-                to_user = to_user).exists():
+                from_user=from_user,
+                to_user=to_user).exists():
             raise AlreadyExistsError("User has sent the follow request.")
 
         request, created = Request.objects.get_or_create(from_user=from_user, to_user=to_user)
