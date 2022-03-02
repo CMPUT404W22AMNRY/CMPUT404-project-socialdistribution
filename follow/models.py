@@ -20,7 +20,7 @@ class FollowManager(models.Manager):
         qs = Follow.objects.filter(follower=user).all()
         followings = [_.followee for _ in qs]
         return followings
-    
+
     def followers(self, user):
         qs = Follow.objects.filter(followings=user).all()
         followers = [_.follower for _ in qs]
@@ -52,10 +52,10 @@ class FollowManager(models.Manager):
         if self.check_follow(from_user, to_user):
             raise AlreadyExistsError("Users has already followed.")
 
-        if Request.objects.filter(from_user = from_user, 
-        to_user = to_user).exists():
+        if Request.objects.filter(from_user = from_user,
+                                    to_user = to_user).exists():
             raise AlreadyExistsError("User has sent the follow request.")
-        
+
         request, created = Request.objects.get_or_create(from_user=from_user, to_user=to_user)
         if created is False:
             raise AlreadyExistsError("User has sent the follow request.")
@@ -72,7 +72,7 @@ class FollowManager(models.Manager):
                     true_friend_bidirect.true_friend = True
                     true_friend_bidirect.save()
             except Follow.DoesNotExist:
-                pass        
+                pass     
             relation.delete()
             return True
         except Follow.DoesNotExist:
@@ -94,6 +94,7 @@ class FollowManager(models.Manager):
                 followee=follower, 
                 true_friend=True).exists():
             return True
+        
         else: 
             return False
 
