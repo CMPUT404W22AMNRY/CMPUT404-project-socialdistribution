@@ -71,7 +71,8 @@ class FollowManager(models.Manager):
                 if relation.true_friend and true_friend_bidirect.true_friend:
                     true_friend_bidirect.true_friend = True
                     true_friend_bidirect.save()
-            except Follow.DoesNotExist: pass     
+            except Follow.DoesNotExist:
+                pass     
             relation.delete()
             return True
         except Follow.DoesNotExist:
@@ -86,11 +87,11 @@ class FollowManager(models.Manager):
 
     def check_true_friend(self, follower, followee):
         if Follow.objects.filter(
-            follower=follower, 
+            follower=follower,
             followee=followee, 
             true_friend=True).exists() and Follow.objects.filter(
-                follower=followee, 
-                followee=follower, 
+                follower=followee,
+                followee=follower,
                 true_friend=True).exists():
             return True
         else:
