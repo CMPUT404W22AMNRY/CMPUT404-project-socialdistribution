@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
@@ -18,7 +19,6 @@ class ContentType(models.TextChoices):
 
 
 class Post(models.Model):
-
     class Visibility(models.TextChoices):
         PUBLIC = "PUBLIC"
         FRIENDS = "FRIENDS"
@@ -32,6 +32,9 @@ class Post(models.Model):
     date_published = models.DateTimeField(auto_now_add=True)
     unlisted = models.BooleanField()
     categories = models.ManyToManyField(Category, blank=True)
+
+    def get_absolute_url(self):
+        return reverse('posts:detail', kwargs={'pk': self.id})
 
 
 class Comment(models.Model):
