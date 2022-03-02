@@ -1,6 +1,10 @@
+from distutils.command.upload import upload
 from django.db import models
+from django.db.models.fields.files import ImageField
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
+
+from lib.storage.storage import AppEngineBlobStorage
 
 STR_MAX_LENGTH = 512
 
@@ -26,7 +30,14 @@ class Post(models.Model):
     content_type = models.CharField(max_length=18, default=ContentType.PLAIN, choices=ContentType.choices)
     visibility = models.CharField(max_length=7, default=Visibility.PUBLIC, choices=Visibility.choices)
     content = models.TextField()
+    imgContent = models.ImageField(null=True, blank=True,upload_to='images/')
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     date_published = models.DateTimeField(auto_now_add=True)
     unlisted = models.BooleanField()
     categories = models.ManyToManyField(Category, blank=True)
+
+
+# Inspired by: https://stackoverflow.com/questions/18747730/storing-images-in-db-using-django-models
+class PostImage(models.Model):
+    blob = ImageField(upload_to='BlobStorage', max_length=255, blank=False)
+#     serving_url = models.URLField()
