@@ -1,0 +1,44 @@
+{% extends "base.html" %} {% block content %}
+<html lang="en">
+    <head>
+        <title>Users</title>
+
+    </head>
+    <body>
+        <h1>Local user</h1>
+        <br/>
+        {% for to_username in users %}
+            <li>
+                {% if user %}
+                    {{ to_username }} 
+                    <a href="{% url 'follow:create_follow_request' to_username %}">Send follow request</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+        <br/>
+        <h2>Following</h2>
+        {% for following in followings %}
+            <li>
+                {% if user %}
+                    {{following}}
+                {% endif %}
+            </li>
+        {% endfor %}
+        <h2>Follower</h2>
+        {% for follower in followers %}
+            <li>
+                {% if user %}
+                    {{follower}}
+                {% endif %}
+            </li>
+        {% endfor %}
+        <h2>Request</h2>
+        {% for request in request_list %}
+            <li>
+                <a href="{% url 'follow:accept_follow_request' request %}">Accept request from {{request}}</a>
+            </li>
+        {% endfor %}
+    </body>
+</html>
+
+{% endblock %}

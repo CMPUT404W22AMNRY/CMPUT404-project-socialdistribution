@@ -22,7 +22,7 @@ class FollowManager(models.Manager):
         return followings
 
     def followers(self, user):
-        qs = Follow.objects.filter(followings=user).all()
+        qs = Follow.objects.filter(followee=user).all()
         followers = [_.follower for _ in qs]
         return followers
 
@@ -36,7 +36,7 @@ class FollowManager(models.Manager):
 
     def request(self, user):
         qs = (Request.objects.select_related("from_user", "to_user").filter(to_user=user).all())
-        requests = list(qs)
+        requests = [_.from_user for _ in qs]
         return requests
 
     def sent_request(self, user):
@@ -58,8 +58,13 @@ class FollowManager(models.Manager):
             raise AlreadyExistsError("User has sent the follow request.")
 
         request, created = Request.objects.get_or_create(from_user=from_user, to_user=to_user)
+        print("Create request!")
         if created is False:
             raise AlreadyExistsError("User has sent the follow request.")
+        else:
+            print("Work!")
+            request.title = request.__str__()
+            request.save()
 
         request_create.send(sender=request)
         return request
@@ -81,7 +86,8 @@ class FollowManager(models.Manager):
 
     def check_follow(self, follower, followee):
         try:
-            relation = Follow.objects.get(follower=follower, followee=followee)
+            relation = Follow.objects.get(follower__username=follower, followee__username=followee)
+            print("Not follow yet")
             return True
         except Follow.DoesNotExist:
             return False
@@ -119,7 +125,6 @@ class Follow(models.Model):
             follow_reverse = Follow.objects.get(follower=self.followee, followee=self.follower)
             self.true_friend = True
             follow_reverse.true_friend = True
-            follow_reverse.save()
         except Follow.DoesNotExist:
             pass
         super().save(*args, **kwargs)
@@ -128,7 +133,9 @@ class Follow(models.Model):
 class Request(models.Model):
     from_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="from_user")
     to_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="to_user")
+    title = models.CharField(max_length=512, default="")
     created = models.DateTimeField(default=timezone.now)
+    objects = FollowManager()
 
     class Meta:
         unique_together = ("from_user", "to_user")
@@ -141,7 +148,7 @@ class Request(models.Model):
             raise ValidationError("User cannot request to follow themselves.")
         try:
             follow_check = Follow.objects.get(follower=self.from_user, followee=self.to_user)
-            raise ValidationError("User have already followed.")
+            raise AlreadyExistsError("User have already followed.")
         except Follow.DoesNotExist:
             pass
         super().save(*args, **kwargs)
@@ -162,7 +169,6 @@ class Request(models.Model):
             relation.save()
         except Follow.DoesNotExist:
             pass
-
         self.delete()
         return True
 
