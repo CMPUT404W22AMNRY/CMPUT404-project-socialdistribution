@@ -6,8 +6,10 @@ from django.contrib.auth import get_user_model
 # Create your views here.
 USER_MODEL = get_user_model()
 
+
 def get_follow_list():
     return getattr(settings, "FOLLOW_LIST", "users")
+
 
 def all_users_list(request):
     users = USER_MODEL.objects.all()
@@ -19,12 +21,13 @@ def all_users_list(request):
     request_list = Request.objects.request(user=request.user)
     print(request_list)
     return render(
-        request, template_name="./all_users.html", context={get_follow_list(): list(set(user_list) - set(followings)), 
-            "followings": followings,
-            "followers": followers,
-            "request_list": request_list
-        }
+        request, template_name="./all_users.html", context={get_follow_list(): list(set(user_list) - set(followings)),
+                                                            "followings": followings,
+                                                            "followers": followers,
+                                                            "request_list": request_list
+                                                            }
     )
+
 
 def create_follow_request(request, to_username):
     payload = {"to_username": to_username}
@@ -38,9 +41,10 @@ def create_follow_request(request, to_username):
         except ValidationError as e2:
             payload["error"] = str(e2)
         else:
-            return redirect("/") # TODO need to be update
+            return redirect("/")  # TODO need to be update
 
     return render(request, template_name='./create_follow_request.html', context=payload)
+
 
 def accept_follow_request(request, from_username):
     payload = {"from_username": from_username}
@@ -56,8 +60,9 @@ def accept_follow_request(request, from_username):
         except ValidationError as e2:
             payload["error"] = str(e2)
         else:
-            return redirect("/") # TODO need to be update
-    return render(request, template_name='./accept_follow_request.html', context=payload)  
+            return redirect("/")  # TODO need to be update
+    return render(request, template_name='./accept_follow_request.html', context=payload)
+
 
 def reject_follow_request(request, from_username):
     payload = {"from_username": from_username}
@@ -70,8 +75,9 @@ def reject_follow_request(request, from_username):
         except ValidationError as e2:
             payload["error"] = str(e2)
         else:
-            return redirect("/") # TODO need to be update
-    return render(request, template_name='./reject_follow_request.html', context=payload)    
+            return redirect("/")  # TODO need to be update
+    return render(request, template_name='./reject_follow_request.html', context=payload)
+
 
 def unfollow_request(request, from_username):
     payload = {"from_username": from_username}
@@ -85,8 +91,9 @@ def unfollow_request(request, from_username):
         except ValidationError as e2:
             payload["error"] = str(e2)
         else:
-            return redirect("/") # TODO need to be update
+            return redirect("/")  # TODO need to be update
     return render(request, template_name='./unfollow_request.html', context=payload)
+
 
 def remove_follow_request(request, to_username):
     payload = {"to_username": to_username}
@@ -100,5 +107,5 @@ def remove_follow_request(request, to_username):
         except ValidationError as e2:
             payload["error"] = str(e2)
         else:
-            return redirect("/") # TODO need to be update
+            return redirect("/")  # TODO need to be update
     return render(request, template_name='./remove_follow_request.html', context=payload)

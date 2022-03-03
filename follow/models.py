@@ -174,7 +174,7 @@ class Request(models.Model):
 
     def reject(self):
         self.delete()
-        #request_reject.send(sender=self)
+        # request_reject.send(sender=self)
         return True
 
     def cancel(self):
