@@ -21,6 +21,7 @@
             <li>
                 {% if user %}
                     {{following}}
+                    <a href="{% url 'follow:remove_follow_request' following %}">Stop following</a>
                 {% endif %}
             </li>
         {% endfor %}
@@ -29,6 +30,7 @@
             <li>
                 {% if user %}
                     {{follower}}
+                    <a href="{% url 'follow:unfollow_request' follower %}">Remove Follower</a>
                 {% endif %}
             </li>
         {% endfor %}
@@ -36,6 +38,7 @@
         {% for request in request_list %}
             <li>
                 <a href="{% url 'follow:accept_follow_request' request %}">Accept request from {{request}}</a>
+                <a href="{% url 'follow:reject_follow_request' request %}">Reject</a>
             </li>
         {% endfor %}
     </body>

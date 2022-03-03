@@ -74,7 +74,8 @@ class FollowManager(models.Manager):
             try:
                 true_friend_bidirect = Follow.objects.get(follower=followee, followee=follower)
                 if relation.true_friend and true_friend_bidirect.true_friend:
-                    true_friend_bidirect.true_friend = True
+                    print("Yes friend")
+                    true_friend_bidirect.true_friend = False
                     true_friend_bidirect.save()
             except Follow.DoesNotExist:
                 pass
@@ -173,7 +174,7 @@ class Request(models.Model):
 
     def reject(self):
         self.delete()
-        request_reject.send(sender=self)
+        #request_reject.send(sender=self)
         return True
 
     def cancel(self):
