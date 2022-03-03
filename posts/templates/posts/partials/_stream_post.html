@@ -15,8 +15,10 @@
                         {{ post.content }}
                     </p>
                 {% elif post.content_type == 'image/png;base64' or post.content_type == 'image/jpeg;base64' %}
-                    {% if post.imgContent is not None %}
+                    {% if post.imgContent %}
 						<img src="{{ post.imgContent.url }}" height="auto" width="100%" alt="alt"/>
+					{% else %}
+						<img src="{{ post.content }}" height="auto" width="100%" alt="alt"/>
 					{% endif %}
                 {% endif %}
             </tr>
