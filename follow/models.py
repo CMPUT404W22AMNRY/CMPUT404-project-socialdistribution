@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
-from django.utils import timezone
 from follow.signals import (
     request_create,
     request_reject,
@@ -108,7 +107,7 @@ class FollowManager(models.Manager):
 class Follow(models.Model):
     followee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="followee")
     follower = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="follower")
-    created = models.DateTimeField(default=timezone.now)
+    created = models.DateTimeField(auto_now_add=True)
     true_friend = models.BooleanField(default=False)
     objects = FollowManager()
 
@@ -134,7 +133,7 @@ class Request(models.Model):
     from_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="from_user")
     to_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="to_user")
     title = models.CharField(max_length=512, default="")
-    created = models.DateTimeField(default=timezone.now)
+    created = models.DateTimeField(auto_now_add=True)
     objects = FollowManager()
 
     class Meta:
