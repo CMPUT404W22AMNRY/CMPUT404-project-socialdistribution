@@ -37,7 +37,7 @@ class Post(models.Model):
     categories = models.ManyToManyField(Category, blank=True)
 
     def get_absolute_url(self):
-            return reverse('posts:detail', kwargs={'pk': self.id})
+        return reverse('posts:detail', kwargs={'pk': self.id})
 
 
 class Comment(models.Model):
