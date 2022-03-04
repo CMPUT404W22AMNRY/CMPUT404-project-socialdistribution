@@ -1,0 +1,46 @@
+{% extends "base.html" %} {% block content %}
+<style>
+	img{
+		width: 250px;
+		height: 250px;
+		border-color: #111;
+		border-width: 1;
+		border: rgb(17, 56, 139);
+		border-radius: 50%;
+	}
+</style>
+<div class="container">
+	<h1>Full Name: {{object.get_full_name}}</h1>
+	<div class="intro">
+		<div>
+			<img id="profilephoto" class='center' src="{{ object.profile_image_url }}"  alt="profile photo">
+
+		</div>
+
+		<h2>
+			Username: {{ object.username }}
+		</h2>
+		<h2>
+			Github: {{ object.github_url }}
+		</h2>
+	</div>
+	<ul>
+		<li><a href="{% url 'posts:new' %}">New post</a></li>
+		<li><a href="">Friend Requests</a></li>
+		<!-- <li><a href="/socialdistribution/user_profile.html">Profile</a></li> -->
+	</ul>
+	<h2>Posts</h2>
+	<div class="post">
+		<ul>
+			{% for post in object_list %}
+				{% include "posts/partials/_stream_post.html" %}
+			{% empty %}
+				<li> No posts yet. </li>
+			{% endfor %}
+		</ul>
+	</div>
+
+	
+
+</div>
+{% endblock content %}
