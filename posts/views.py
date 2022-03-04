@@ -64,7 +64,8 @@ class PostDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         try:
-            context['has_liked'] = Like.objects.get(author=self.request.user, post=self.get_object())
+            Like.objects.get(author=self.request.user, post=self.get_object())
+            context['has_liked'] = True
         except Like.DoesNotExist:
             pass
         return context
@@ -100,5 +101,9 @@ class MyPostsView(LoginRequiredMixin, ListView):
 def like_post_view(request: HttpRequest, pk: int):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
-    Like.objects.create(author_id=request.user.id, post_id=pk)
+
+    try:
+        Like.objects.get(author_id=request.user.id, post_id=pk)
+    except Like.DoesNotExist:
+        Like.objects.create(author_id=request.user.id, post_id=pk)
     return redirect(Post.objects.get(pk=pk).get_absolute_url())
