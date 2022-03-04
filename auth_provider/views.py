@@ -37,6 +37,7 @@ class EditProfileView(UpdateView):
     def get_object(self):
         return self.request.user
 
+
 def logout_view(request):
     logout(request)
     return redirect('/')
