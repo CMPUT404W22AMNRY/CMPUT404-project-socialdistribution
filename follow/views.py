@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.generic.list import ListView
 from follow.models import AlreadyExistsError, Follow, Request
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -27,7 +28,7 @@ def create_follow_request(request, to_username):
         except ValidationError as e2:
             payload["error"] = str(e2)
         else:
-            return redirect("/")  # TODO need to be update
+            return redirect(to_user.get_absolute_url())
 
     return render(request, template_name='./create_follow_request.html', context=payload)
 
@@ -46,7 +47,7 @@ def accept_follow_request(request, from_username):
         except ValidationError as e2:
             payload["error"] = str(e2)
         else:
-            return redirect("/")  # TODO need to be update
+            return redirect(from_user.get_absolute_url())
     return render(request, template_name='./accept_follow_request.html', context=payload)
 
 
@@ -61,7 +62,7 @@ def reject_follow_request(request, from_username):
         except ValidationError as e2:
             payload["error"] = str(e2)
         else:
-            return redirect("/")  # TODO need to be update
+            return redirect(from_user.get_absolute_url())
     return render(request, template_name='./reject_follow_request.html', context=payload)
 
 
@@ -76,7 +77,7 @@ def unfollow_request(request, from_username):
         except ValidationError as e2:
             payload["error"] = str(e2)
         else:
-            return redirect("/")  # TODO need to be update
+            return redirect(from_user.get_absolute_url())
     return render(request, template_name='./unfollow_request.html', context=payload)
 
 
