@@ -78,18 +78,32 @@ a:hover {
   text-align: center;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
 h1 {
-  text-align: center;
   font-size: 300%;
-  font-family: "Courier New", Courier, monospace;
+  margin-bottom: 0.3rem;
 }
 
 h2 {
   font-size: 250%;
+  margin-bottom: 0.2rem;
 }
 
 h3 {
   font-size: 150%;
+}
+
+.subtitle {
+  color: hsl(0, 0%, 30%);
+  font-weight: normal;
 }
 
 /* App Bar */
@@ -138,4 +152,8 @@ nav ul {
 .center {
   display: grid;
   place-items: center;
+}
+
+section {
+  margin-bottom: 2rem;
 }
