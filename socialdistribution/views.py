@@ -1,10 +1,9 @@
 from pprint import isreadable
 from django.urls import reverse_lazy, reverse
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.views.generic.list import ListView
 from auth_provider.models import User
-from django.views.generic.edit import CreateView
 from django.views.generic.detail import DetailView
 
 from posts.models import Post
