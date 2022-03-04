@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render
+from django.views.generic.list import ListView
 from follow.models import AlreadyExistsError, Follow, Request
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import get_user_model
-# Create your views here.
+
 USER_MODEL = get_user_model()
 
 
@@ -109,3 +111,12 @@ def remove_follow_request(request, to_username):
         else:
             return redirect("/")  # TODO need to be update
     return render(request, template_name='./remove_follow_request.html', context=payload)
+
+
+class FriendRequestsView(LoginRequiredMixin, ListView):
+    model = Request
+    paginate_by = 100
+    template_name = 'follow/request_list.html'
+
+    def get_queryset(self):
+        return Request.objects.request(user=self.request.user)
