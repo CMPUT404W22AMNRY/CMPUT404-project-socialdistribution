@@ -1,9 +1,12 @@
 from distutils.command.upload import upload
 from django.db import models
 from django.db.models.fields.files import ImageField
+from django.forms import ValidationError
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
+
+from lib.url import is_url_valid_image
 
 STR_MAX_LENGTH = 512
 
@@ -36,8 +39,27 @@ class Post(models.Model):
     unlisted = models.BooleanField()
     categories = models.ManyToManyField(Category, blank=True)
 
+    def clean(self):
+        print("clean!!!")
+        # Ensure that either the content is a link to image, or they uploaded one
+        if self.content_type == ContentType.PNG or self.content_type == ContentType.JPG:
+            print('content is image')
+            print(self.imgContent)
+            if (not self.imgContent):
+                print('imgcontnet is None')
+                if (not is_url_valid_image(self.content)):
+                    print('url not valid image')
+                    raise ValidationError(
+                        _('You must upload an image or link to a valid image url in the \'Content\' field.'))
+
+
     def get_absolute_url(self):
         return reverse('posts:detail', kwargs={'pk': self.id})
+
+    def save(self, *args, **kwargs):
+        print('save')
+        self.clean()
+        return super(Post, self).save(*args, **kwargs)
 
 
 class Comment(models.Model):
