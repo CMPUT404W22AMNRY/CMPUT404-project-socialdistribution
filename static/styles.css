@@ -30,6 +30,13 @@ select {
   font-family: inherit;
 }
 
+input:not([type="submit"]):focus,
+textarea:focus {
+  transition: 0.2s background-color;
+  background-color: #ddd;
+  outline: none;
+}
+
 textarea {
   resize: none;
   background-color: #f1f1f1;
@@ -46,13 +53,6 @@ form td {
 
 form td > * {
   flex-grow: 1;
-}
-
-input:not([type="submit"]):focus,
-textarea:focus {
-  transition: 0.2s background-color;
-  background-color: #ddd;
-  outline: none;
 }
 
 /* Overwrite default styles of hr */
