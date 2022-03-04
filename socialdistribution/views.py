@@ -1,7 +1,7 @@
-from pprint import isreadable
 from django.urls import reverse_lazy, reverse
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.list import ListView
 
 from posts.models import Post
@@ -13,7 +13,7 @@ def root(request: HttpRequest) -> HttpResponse:
     return redirect(reverse('stream'))
 
 
-class StreamView(ListView):
+class StreamView(LoginRequiredMixin, ListView):
     model = Post
     paginate_by = 100
     template_name = 'stream.html'
