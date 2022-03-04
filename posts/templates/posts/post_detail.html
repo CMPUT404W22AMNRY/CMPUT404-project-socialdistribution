@@ -42,14 +42,14 @@
         <a href="{% url 'posts:edit' object.id %}">Edit post</a>
       </li>
       {% endif %}
+      {% if has_liked is not True %}
       <li>
-        {% if has_liked is not True %}
         <form method="POST" action="{% url 'posts:like' object.id %}">
           {% csrf_token %}
           <input type="submit" value="Like" class="link">
         </form>
-        {% endif %}
       </li>
+      {% endif %}
     </ul>
   </section>
 </div>
