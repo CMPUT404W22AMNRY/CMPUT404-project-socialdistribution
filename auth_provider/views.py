@@ -46,11 +46,11 @@ class ProfileView(DetailView):
                 return None
             return {
                 'name': user_action[0],
-                'link': user_action[1]
+                'link': user_action[1],
             }
 
-        context['user_actions'] = filter(lambda x: x is not None, [get_action(user_action_generator)
-                                                                   for user_action_generator in user_action_generators])
+        context['user_actions'] = [get_action(user_action_generator)
+                                   for user_action_generator in user_action_generators]
 
         return context
 
