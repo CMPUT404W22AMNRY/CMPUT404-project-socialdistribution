@@ -6,20 +6,19 @@
 		<li>
 			<a href="{% url 'follow:view_all_users' %}">All users</a>
 		</li>
-		<li>
-			<a href="{% url 'posts:my-posts' %}">My posts</a>
-		</li>
 	</ul>
 </section>
 
 <section>
 	<h1>Posts</h1>
-	<ul>
+	<ul class="no-indent large-gap">
 	  <li>
 		<a href="{% url 'posts:new' %}">New post</a>
 	  </li>
 	  {% for post in object_list %}
-		  {% include "posts/partials/_stream_post.html" %}
+		<li>
+			{% include "posts/partials/_stream_post.html" %}
+		</li>
 	  {% empty %}
 		  <li>No posts yet.</li>
 	  {% endfor %}
