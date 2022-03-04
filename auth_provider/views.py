@@ -37,6 +37,20 @@ class ProfileView(DetailView):
     def get_context_object_name(self, obj: Any) -> Optional[str]:
         return 'object'
 
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        def get_action(user_action_generator: UserActionGenerator):
+            user_action = user_action_generator(self.request.user, self.get_object())
+            return {
+                'name': user_action[0],
+                'link': user_action[1]
+            }
+
+        context['user_actions'] = [get_action(user_action_generator)
+                                   for user_action_generator in user_action_generators]
+        return context
+
 
 class EditProfileView(UpdateView):
     form_class = EditProfileForm

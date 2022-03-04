@@ -1,7 +1,5 @@
-from unicodedata import name
 from django.urls import path
 from .views import (
-    all_users_list,
     create_follow_request,
     accept_follow_request,
     unfollow_request,
@@ -12,10 +10,10 @@ from .views import (
 
 app_name = 'follow'
 urlpatterns = [
-    path('users/request/<slug:to_username>/', view=create_follow_request, name='create_follow_request'),
-    path('users/accept/<slug:from_username>', view=accept_follow_request, name='accept_follow_request'),
-    path('users/unfollow/<slug:from_username>', view=unfollow_request, name='unfollow_request'),
-    path('users/removefollow/<slug:to_username>', view=remove_follow_request, name='remove_follow_request'),
-    path('users/reject/<slug:from_username>', view=reject_follow_request, name='reject_follow_request'),
+    path('users/<slug:to_username>/request/', view=create_follow_request, name='create_follow_request'),
+    path('users/<slug:from_username>/accept/', view=accept_follow_request, name='accept_follow_request'),
+    path('users/<slug:from_username>/unfollow/', view=unfollow_request, name='unfollow_request'),
+    path('users/<slug:to_username>/removefollow/', view=remove_follow_request, name='remove_follow_request'),
+    path('users/<slug:from_username>/reject/', view=reject_follow_request, name='reject_follow_request'),
     path('', view=UsersView.as_view(), name='users'),
 ]

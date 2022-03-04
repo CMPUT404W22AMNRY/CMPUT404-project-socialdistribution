@@ -10,6 +10,9 @@ from follow.signals import (
 )
 
 
+USER_MODEL = get_user_model()
+
+
 class AlreadyExistsError(IntegrityError):
     pass
 
@@ -84,7 +87,7 @@ class FollowManager(models.Manager):
         except Follow.DoesNotExist:
             return False
 
-    def check_follow(self, follower, followee):
+    def check_follow(self, follower: str, followee: str):
         try:
             relation = Follow.objects.get(follower__username=follower, followee__username=followee)
             print("Not follow yet")

@@ -8,5 +8,18 @@
 <div class="card">
   {% include 'profile/partials/_summary.html' %}
 
+  <section id="actions">
+    <h3>Actions</h3>
+    <ul class="no-indent">
+      {% for user_action in user_actions %}
+      <li>
+        <form method="post" action="{{ user_action.link }}">
+          {% csrf_token %}
+          <input type="submit" value="{{ user_action.name }}" class="primarybtn" />
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
 </div>
 {% endblock content %}
