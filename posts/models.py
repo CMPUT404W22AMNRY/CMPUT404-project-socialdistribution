@@ -40,18 +40,11 @@ class Post(models.Model):
     categories = models.ManyToManyField(Category, blank=True)
 
     def clean(self):
-        print("clean!!!")
         # Ensure that either the content is a link to image, or they uploaded one
         if self.content_type == ContentType.PNG or self.content_type == ContentType.JPG:
-            print('content is image')
-            print(self.imgContent)
-            if (not self.imgContent):
-                print('imgcontnet is None')
-                if (not is_url_valid_image(self.content)):
-                    print('url not valid image')
-                    raise ValidationError(
-                        _('You must upload an image or link to a valid image url in the \'Content\' field.'))
-
+            if (not self.imgContent and not is_url_valid_image(self.content)):
+                raise ValidationError(
+                    _('You must upload an image or link to a valid image url in the \'Content\' field.'))
 
     def get_absolute_url(self):
         return reverse('posts:detail', kwargs={'pk': self.id})
