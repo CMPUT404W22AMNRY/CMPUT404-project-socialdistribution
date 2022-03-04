@@ -3,6 +3,7 @@ body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
 }
+
 /* Add padding to containers */
 .container {
   max-width: 80ch;
@@ -55,13 +56,13 @@ hr {
 
 /* Add a blue text color to links */
 a {
-  color: hsl(210, 100%, 56%);
+  color: dodgerblue;
   text-decoration: none;
   transition: 0.2s color;
 }
 
 a:hover {
-  color: hsl(210, 100%, 70%);
+  color: hsl(209.6, 100%, 70%);
 }
 
 .alert {
@@ -89,4 +90,52 @@ h2 {
 
 h3 {
   font-size: 150%;
+}
+
+/* App Bar */
+
+.app_bar {
+  padding-top: 1rem;
+  box-shadow: 0 0 2em rgba(0, 0, 0, 0.3);
+}
+
+nav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+nav ul {
+  display: flex;
+  flex-direction: row;
+  gap: 2em;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.app_bar a {
+  color: hsl(0, 0%, 0%);
+  transition: 0.2s color;
+}
+
+.app_bar a:hover {
+  color: dodgerblue;
+}
+
+.app_bar h2 {
+  margin: 0;
+}
+
+/* Content */
+
+#content {
+  max-width: 80ch;
+  margin: 3em auto;
+}
+
+.center {
+  display: grid;
+  place-items: center;
 }
