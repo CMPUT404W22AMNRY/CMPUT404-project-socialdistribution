@@ -24,7 +24,6 @@ input:not[type="submit"],
 textarea,
 select {
   padding: 1rem;
-  width: -webkit-fill-available;
   font-size: 100%;
   border: none;
   background-color: #f1f1f1;
@@ -36,7 +35,20 @@ textarea {
   background-color: #f1f1f1;
 }
 
-input:not[type="submit"]:focus,
+form th {
+  text-align: right;
+  margin-right: 1rem;
+}
+
+form td {
+  display: flex;
+}
+
+form td > * {
+  flex-grow: 1;
+}
+
+input:focus,
 textarea:focus {
   transition: 0.2s background-color;
   background-color: #ddd;
@@ -219,7 +231,7 @@ ul.large-gap > li {
 
 .pill {
   border-radius: 8rem;
-  background-color: gray;
+  background-color: dodgerblue;
   padding: 0.5rem;
   color: white;
 }
