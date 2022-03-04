@@ -56,8 +56,13 @@ hr {
 
 /* Add a blue text color to links */
 a {
-  color: dodgerblue;
+  color: hsl(209.6,	100%,	55.88%);
   text-decoration: none;
+  transition: .2s color;
+}
+
+a:hover {
+  color: hsl(209.6,	100%,	70%);
 }
 
 .alert {
