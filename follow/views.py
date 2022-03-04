@@ -99,7 +99,6 @@ def remove_follow_request(request, to_username):
 
 class UsersView(LoginRequiredMixin, ListView):
     model = USER_MODEL
-    paginate_by = 100
     template_name = 'follow/user_list.html'
 
     def get_queryset(self):
