@@ -15,24 +15,6 @@ def get_follow_list():
     return getattr(settings, "FOLLOW_LIST", "users")
 
 
-def all_users_list(request):
-    users = USER_MODEL.objects.all()
-    user_list = [_.username for _ in users if _.username != request.user.username]
-    print(user_list)
-
-    followings = Follow.objects.followings(user=request.user)
-    followers = Follow.objects.followers(user=request.user)
-    request_list = Request.objects.request(user=request.user)
-    print(request_list)
-    return render(
-        request, template_name="./all_users.html", context={get_follow_list(): list(set(user_list) - set(followings)),
-                                                            "followings": followings,
-                                                            "followers": followers,
-                                                            "request_list": request_list
-                                                            }
-    )
-
-
 def create_follow_request(request, to_username):
     payload = {"to_username": to_username}
     if request.method == 'POST':
