@@ -60,11 +60,9 @@ class FollowManager(models.Manager):
             raise AlreadyExistsError("User has sent the follow request.")
 
         request, created = Request.objects.get_or_create(from_user=from_user, to_user=to_user)
-        print("Create request!")
         if created is False:
             raise AlreadyExistsError("User has sent the follow request.")
         else:
-            print("Work!")
             request.title = request.__str__()
             request.save()
 
@@ -77,7 +75,6 @@ class FollowManager(models.Manager):
             try:
                 true_friend_bidirect = Follow.objects.get(follower=followee, followee=follower)
                 if relation.true_friend and true_friend_bidirect.true_friend:
-                    print("Yes friend")
                     true_friend_bidirect.true_friend = False
                     true_friend_bidirect.save()
             except Follow.DoesNotExist:
@@ -89,8 +86,7 @@ class FollowManager(models.Manager):
 
     def check_follow(self, follower: str, followee: str):
         try:
-            relation = Follow.objects.get(follower__username=follower, followee__username=followee)
-            print("Not follow yet")
+            Follow.objects.get(follower__username=follower, followee__username=followee)
             return True
         except Follow.DoesNotExist:
             return False
