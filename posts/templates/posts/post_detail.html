@@ -49,6 +49,13 @@
           <input type="submit" value="Like" class="link">
         </form>
       </li>
+      {% else %}
+      <li>
+        <form method="POST" action="{% url 'posts:unlike' object.id %}">
+          {% csrf_token %}
+          <input type="submit" value="Unlike" class="link">
+        </form>
+      </li>
       {% endif %}
     </ul>
   </section>

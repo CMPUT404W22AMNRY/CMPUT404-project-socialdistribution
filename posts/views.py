@@ -107,3 +107,15 @@ def like_post_view(request: HttpRequest, pk: int):
     except Like.DoesNotExist:
         Like.objects.create(author_id=request.user.id, post_id=pk)
     return redirect(Post.objects.get(pk=pk).get_absolute_url())
+
+
+def unlike_post_view(request: HttpRequest, pk: int):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+
+    try:
+        like = Like.objects.get(author_id=request.user.id, post_id=pk)
+        like.delete()
+    except Like.DoesNotExist:
+        pass
+    return redirect(Post.objects.get(pk=pk).get_absolute_url())
