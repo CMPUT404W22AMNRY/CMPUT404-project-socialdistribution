@@ -1,9 +1,9 @@
-from typing import Callable
+from typing import Callable, Optional
 
 from .models import User
 
 # Holds the name, and link of an action
-UserAction = tuple[str, str]
+UserAction = Optional[tuple[str, str]]
 # Generates a UserAction when called with current_user and target_user
 UserActionGenerator = Callable[[User, User], UserAction]
 

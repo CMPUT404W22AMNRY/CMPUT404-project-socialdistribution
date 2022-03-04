@@ -1,3 +1,4 @@
+from typing import Optional
 from django.contrib import admin
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -22,16 +23,16 @@ admin.site.register(Follow, FollowAdmin)
 admin.site.register(Request, RequestAdmin)
 
 
-def AddFriendAction(current_user: USER_MODEL, target_user: USER_MODEL) -> str:
+def AddFriendAction(current_user: USER_MODEL, target_user: USER_MODEL) -> Optional[tuple[str, str]]:
     if Follow.objects.check_follow(follower=current_user, followee=target_user):
-        return ('', '')
+        return None
     try:
         Request.objects.get(
             from_user=current_user,
             to_user=target_user)
     except Request.DoesNotExist:
         return ('Add friend', reverse('follow:create_follow_request', kwargs={'to_username': target_user.username}))
-    return ('', '')
+    return None
 
 
 user_action_generators.register(AddFriendAction)

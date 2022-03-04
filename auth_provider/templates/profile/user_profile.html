@@ -8,6 +8,7 @@
 <div class="card">
   {% include 'profile/partials/_summary.html' %}
 
+  {% if user_actions|length > 0 %}
   <section id="actions">
     <h3>Actions</h3>
     <ul class="no-indent">
@@ -21,5 +22,6 @@
       {% endfor %}
     </ul>
   </section>
+  {% endif %}
 </div>
 {% endblock content %}
