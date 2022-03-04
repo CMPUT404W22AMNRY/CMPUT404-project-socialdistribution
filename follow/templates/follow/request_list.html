@@ -1,0 +1,11 @@
+{% extends "base.html" %} {% block content %}
+
+<h1>Friend requests</h1>
+
+{% for object in object_list %}
+{% include "follow/partial_friend_request.html" %}
+{% empty %}
+<li>No friend requests yet.</li>
+{% endfor %}
+
+{% endblock %}

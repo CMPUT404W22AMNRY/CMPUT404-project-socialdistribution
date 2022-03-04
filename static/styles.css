@@ -19,18 +19,26 @@ body {
 }
 
 /* Full-width input fields */
-input[type="text"],
-input[type="password"] {
-  width: 100%;
-  padding: 15px;
-  margin: 5px 0 22px 0;
-  display: inline-block;
+
+input,
+textarea,
+select {
+  padding: 1rem;
+  width: -webkit-fill-available;
+  font-size: 100%;
   border: none;
-  background: #f1f1f1;
+  background-color: #f1f1f1;
+  font-family: inherit;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
+textarea {
+  resize: none;
+  background-color: #f1f1f1;
+}
+
+input:focus,
+textarea:focus {
+  transition: 0.2s background-color;
   background-color: #ddd;
   outline: none;
 }
@@ -50,11 +58,11 @@ hr {
   border: none;
   cursor: pointer;
   width: 100%;
-  opacity: 0.9;
+  transition: 0.2s filter;
 }
 
 .primarybtn:hover {
-  opacity: 1;
+  filter: brightness(120%);
 }
 
 /* Add a blue text color to links */
@@ -73,12 +81,6 @@ a:hover {
   text-align: center;
   font-family: Arial;
   font-size: 15;
-}
-
-/* Set a grey background color and center the text of the "sign in" section */
-.note {
-  background-color: #f1f1f1;
-  text-align: center;
 }
 
 h1,
@@ -165,7 +167,7 @@ section:not(:last-child) {
 
 .card {
   background-color: white;
-  padding: 1rem;
+  padding: 3rem;
   box-shadow: 0 0.5rem 0.5rem hsla(0, 0%, 0%, 0.3);
   transition: 0.2s transform, 0.2s box-shadow;
 }
@@ -176,7 +178,8 @@ section:not(:last-child) {
 }
 
 /* https://stackoverflow.com/questions/9620594/removing-ul-indentation-with-css */
-ul.no-indent, ol.no-indent {
+ul.no-indent,
+ol.no-indent {
   padding: 0;
   list-style-type: none;
 }
@@ -196,4 +199,22 @@ ol.horizontal {
   display: flex;
   flex-direction: row;
   gap: 2rem;
+}
+
+.gutter-bottom {
+  margin-bottom: 1rem;
+}
+
+.helptext {
+  font-size: 80%;
+  color: gray;
+}
+
+form > table {
+  width: 100%;
+}
+
+form > table td,
+form > table th {
+  padding-bottom: 1rem;
 }
