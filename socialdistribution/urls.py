@@ -26,6 +26,5 @@ urlpatterns = [
     path('follow/', include('follow.urls')),
     path('admin/', admin.site.urls),
     path('accounts/', include('auth_provider.urls')),
-    path('accounts/profile/', views.ProfileView.as_view(), name='user_profile'),
     path('api/v1/', include('api.urls')),
 ]
