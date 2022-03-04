@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from .forms import SignUpForm, EditProfileForm
-from django.shortcuts import redirect
 
 
 class SignUpView(CreateView):
