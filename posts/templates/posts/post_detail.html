@@ -6,11 +6,11 @@
   {% if object.content_type == 'text/plain' %}
   <p>{{ object.content }}</p>
   {% elif object.content_type == 'image/png;base64' or object.content_type == 'image/jpeg;base64' %}
-    {% if object.imgContent %}
-    <img src="{{ object.imgContent.url }}" height="auto" width="100%" alt="alt" />
-    {% else %}
-    <img src="{{ object.content }}" height="auto" width="100%" alt="alt" />
-    {% endif %}
+  {% if object.imgContent %}
+  <img src="{{ object.imgContent.url }}" height="auto" width="100%" alt="alt" />
+  {% else %}
+  <img src="{{ object.content }}" height="auto" width="100%" alt="alt" />
+  {% endif %}
   {% endif %}
 
   <section id="categories">
@@ -24,11 +24,10 @@
   <section>
     <h3>Comments</h3>
     <a href="{% url 'posts:new-comment' object.id %}">New comment</a>
-    <ul>
-      {% for comment in object.comment_set.all %}
+    <ul class="no-indent">
+      {% for comment in object.comment_set.all|dictsort:'date_published' reversed %}
       <li>
-        <p>{{ comment.comment }}</p>
-        <p>{{ comment.author.get_full_name }}</p>
+        {% include 'posts/partials/_comment.html' %}
       </li>
       {% endfor %}
     </ul>
