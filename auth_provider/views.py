@@ -5,8 +5,9 @@ from django.contrib.auth import get_user_model, logout
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
 
-from auth_provider.user_resources import user_resources
+from .user_resources import user_resources
 from .forms import SignUpForm, EditProfileForm
+from .user_action_generators import UserActionGenerator, user_action_generators
 
 
 class SignUpView(CreateView):
@@ -17,7 +18,7 @@ class SignUpView(CreateView):
 
 class MyProfileView(DetailView):
     model = get_user_model()
-    template_name = 'profile/user_profile.html'
+    template_name = 'profile/my_profile.html'
 
     def get_object(self):
         return self.request.user
