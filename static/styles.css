@@ -159,7 +159,7 @@ nav ul {
   place-items: center;
 }
 
-section:not(:nth-last-child()) {
+section:not(:last-child) {
   margin-bottom: 2rem;
 }
 
