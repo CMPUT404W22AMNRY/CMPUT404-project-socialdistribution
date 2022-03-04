@@ -49,8 +49,13 @@ class ProfileView(DetailView):
                 'link': user_action[1],
             }
 
-        context['user_actions'] = [get_action(user_action_generator)
-                                   for user_action_generator in user_action_generators]
+        # TODO: Clean this up with a lambda
+        actions = [get_action(user_action_generator)
+                   for user_action_generator in user_action_generators]
+        context['user_actions'] = []
+        for action in actions:
+            if action is not None:
+                context['user_actions'].append(action)
 
         return context
 

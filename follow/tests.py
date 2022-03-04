@@ -2,6 +2,8 @@ from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
+from follow.admin import AddFriendAction
+
 from .models import Follow
 
 
@@ -23,3 +25,21 @@ class FriendRequestsViewTests(TestCase):
         res = self.client.get(reverse('follow:friend_requests'))
 
         self.assertContains(res, self.alice.username)
+
+
+class AddFriendActionTests(TestCase):
+    def setUp(self) -> None:
+        self.bob = get_user_model().objects.create_user(username='bob', password='password')
+        self.alice = get_user_model().objects.create_user(username='alice', password='password')
+
+    def test_add_friend_enable_default(self):
+        self.assertIsNotNone(AddFriendAction(self.bob, self.alice))
+
+    def test_disabled_when_requested_already(self):
+        Follow.objects.follow_request(from_user=self.bob, to_user=self.alice)
+        self.assertIsNone(AddFriendAction(self.bob, self.alice))
+
+    def test_disabled_when_following_already(self):
+        request = Follow.objects.follow_request(from_user=self.bob, to_user=self.alice)
+        request.accept()
+        self.assertIsNone(AddFriendAction(self.bob, self.alice))
