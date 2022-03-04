@@ -40,5 +40,15 @@ def AddFriendAction(current_user: USER_MODEL, target_user: USER_MODEL) -> Option
 
 user_action_generators.register(AddFriendAction)
 
+
+def UnfollowAction(current_user: USER_MODEL, target_user: USER_MODEL) -> Optional[tuple[str, str]]:
+    if not Follow.objects.check_follow(follower=current_user, followee=target_user):
+        return None
+    return ('Unfollow', reverse('follow:unfollow_request', kwargs={'from_username': target_user.username}))
+
+
+user_action_generators.register(UnfollowAction)
+
+
 # Register Friends page to my profile page
 user_resources.register(resource_name='Friends', link_to_user_resource=reverse_lazy('follow:friends'))
