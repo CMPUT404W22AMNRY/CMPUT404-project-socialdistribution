@@ -1,8 +1,7 @@
 {% extends "base.html" %} {% block content %}
 <div class="card">
   <h2>{{ object.title }}</h2>
-  <h3 class="subtitle">{{ object.author }}</h3>
-
+  <h3 class="subtitle">{{ object.author.get_full_name }}</h3>
   {% if object.content_type == 'text/plain' %}
   <p>{{ object.content }}</p>
   {% elif object.content_type == 'image/png;base64' or object.content_type == 'image/jpeg;base64' %}
@@ -12,6 +11,8 @@
   <img src="{{ object.content }}" height="auto" width="100%" alt="alt" />
   {% endif %}
   {% endif %}
+
+  <p>{{ object.date_published }}</p>
 
   <section id="categories">
     <ol class="horizontal no-indent">
