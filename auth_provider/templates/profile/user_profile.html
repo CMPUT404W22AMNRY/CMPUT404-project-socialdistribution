@@ -1,21 +1,16 @@
 {% extends "base.html" %} {% block content %}
 <style>
   img {
-    width: 250px;
-    height: 250px;
-    border-color: #111;
-    border-width: 1;
-    border: rgb(17, 56, 139);
+    max-width: 250px;
     border-radius: 50%;
   }
 </style>
 
 <h1>Full Name: {{object.get_full_name}}</h1>
 <section class="intro">
-  <div>
+  <div class="center">
     <img
       id="profilephoto"
-      class="center"
       src="{{ object.profile_image_url }}"
       alt="profile photo"
     />

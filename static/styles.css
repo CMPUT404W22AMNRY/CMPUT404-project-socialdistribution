@@ -58,11 +58,11 @@ hr {
 a {
   color: dodgerblue;
   text-decoration: none;
-  transition: .2s color;
+  transition: 0.2s color;
 }
 
 a:hover {
-  color: hsl(209.6,	100%,	70%);
+  color: hsl(209.6, 100%, 70%);
 }
 
 .alert {
@@ -84,12 +84,11 @@ h1 {
   font-family: "Courier New", Courier, monospace;
 }
 
-
 /* App Bar */
 
 .app_bar {
   padding-top: 1rem;
-  box-shadow: 0 0 2em rgba(0, 0, 0, .3);
+  box-shadow: 0 0 2em rgba(0, 0, 0, 0.3);
 }
 
 nav {
@@ -126,4 +125,9 @@ nav ul {
 #content {
   max-width: 80ch;
   margin: 3em auto;
+}
+
+.center {
+  display: grid;
+  place-items: center;
 }
