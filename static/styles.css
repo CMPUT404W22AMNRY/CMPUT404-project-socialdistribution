@@ -20,7 +20,7 @@ body {
 
 /* Full-width input fields */
 
-input:not[type="submit"],
+input:not([type="submit"]),
 textarea,
 select {
   padding: 1rem;
@@ -36,7 +36,7 @@ textarea {
   background-color: #f1f1f1;
 }
 
-input:not[type="submit"]:focus,
+input:not([type="submit"]):focus,
 textarea:focus {
   transition: 0.2s background-color;
   background-color: #ddd;
