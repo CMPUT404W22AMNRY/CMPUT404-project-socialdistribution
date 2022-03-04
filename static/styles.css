@@ -20,7 +20,7 @@ body {
 
 /* Full-width input fields */
 
-input,
+input:not[type="submit"],
 textarea,
 select {
   padding: 1rem;
@@ -36,7 +36,7 @@ textarea {
   background-color: #f1f1f1;
 }
 
-input:focus,
+input:not[type="submit"]:focus,
 textarea:focus {
   transition: 0.2s background-color;
   background-color: #ddd;
@@ -84,14 +84,25 @@ hr {
 }
 
 /* Add a blue text color to links */
+
+input[type="submit"].link {
+  border: none;
+  background-color: inherit;
+  padding: 0;
+}
+
+input[type="submit"].link,
 a {
   color: dodgerblue;
   text-decoration: none;
   transition: 0.2s color;
+  font-size: 100%;
 }
 
+input[type="submit"].link:hover,
 a:hover {
   color: hsl(209.6, 100%, 70%);
+  cursor: pointer;
 }
 
 .alert {
