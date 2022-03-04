@@ -112,4 +112,4 @@ class FriendRequestsView(LoginRequiredMixin, ListView):
     template_name = 'follow/request_list.html'
 
     def get_queryset(self):
-        return Request.objects.request(user=self.request.user)
+        return Request.objects.filter(to_user=self.request.user)
