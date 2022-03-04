@@ -87,16 +87,16 @@ h1 {
 
 /* App Bar */
 
-nav {
-  display: flex;
-  flex-direction: row;
-}
-
 .app_bar {
   padding-top: 1rem;
   box-shadow: 0 0 2em rgba(0, 0, 0, .3);
 }
 
+nav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
 
 nav ul {
   display: flex;
@@ -106,6 +106,19 @@ nav ul {
   margin: 0;
   padding: 0;
   overflow: hidden;
+}
+
+.app_bar a {
+  color: hsl(0, 0%, 0%);
+  transition: 0.2s color;
+}
+
+.app_bar a:hover {
+  color: hsl(0, 0%, 30%);
+}
+
+.app_bar h2 {
+  margin: 0;
 }
 
 /* Content */
