@@ -56,7 +56,7 @@ hr {
 
 /* Add a blue text color to links */
 a {
-  color: hsl(209.6,	100%,	55.88%);
+  color: dodgerblue;
   text-decoration: none;
   transition: .2s color;
 }
@@ -114,7 +114,7 @@ nav ul {
 }
 
 .app_bar a:hover {
-  color: hsl(0, 0%, 30%);
+  color: dodgerblue;
 }
 
 .app_bar h2 {
