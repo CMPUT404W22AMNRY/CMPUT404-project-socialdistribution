@@ -2,8 +2,8 @@ html,
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-
 }
+
 /* Add padding to containers */
 .container {
   max-width: 80ch;
@@ -15,15 +15,9 @@ body {
   background-color: white;
 }
 
-/* content container */
-.post{
-  width: 80%;
-  margin: auto;
-  background-color: white;
-}
-
 /* Full-width input fields */
-input[type=text], input[type=password] {
+input[type="text"],
+input[type="password"] {
   width: 100%;
   padding: 15px;
   margin: 5px 0 22px 0;
@@ -32,7 +26,8 @@ input[type=text], input[type=password] {
   background: #f1f1f1;
 }
 
-input[type=text]:focus, input[type=password]:focus {
+input[type="text"]:focus,
+input[type="password"]:focus {
   background-color: #ddd;
   outline: none;
 }
@@ -61,10 +56,16 @@ hr {
 
 /* Add a blue text color to links */
 a {
-  color: dodgerblue;
+  color: hsl(209.6,	100%,	55.88%);
+  text-decoration: none;
+  transition: .2s color;
 }
 
-.alert{
+a:hover {
+  color: hsl(209.6,	100%,	70%);
+}
+
+.alert {
   color: red;
   text-align: center;
   font-family: Arial;
@@ -76,34 +77,40 @@ a {
   background-color: #f1f1f1;
   text-align: center;
 }
- 
-h1{
+
+h1 {
   text-align: center;
   font-size: 50px;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", Courier, monospace;
 }
 
-/* Nav bar stuff */
-ul {
+
+/* App Bar */
+
+nav {
+  display: flex;
+  flex-direction: row;
+}
+
+.app_bar {
+  padding-top: 1rem;
+  box-shadow: 0 0 2em rgba(0, 0, 0, .3);
+}
+
+
+nav ul {
+  display: flex;
+  flex-direction: row;
+  gap: 2em;
   list-style-type: none;
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #f1f1f1;
-}
-li {
-  float: left;
-  display: inline;
-}
-li a {
-  display: block;
-  color: #000;
-  padding: 14px 16px;
-  text-decoration: none;
 }
 
-/* Change the link color on hover */
-li a:hover {
-  background-color: #555;
-  color: white;
-}	
+/* Content */
+
+#content {
+  max-width: 80ch;
+  margin: 3em auto;
+}
