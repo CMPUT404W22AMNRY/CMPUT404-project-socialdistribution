@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model, logout
@@ -15,7 +15,7 @@ class SignUpView(CreateView):
     success_url = reverse_lazy('auth_provider:login')
 
 
-class ProfileView(DetailView):
+class MyProfileView(DetailView):
     model = get_user_model()
     template_name = 'profile/user_profile.html'
 
@@ -27,6 +27,14 @@ class ProfileView(DetailView):
         context['user_resources'] = [{'name': user_resource[0], 'link': user_resource[1]}
                                      for user_resource in user_resources]
         return context
+
+
+class ProfileView(DetailView):
+    model = get_user_model()
+    template_name = 'profile/user_profile.html'
+
+    def get_context_object_name(self, obj: Any) -> Optional[str]:
+        return 'object'
 
 
 class EditProfileView(UpdateView):

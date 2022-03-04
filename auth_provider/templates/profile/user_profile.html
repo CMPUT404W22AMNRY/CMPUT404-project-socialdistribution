@@ -8,18 +8,15 @@
 <div class="card">
   <section id="intro">
     <div class="center">
-      <img
-        id="profilephoto"
-        src="{{ object.profile_image_url }}"
-        alt="profile photo"
-      />
+      <img id="profilephoto" src="{{ object.profile_image_url }}" alt="profile photo" />
     </div>
 
-    <h1>{{object.get_full_name}}</h1>
+    <h1>{{ object.get_full_name }}</h1>
     <h2 class="subtitle">{{ object.username }}</h2>
     <span><a href="{{ object.github_url }}">Github profile</a></span>
   </section>
 
+  {% if object.id == user.id %}
   <section id="manage">
     <h3>Manage</h3>
     <ul>
@@ -39,5 +36,6 @@
       {% endfor %}
     </ul>
   </section>
+  {% endif %}
 </div>
 {% endblock content %}
