@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import (
     FriendRequestsView,
+    MyFriendsView,
     create_follow_request,
     accept_follow_request,
     unfollow_request,
@@ -17,5 +18,6 @@ urlpatterns = [
     path('users/<slug:to_username>/removefollow/', view=remove_follow_request, name='remove_follow_request'),
     path('users/<slug:from_username>/reject/', view=reject_follow_request, name='reject_follow_request'),
     path('friend-requests', view=FriendRequestsView.as_view(), name='friend_requests'),
+    path('friends', view=MyFriendsView.as_view(), name='friends'),
     path('', view=UsersView.as_view(), name='users'),
 ]

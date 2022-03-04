@@ -107,8 +107,15 @@ class UsersView(LoginRequiredMixin, ListView):
 
 class FriendRequestsView(LoginRequiredMixin, ListView):
     model = Request
-    paginate_by = 100
     template_name = 'follow/request_list.html'
 
     def get_queryset(self):
         return Request.objects.filter(to_user=self.request.user)
+
+
+class MyFriendsView(LoginRequiredMixin, ListView):
+    model = USER_MODEL
+    template_name = 'follow/friend_list.html'
+
+    def get_queryset(self):
+        return Follow.objects.true_friend(self.request.user)

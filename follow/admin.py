@@ -2,6 +2,8 @@ from typing import Optional
 from django.contrib import admin
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.urls import reverse_lazy
+from auth_provider import user_resources
 
 import auth_provider.user_action_generators as user_action_generators
 from .models import Follow, Request
@@ -23,6 +25,7 @@ admin.site.register(Follow, FollowAdmin)
 admin.site.register(Request, RequestAdmin)
 
 
+# Register add friend function to user profile page
 def AddFriendAction(current_user: USER_MODEL, target_user: USER_MODEL) -> Optional[tuple[str, str]]:
     if Follow.objects.check_follow(follower=current_user, followee=target_user):
         return None
@@ -36,3 +39,6 @@ def AddFriendAction(current_user: USER_MODEL, target_user: USER_MODEL) -> Option
 
 
 user_action_generators.register(AddFriendAction)
+
+# Register Friends page to my profile page
+user_resources.register(resource_name='Friends', link_to_user_resource=reverse_lazy('follow:friends'))
