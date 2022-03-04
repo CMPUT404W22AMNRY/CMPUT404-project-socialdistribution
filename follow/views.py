@@ -27,7 +27,7 @@ def create_follow_request(request, to_username):
             payload["error"] = str(e1)
         except ValidationError as e2:
             payload["error"] = str(e2)
-        else:
+        finally:
             return redirect(to_user.get_absolute_url())
 
     return render(request, template_name='./create_follow_request.html', context=payload)
@@ -46,7 +46,7 @@ def accept_follow_request(request, from_username):
             payload["error"] = str(e1)
         except ValidationError as e2:
             payload["error"] = str(e2)
-        else:
+        finally:
             return redirect(from_user.get_absolute_url())
     return render(request, template_name='./accept_follow_request.html', context=payload)
 
@@ -61,7 +61,7 @@ def reject_follow_request(request, from_username):
             request_accept.reject()
         except ValidationError as e2:
             payload["error"] = str(e2)
-        else:
+        finally:
             return redirect(from_user.get_absolute_url())
     return render(request, template_name='./reject_follow_request.html', context=payload)
 
@@ -76,7 +76,7 @@ def unfollow_request(request, from_username):
             payload["error"] = str(e1)
         except ValidationError as e2:
             payload["error"] = str(e2)
-        else:
+        finally:
             return redirect(from_user.get_absolute_url())
     return render(request, template_name='./unfollow_request.html', context=payload)
 
