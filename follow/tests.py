@@ -43,3 +43,21 @@ class AddFriendActionTests(TestCase):
         request = Follow.objects.follow_request(from_user=self.bob, to_user=self.alice)
         request.accept()
         self.assertIsNone(AddFriendAction(self.bob, self.alice))
+
+
+class FollowModelTests(TestCase):
+    def setUp(self) -> None:
+        self.bob = get_user_model().objects.create_user(username='bob', password='password')
+        self.alice = get_user_model().objects.create_user(username='alice', password='password')
+
+    def test_unfollow_request(self):
+        Follow.objects.follow_request(from_user=self.bob, to_user=self.alice).accept()
+        Follow.objects.follow_request(from_user=self.alice, to_user=self.bob).accept()
+
+        self.assertEqual(len(Follow.objects.true_friend(self.bob)), 1)
+        self.assertEqual(len(Follow.objects.true_friend(self.alice)), 1)
+
+        self.assertTrue(Follow.objects.unfollow(follower=self.bob, followee=self.alice))
+
+        self.assertEqual(len(Follow.objects.true_friend(self.bob)), 0)
+        self.assertEqual(len(Follow.objects.true_friend(self.alice)), 0)

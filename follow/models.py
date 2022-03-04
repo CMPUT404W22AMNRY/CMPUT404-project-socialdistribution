@@ -71,15 +71,13 @@ class FollowManager(models.Manager):
 
     def unfollow(self, follower, followee):
         try:
-            relation = Follow.objects.get(follower=follower, followee=followee)
+            Follow.objects.get(follower=follower, followee=followee).delete()
             try:
                 true_friend_bidirect = Follow.objects.get(follower=followee, followee=follower)
-                if relation.true_friend and true_friend_bidirect.true_friend:
-                    true_friend_bidirect.true_friend = False
-                    true_friend_bidirect.save()
+                true_friend_bidirect.true_friend = False
+                true_friend_bidirect.save()
             except Follow.DoesNotExist:
-                pass
-            relation.delete()
+                return False
             return True
         except Follow.DoesNotExist:
             return False
