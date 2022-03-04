@@ -1,7 +1,11 @@
+from pprint import isreadable
 from django.urls import reverse_lazy, reverse
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.generic.list import ListView
+from auth_provider.models import User
+from django.views.generic.edit import CreateView
+from django.views.generic.detail import DetailView
 
 from posts.models import Post
 
@@ -23,3 +27,11 @@ class StreamView(ListView):
             visibility=Post.Visibility.PUBLIC,
             unlisted=False).order_by('-date_published')
         return context
+
+
+class ProfileView(DetailView):
+    model = User
+    template_name = 'user_profile.html'
+
+    def get_object(self):
+        return self.request.user
