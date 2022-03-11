@@ -6,8 +6,8 @@ from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 from posts.models import Post
 
 
-class AuthorSerializer(HyperlinkedModelSerializer):        
-    
+class AuthorSerializer(HyperlinkedModelSerializer):
+
     class Meta:
         model = get_user_model()
         fields = ['id', 'url', ]
@@ -20,15 +20,16 @@ class AuthorSerializer(HyperlinkedModelSerializer):
         representation['profileImage'] = instance.profile_image_url
         return representation
 
+
 class PostSerializer(NestedHyperlinkedModelSerializer):
     parent_lookup_kwargs = {
         'author_pk': 'author__pk',
-    }    
+    }
 
-    # TODO: Create post serializer 
+    # TODO: Create post serializer
     class Meta:
         model = Post
-        fields = ['id', ] # TODO: hyperlinking is broken atm... :( will fix eventually - Reilly
+        fields = ['id', ]  # TODO: hyperlinking is broken atm... :( will fix eventually - Reilly
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
