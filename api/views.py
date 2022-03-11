@@ -1,5 +1,6 @@
 import base64
 import os
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -48,4 +49,4 @@ class PostViewSet(viewsets.ModelViewSet):
         with open(os.path.abspath(settings.BASE_DIR) + img.img_content.url, 'rb') as img_file:
             encoded_img = base64.b64encode(img_file.read())
                 
-        return Response(encoded_img, content_type='application/base64')
+        return HttpResponse(encoded_img, content_type=img.content_type)
