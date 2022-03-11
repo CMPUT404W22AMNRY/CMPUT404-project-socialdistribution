@@ -11,5 +11,6 @@ class Server(models.Model):
     username = models.CharField(max_length=STR_MAX_LENGTH)
     password = models.CharField(max_length=STR_MAX_LENGTH)
 
-    def get(self, endpoint: str, params: Dict[str, str]) -> requests.Response:
-        return requests.get(endpoint, params, auth=HTTPBasicAuth(self.username, self.password))
+    def get(self, endpoint: str, params: Dict[str, str] = []) -> requests.Response:
+        full_endpoint = self.service_address + endpoint
+        return requests.get(full_endpoint, params, auth=HTTPBasicAuth(self.username, self.password))
