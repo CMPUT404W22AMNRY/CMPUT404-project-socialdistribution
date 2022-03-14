@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from posts.models import Post, ContentType
 
-from .constants import POST_IMG_DATA
+from .constants import POST_DATA, POST_IMG_DATA
 
 
 class AuthorTests(TestCase):
@@ -37,6 +37,16 @@ class ImageTests(TestCase):
         self.author = get_user_model().objects.create_user(username='bob', password='password')
 
         self.post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],            
+            author_id=self.author.id,
+            unlisted=POST_DATA['unlisted'])
+        self.post.full_clean()
+        self.post.save()
+
+        self.img_post = Post.objects.create(
             title=POST_IMG_DATA['title'],
             description=POST_IMG_DATA['description'],
             content_type=POST_IMG_DATA['content_type'],
@@ -44,13 +54,22 @@ class ImageTests(TestCase):
             img_content=POST_IMG_DATA['img_content'],
             author_id=self.author.id,
             unlisted=POST_IMG_DATA['unlisted'])
-        self.post.full_clean()
-        self.post.save()
+        self.img_post.full_clean()
+        self.img_post.save()
 
         return
 
     def test_image(self):
         self.client.login(username='bob', password='password')
-        res2 = self.client.get(f'/api/v1/authors/{self.author.id}/posts/{self.post.id}/image/')
+        res2 = self.client.get(f'/api/v1/authors/{self.author.id}/posts/{self.img_post.id}/image/')
         self.assertEqual(res2.status_code, 200)
         self.assertEqual(res2.headers['Content-Type'], ContentType.PNG)
+
+    def test_not_image_404(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.get(f'/api/v1/authors/{self.author.id}/posts/{self.post.id}/image/')
+        self.assertEqual(res.status_code, 404)        
+
+    def test_image_require_login(self):
+        res = self.client.get(f'/api/v1/authors/{self.author.id}/posts/{self.img_post.id}/image/')
+        self.assertEqual(res.status_code, 403)
