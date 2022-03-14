@@ -40,7 +40,7 @@ class ImageTests(TestCase):
             title=POST_DATA['title'],
             description=POST_DATA['description'],
             content_type=POST_DATA['content_type'],
-            content=POST_DATA['content'],            
+            content=POST_DATA['content'],
             author_id=self.author.id,
             unlisted=POST_DATA['unlisted'])
         self.post.full_clean()
@@ -68,7 +68,7 @@ class ImageTests(TestCase):
     def test_not_image_404(self):
         self.client.login(username='bob', password='password')
         res = self.client.get(f'/api/v1/authors/{self.author.id}/posts/{self.post.id}/image/')
-        self.assertEqual(res.status_code, 404)        
+        self.assertEqual(res.status_code, 404)
 
     def test_image_require_login(self):
         res = self.client.get(f'/api/v1/authors/{self.author.id}/posts/{self.img_post.id}/image/')
