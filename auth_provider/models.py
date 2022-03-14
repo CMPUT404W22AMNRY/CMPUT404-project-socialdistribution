@@ -15,4 +15,4 @@ class User(AbstractUser):
 
     def clean(self):
         if self.profile_image_url is None or self.profile_image_url == '':
-            self.profile_image_url= static('default.jpg')
+            self.profile_image_url = static('default.jpg')
