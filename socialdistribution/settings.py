@@ -141,5 +141,5 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
-import django_heroku
+import django_heroku  # noqa
 django_heroku.settings(locals())
