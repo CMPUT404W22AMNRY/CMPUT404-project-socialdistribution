@@ -141,5 +141,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
-import django_heroku  # noqa
-django_heroku.settings(locals())
+if os.environ.get('DATABASE_URL'):
+    # Heroku environment    
+    import django_heroku  # noqa
+    django_heroku.settings(locals())
