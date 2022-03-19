@@ -142,6 +142,6 @@ REST_FRAMEWORK = {
 }
 
 if os.environ.get('DATABASE_URL'):
-    # Heroku environment    
+    # Heroku environment
     import django_heroku  # noqa
     django_heroku.settings(locals())
