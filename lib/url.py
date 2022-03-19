@@ -14,15 +14,7 @@ def is_url_valid(url: str) -> bool:
     return True
 
 
-def is_url_valid_image(url: str) -> bool:
-    valid_url = is_url_valid(url)
-    valid_image = is_url_image(url)
-    if valid_url:
-        print('valid url: ' + url)
-
-    if valid_image:
-        print('valid image: ' + url)
-
+def is_url_valid_image(url: str) -> bool:    
     return is_url_valid(url) and is_url_image(url)
 
 
