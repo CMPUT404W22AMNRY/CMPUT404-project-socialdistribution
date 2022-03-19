@@ -18,6 +18,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: socialdistribution
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -42,9 +43,9 @@ jobs:
         run: |
           python manage.py collectstatic --no-input
         env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/socialdistribution
       - name: Run Tests
         run: |
           python manage.py test
         env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/socialdistribution
