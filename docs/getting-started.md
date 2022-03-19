@@ -22,7 +22,11 @@
    ```sh
    pip install -r requirements.txt
    ```
-5. Run server
+5. Generate static files
+   ```
+   python manage.py collectstatic --noinput
+   ```
+6. Run server
    ```sh
    python manage.py runserver
    ```
