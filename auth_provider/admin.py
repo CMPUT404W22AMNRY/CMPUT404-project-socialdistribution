@@ -9,5 +9,6 @@ class UserModelAdmin(admin.ModelAdmin):
         "is_api_user"
     ]
 
+
 admin.site.register(User, UserModelAdmin)
 admin.site.register(Post)

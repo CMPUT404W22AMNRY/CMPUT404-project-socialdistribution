@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 TEST_USERNAME = 'bob'
 TEST_PASSWORD = 'password'
 
+
 class AuthorTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
