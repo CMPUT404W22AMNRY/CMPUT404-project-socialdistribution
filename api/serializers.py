@@ -4,8 +4,6 @@ from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 
 from posts.models import Post
 
-from posts.models import Post
-
 
 class AuthorSerializer(serializers.HyperlinkedModelSerializer):
 
