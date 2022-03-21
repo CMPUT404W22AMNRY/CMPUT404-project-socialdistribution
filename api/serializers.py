@@ -6,7 +6,6 @@ from posts.models import Post
 
 
 class AuthorSerializer(serializers.HyperlinkedModelSerializer):
-
     class Meta:
         model = get_user_model()
         fields = ['id', 'url', ]
