@@ -7,7 +7,7 @@ from posts.models import Post
 from posts.models import Post
 
 
-class AuthorSerializer(HyperlinkedModelSerializer):
+class AuthorSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = get_user_model()
