@@ -93,4 +93,3 @@ class PostTests(TestCase):
         self.assertIn('published', post)
         self.assertIn('url', post)
         self.assertIn('categories', post)
-

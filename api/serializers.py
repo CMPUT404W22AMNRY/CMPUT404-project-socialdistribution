@@ -18,10 +18,11 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
         representation['profileImage'] = instance.profile_image_url
         return representation
 
+
 class PostSerializer(NestedHyperlinkedModelSerializer):
     parent_lookup_kwargs = {
-		'author_pk': 'author__pk',
-	}
+        'author_pk': 'author__pk',
+    }
     author = AuthorSerializer(many=False, read_only=True)
 
     class Meta:
