@@ -44,6 +44,7 @@ class AuthorTests(TestCase):
         res = self.client.get('/api/v1/authors/')
         self.assertEqual(res.status_code, 200)
 
+
 class PostTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
