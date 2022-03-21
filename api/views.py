@@ -17,11 +17,14 @@ class AuthorViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ['get']
 
+
 class PostViewSet(viewsets.ModelViewSet):
     renderer_classes = [JSONRenderer]
     pagination_class = page_number_pagination_class_factory([('type', 'posts')])
 
-    queryset = Post.objects.all().order_by('-date_published')
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ['get']
+
+    def get_queryset(self):
+        return Post.objects.filter(author=self.kwargs['author_pk']).order_by('-date_published')

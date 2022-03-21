@@ -40,7 +40,16 @@ class PostTests(TestCase):
             content=POST_DATA['content'],
             author_id=self.user.id,
             unlisted=POST_DATA['unlisted'])
-        self.post.save()
+
+        self.other_user = get_user_model().objects.create_user(username='alice', password='password')
+        self.post_by_other_user = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.other_user.id,
+            unlisted=POST_DATA['unlisted'])
+        self.post_by_other_user.save()
 
     def test_posts(self):
         self.client.login(username='bob', password='password')

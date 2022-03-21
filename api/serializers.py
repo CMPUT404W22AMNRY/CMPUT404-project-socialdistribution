@@ -17,6 +17,7 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
         representation['profileImage'] = instance.profile_image_url
         return representation
 
+
 class PostSerializer(serializers.HyperlinkedModelSerializer):
     author = AuthorSerializer(many=False, read_only=True)
 
