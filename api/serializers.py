@@ -18,13 +18,16 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
         return representation
 
 class PostSerializer(serializers.HyperlinkedModelSerializer):
-    author  = AuthorSerializer(many=False, read_only=True)
+    author = AuthorSerializer(many=False, read_only=True)
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'description', 'content_type', 'content', 'author', 'categories']
+        fields = ['id', 'title', 'description', 'content', 'author', 'visibility', 'unlisted']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['type'] = 'post'
+        representation['contentType'] = instance.content_type
+        representation['published'] = instance.date_published
+        representation['categories'] = [category.category for category in instance.categories.all()]
         return representation
