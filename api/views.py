@@ -49,4 +49,4 @@ class PostViewSet(viewsets.ModelViewSet):
         with open(os.path.abspath(settings.BASE_DIR) + img.img_content.url, 'rb') as img_file:
             encoded_img = base64.b64encode(img_file.read()).decode('utf-8')
 
-        return HttpResponse(f'data:{img.content_type},{encoded_img}', content_type=img.content_type)
+        return HttpResponse(encoded_img, content_type=img.content_type)
