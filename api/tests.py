@@ -69,6 +69,7 @@ class PostTests(TestCase):
             self.assertIn('type', post)
             self.assertIn('contentType', post)
             self.assertIn('published', post)
+            self.assertIn('url', post)
             self.assertIn('categories', post)
 
     def test_posts_require_login(self):
@@ -90,4 +91,6 @@ class PostTests(TestCase):
         self.assertIn('type', post)
         self.assertIn('contentType', post)
         self.assertIn('published', post)
+        self.assertIn('url', post)
         self.assertIn('categories', post)
+
