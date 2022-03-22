@@ -31,6 +31,8 @@ class FollowManager(models.Manager):
     def true_friend(self, user):
         followers = self.followers(user)
         followings = set(self.followings(user))
+        print(followers)
+        print(followings)
         friends = []
         for follower in range(len(followers)):
             if follower in followings:
