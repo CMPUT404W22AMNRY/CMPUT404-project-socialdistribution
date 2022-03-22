@@ -34,9 +34,7 @@ class FollowManager(models.Manager):
         friends = []
         print(len(followers))
         for follower in range(len(followers)):
-            print(follower)
             if follower in followings:
-                print("Yep")
                 friends.append(follower)
         return friends
 
