@@ -37,6 +37,7 @@ class FollowManager(models.Manager):
         for follower in range(len(followers)):
             if follower in followings:
                 friends.append(follower)
+        print(friends)
         return friends
 
     def request(self, user):
