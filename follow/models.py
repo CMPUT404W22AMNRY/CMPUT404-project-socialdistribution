@@ -37,7 +37,6 @@ class FollowManager(models.Manager):
                 friends.append(follower)
         return friends
 
-
     def request(self, user):
         qs = (Request.objects.select_related("from_user", "to_user").filter(to_user=user).all())
         requests = [_.from_user for _ in qs]
