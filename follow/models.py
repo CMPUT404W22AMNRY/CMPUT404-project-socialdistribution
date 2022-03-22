@@ -28,9 +28,6 @@ class FollowManager(models.Manager):
         followers = [_.follower for _ in qs]
         return followers
 
-    def true_friend(self, user):
-        pass
-
     def request(self, user):
         qs = (Request.objects.select_related("from_user", "to_user").filter(to_user=user).all())
         requests = [_.from_user for _ in qs]
