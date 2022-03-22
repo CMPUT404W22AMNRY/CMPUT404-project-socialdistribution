@@ -11,6 +11,7 @@ from posts.tests.constants import POST_DATA
 from servers.models import Server
 from socialdistribution.views import StreamView
 
+
 class ViewsTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
@@ -46,9 +47,9 @@ class StreamViewTests(TestCase):
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
         res = self.client.get(reverse_lazy('stream'))
         self.assertEqual(res.status_code, 200)
-        
+
         self.assertContains(res, POST_DATA['title'], count=self.num_posts)
-    
+
     def test_displays_remote_posts(self):
         # TODO: Update this when our groupmates have updated their interface
         mock_raw_json_response = '''[
@@ -93,5 +94,3 @@ class StreamViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
 
         self.assertContains(res, mock_json_response[0]['title'])
-        
-    
