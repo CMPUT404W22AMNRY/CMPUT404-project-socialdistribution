@@ -45,7 +45,6 @@ class FollowManager(models.Manager):
             return
 
         if self.check_follow(from_user, to_user):
-            raise AlreadyExistsError("Users has already followed.")
             return
 
         if Request.objects.filter(
