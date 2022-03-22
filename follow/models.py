@@ -29,10 +29,7 @@ class FollowManager(models.Manager):
         return followers
 
     def true_friend(self, user):
-        qs1 = Follow.objects.filter(follower=user, true_friend=True).all()
-        qs2 = Follow.objects.filter(followee=user, true_friend=True).all()
-        friend1 = [_.followee for _ in qs1]
-        friend2 = [_.follower for _ in qs2]
+        pass
 
         return list(set(friend1 + friend2))
 
@@ -72,12 +69,6 @@ class FollowManager(models.Manager):
     def unfollow(self, follower, followee):
         try:
             Follow.objects.get(follower=follower, followee=followee).delete()
-            try:
-                true_friend_bidirect = Follow.objects.get(follower=followee, followee=follower)
-                true_friend_bidirect.true_friend = False
-                true_friend_bidirect.save()
-            except Follow.DoesNotExist:
-                return False
             return True
         except Follow.DoesNotExist:
             return False
@@ -92,11 +83,9 @@ class FollowManager(models.Manager):
     def check_true_friend(self, follower, followee):
         if Follow.objects.filter(
             follower=follower,
-            followee=followee,
-            true_friend=True).exists() and Follow.objects.filter(
+            followee=followee).exists() and Follow.objects.filter(
                 follower=followee,
-                followee=follower,
-                true_friend=True).exists():
+                followee=follower).exists():
             return True
         else:
             return False
@@ -106,7 +95,6 @@ class Follow(models.Model):
     followee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="followee")
     follower = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="follower")
     created = models.DateTimeField(auto_now_add=True)
-    true_friend = models.BooleanField(default=False)
     objects = FollowManager()
 
     class Meta:
@@ -120,8 +108,6 @@ class Follow(models.Model):
             raise ValidationError("User cannot follow themselves.")
         try:
             follow_reverse = Follow.objects.get(follower=self.followee, followee=self.follower)
-            self.true_friend = True
-            follow_reverse.true_friend = True
         except Follow.DoesNotExist:
             pass
         super().save(*args, **kwargs)
