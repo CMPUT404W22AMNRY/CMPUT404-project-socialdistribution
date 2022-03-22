@@ -147,9 +147,7 @@ class Request(models.Model):
 
         try:
             relation_reverse = Follow.objects.get(follower=self.to_user, followee=self.from_user)
-            relation_reverse.real_friend = True
             relation_reverse.save()
-            relation.real_friend = True
             relation.save()
         except Follow.DoesNotExist:
             pass
