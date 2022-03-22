@@ -48,6 +48,8 @@ class StreamView(LoginRequiredMixin, ServerListView):
                 'description': representation['description'],
                 'content_type': representation['contentType'],
                 'content': representation['content'],
+                'date_published': representation['published'],
+                'get_absolute_url': representation['source'], # TODO: Verify whether this is the correct field
             }
 
         # TODO: Add ['items'] once our groupmates are ready (have the results nested)
