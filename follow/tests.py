@@ -65,6 +65,7 @@ class FollowModelTests(TestCase):
         self.assertEqual(len(Follow.objects.true_friend(self.bob)), 0)
         self.assertEqual(len(Follow.objects.true_friend(self.alice)), 0)
 
+
 class UsersViewTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
@@ -73,7 +74,7 @@ class UsersViewTests(TestCase):
         self.api_user = get_user_model().objects.create_user(username='api_user', password='password')
         self.api_user.is_api_user = True
         self.api_user.save()
-    
+
     def test_uses_correct_template(self):
         self.client.login(username=self.bob.username, password='password')
         res = self.client.get(reverse('follow:users'))
@@ -101,7 +102,7 @@ class UsersViewTests(TestCase):
         mock_json_response = json.loads(mock_raw_json_response)
         mock_response = Response()
         mock_response.json = MagicMock(return_value=mock_json_response)
-        
+
         mock_server = Server(
             service_address="http://localhost:5555/api/v2",
             username="hello",
