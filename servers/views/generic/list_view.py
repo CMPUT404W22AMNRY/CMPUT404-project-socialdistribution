@@ -1,3 +1,4 @@
+from sys import stderr
 from typing import Any, Dict, Callable
 from requests import Response
 from django.views.generic import ListView
@@ -24,9 +25,11 @@ class ServerListView(ListView):
 
         for endpoint in self.get_endpoints():
             for server in Server.objects.all():
-                resp = server.get(endpoint)
-                context['object_list'] += self.serialize(resp)
-
+                try:
+                    resp = server.get(endpoint)
+                    context['object_list'] += self.serialize(resp)
+                except Exception as err:
+                    print(f'Could not serialize {endpoint}, err: {err.with_traceback(None)}', file=stderr)
         return context
 
     # Override this method if there are multiple endpoints to fetch
