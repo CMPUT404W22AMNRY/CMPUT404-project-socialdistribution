@@ -76,7 +76,7 @@ class FollowManager(models.Manager):
 
     def check_follow(self, follower: str, followee: str):
         try:
-            Follow.objects.get(follower__username=follower, followee__username=followee)
+            Follow.objects.get(follower=follower, followee=followee)
             return True
         except Follow.DoesNotExist:
             return False
