@@ -14,11 +14,6 @@ class ServerListView(ListView):
     serialize: Callable[[Response], list] = None
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        if self.endpoint is None:
-            raise ImproperlyConfigured(
-                "No endpoint configured for multi resource list"
-            )
-
         if self.serialize is None:
             raise ImproperlyConfigured(
                 "No serializer was given"
@@ -27,8 +22,18 @@ class ServerListView(ListView):
         context = super().get_context_data(**kwargs)
         context['object_list'] = [obj for obj in context['object_list']]
 
-        for server in Server.objects.all():
-            resp = server.get(self.endpoint)
-            context['object_list'] += self.serialize(resp)
+        for endpoint in self.get_endpoints():
+            for server in Server.objects.all():
+                resp = server.get(endpoint)
+                context['object_list'] += self.serialize(resp)
 
         return context
+
+    # Override this method if there are multiple endpoints to fetch
+    def get_endpoints(self) -> list[str]:
+        if self.endpoint is None:
+            raise ImproperlyConfigured(
+                "No endpoint configured for multi resource list"
+            )
+
+        return [self.endpoint]
