@@ -33,7 +33,7 @@ class FollowManager(models.Manager):
         followings = set(self.followings(user))
         friends = []
         print(len(followers))
-        for follower in range(len(followers)):
+        for follower in followers:
             if follower in followings:
                 friends.append(follower)
         return friends
