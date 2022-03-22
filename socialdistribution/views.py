@@ -3,6 +3,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.list import ListView
+from django.db.models import QuerySet
 
 from posts.models import Post
 
@@ -15,12 +16,10 @@ def root(request: HttpRequest) -> HttpResponse:
 
 class StreamView(LoginRequiredMixin, ListView):
     model = Post
-    paginate_by = 100
+    paginate_by = 10
     template_name = 'stream.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['object_list'] = Post.objects.filter(
+    def get_queryset(self) -> QuerySet[Post]:
+        return Post.objects.filter(
             visibility=Post.Visibility.PUBLIC,
             unlisted=False).order_by('-date_published')
-        return context
