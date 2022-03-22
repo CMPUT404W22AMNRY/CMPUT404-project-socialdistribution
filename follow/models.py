@@ -28,6 +28,16 @@ class FollowManager(models.Manager):
         followers = [_.follower for _ in qs]
         return followers
 
+    def true_friend(self, user):
+        followers = self.followers(user)
+        followings = set(self.followings(user))
+        friends = []
+        for follower in range(len(followers)):
+            if follower in followings:
+                friends.append(follower)
+        return friends
+
+
     def request(self, user):
         qs = (Request.objects.select_related("from_user", "to_user").filter(to_user=user).all())
         requests = [_.from_user for _ in qs]
