@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from posts.models import Post, ContentType
+from follow.models import Follow, Request
 
 from posts.tests.constants import POST_DATA
 from .constants import POST_IMG_DATA
@@ -152,4 +153,36 @@ class ImageTests(TestCase):
 
     def test_image_require_login(self):
         res = self.client.get(f'/api/v1/authors/{self.author.id}/posts/{self.img_post.id}/image/')
+        self.assertEqual(res.status_code, 403)
+
+class FollowersTest(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.author = get_user_model().objects.create_user(username='bob', password='password')
+        self.other_user = get_user_model().objects.create_user(username='alice', password='password')
+        self.follow = Follow.objects.create(
+            followee=self.author,
+            follower=self.other_user
+        )
+        self.follow.save()
+        return
+    
+    def test_get(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.get(f'/api/v1/authors/{self.author.id}/followers')
+        self.assertEqual(res.status_code, 200)
+        body = json.loads(res.content.decode('utf-8'))
+        self.assertEqual(body['type'], 'author')
+        self.assertEqual(len(body['items']), 1)
+        for follower in body['item']:
+            self.assertEqual(follower['type'], 'author')
+            self.assertEqual(follower['id'], self.other_user.id)
+            self.assertIn('url', follower)
+            self.assertIn('displayName', follower)
+            self.assertIn('github', follower)
+            self.assertIn('profileImage', follower)
+
+
+    def test_posts_require_login(self):
+        res = self.client.get(f'/api/v1/authors/{self.user.id}/followers')
         self.assertEqual(res.status_code, 403)
