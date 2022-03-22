@@ -42,7 +42,7 @@ class AddFriendActionTests(TestCase):
     def test_disabled_when_following_already(self):
         request = Follow.objects.follow_request(from_user=self.bob, to_user=self.alice)
         request.accept()
-        self.assertRaises(AddFriendAction(self.bob, self.alice))
+        self.assertIsNone(AddFriendAction(self.bob, self.alice))
 
 
 class FollowModelTests(TestCase):

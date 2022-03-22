@@ -31,8 +31,6 @@ class FollowManager(models.Manager):
     def true_friend(self, user):
         pass
 
-        return list(set(friend1 + friend2))
-
     def request(self, user):
         qs = (Request.objects.select_related("from_user", "to_user").filter(to_user=user).all())
         requests = [_.from_user for _ in qs]
@@ -47,14 +45,17 @@ class FollowManager(models.Manager):
         '''create follow request'''
         if from_user == to_user:
             raise ValidationError("User cannot follow themselves.")
+            return
 
         if self.check_follow(from_user, to_user):
             raise AlreadyExistsError("Users has already followed.")
+            return
 
         if Request.objects.filter(
                 from_user=from_user,
                 to_user=to_user).exists():
             raise AlreadyExistsError("User has sent the follow request.")
+            return
 
         request, created = Request.objects.get_or_create(from_user=from_user, to_user=to_user)
         if created is False:
