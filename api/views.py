@@ -68,4 +68,4 @@ class FollowersViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(request.data)
 
-        return super().create(request, *args, **kwargs)
+        return Response(status.HTTP_200_OK)
