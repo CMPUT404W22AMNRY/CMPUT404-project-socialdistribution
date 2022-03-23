@@ -62,7 +62,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'put', 'delete']
 
     def get_queryset(self):
-        query = Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
+        query = Follow.objects.filter(followee=self.kwargs['author_pk']).get()
         print(query)
         return Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
 
