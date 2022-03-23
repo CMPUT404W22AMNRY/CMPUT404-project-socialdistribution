@@ -1,6 +1,7 @@
 import base64
 from cmath import e
 import os
+import requests
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -44,15 +45,19 @@ class PostViewSet(viewsets.ModelViewSet):
         author_id = kwargs['author_pk']
         post_id = kwargs['pk']
 
-        img = get_object_or_404(Post.objects, author_id=author_id, pk=post_id)
+        post = get_object_or_404(Post.objects, author_id=author_id, pk=post_id)
 
-        if img.content_type != ContentType.PNG and img.content_type != ContentType.JPG:
+        if post.content_type != ContentType.PNG and post.content_type != ContentType.JPG:
             return Response(status=404)
 
-        with open(os.path.abspath(settings.BASE_DIR) + img.img_content.url, 'rb') as img_file:
-            encoded_img = base64.b64encode(img_file.read()).decode('utf-8')
+        if post.img_content:
+            filepath = os.path.abspath(settings.BASE_DIR) + post.img_content.url
+            with open(filepath, 'rb') as img_file:
+                encoded_img = base64.b64encode(img_file.read())
+        else:
+            encoded_img = base64.b64encode(requests.get(post.content).content)
 
-        return HttpResponse(encoded_img, content_type=img.content_type)
+        return HttpResponse(encoded_img, content_type=post.content_type)
 
 
 class FollowersViewSet(viewsets.ModelViewSet):
