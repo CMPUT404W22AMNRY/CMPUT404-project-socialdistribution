@@ -172,9 +172,9 @@ class FollowersTest(TestCase):
         self.client.login(username='bob', password='password')
         res = self.client.get(f'/api/v1/authors/{self.author.id}/followers/')
         print("Good")
-        print(res.items)
         self.assertEqual(res.status_code, 200)
         body = json.loads(res.content.decode('utf-8'))
+        print(body)
         self.assertEqual(body['type'], 'author')
         self.assertEqual(len(body['items']), 1)
         for follower in body['item']:
@@ -185,6 +185,6 @@ class FollowersTest(TestCase):
             self.assertIn('github', follower)
             self.assertIn('profileImage', follower)
 
-    def test_posts_require_login(self):
+    def test_followers_require_login(self):
         res = self.client.get(f'/api/v1/authors/{self.author.id}/followers')
         self.assertEqual(res.status_code, 403)
