@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
 
-from api.serializers import AuthorSerializer, PostSerializer
+from api.serializers import AuthorSerializer, FollowersSerializer, PostSerializer
 from api.util import page_number_pagination_class_factory
 from posts.models import Post, ContentType
 from follow.models import Follow
@@ -55,14 +55,15 @@ class PostViewSet(viewsets.ModelViewSet):
 class FollowersViewSet(viewsets.ModelViewSet):
     renderer_classes = [JSONRenderer]
 
-    serializer_class = PostSerializer
+    serializer_class = FollowersSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     @action(methods=['get'], detail=True)
     def get_followers(self, request, **kwargs):
+        print("trigger1")   
         author_id = kwargs['author_pk']
         try:
-            print("trigger")            
+            print("trigger2")            
             queryset = get_user_model().objects.get(id=author_id)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
