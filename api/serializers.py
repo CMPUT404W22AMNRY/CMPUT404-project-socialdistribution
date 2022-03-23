@@ -6,6 +6,7 @@ from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 from posts.models import Post
 from follow.models import Follow, Request
 
+
 class AuthorSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = get_user_model()
@@ -38,6 +39,7 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
         representation['categories'] = [category.category for category in instance.categories.all()]
         return representation
 
+
 class FollowersSerializer(serializers.ModelSerializer):
     items = AuthorSerializer(many=True)
 
@@ -46,6 +48,7 @@ class FollowersSerializer(serializers.ModelSerializer):
         fields = ['items', ]
 
     def to_representation(self, instance):
-        representation =  super().to_representation(instance)
+        representation = super().to_representation(instance)
         representation['type'] = 'author'
         return representation
+

@@ -53,6 +53,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return HttpResponse(encoded_img, content_type=img.content_type)
 
+
 class FollowersViewSet(viewsets.ModelViewSet):
     renderer_classes = [JSONRenderer]
 
@@ -64,8 +65,8 @@ class FollowersViewSet(viewsets.ModelViewSet):
         print("trigger1")
         author_id = kwargs['author_pk']
         try:
-            print("trigger2")  
+            print("trigger2")
             queryset = get_user_model().objects.get(id=author_id)
         except e:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        
+
