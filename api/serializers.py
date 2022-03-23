@@ -51,4 +51,4 @@ class FollowersSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        return representation
+        return representation['follower']
