@@ -188,10 +188,10 @@ class FollowersTest(TestCase):
             self.assertIn('github', follower)
             self.assertIn('profileImage', follower)
 
-    def test_followers_301(self):
+    def test_follower_require_login(self):
         res = self.client.get(f'/api/v1/authors/{self.author.id}/followers')
-        self.assertEqual(res.status_code, 301)
+        self.assertEqual(res.status_code, 403)
 
-    def test_followers_require_login(self):
+    def test_followee_not_found(self):
         res = self.client.get(f'/api/v1/authors/100000/followers/')
         self.assertEqual(res.status_code, 404)
