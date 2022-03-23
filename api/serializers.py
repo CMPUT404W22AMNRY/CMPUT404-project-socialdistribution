@@ -1,4 +1,5 @@
 from dataclasses import fields
+from email.policy import default
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
@@ -41,13 +42,13 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
 
 
 class FollowersSerializer(serializers.ModelSerializer):
+    type = serializers.CharField(default='followers') 
     follower = AuthorSerializer(many=False, read_only=True)
 
     class Meta:
         model = Follow
-        fields = ['follower']
+        fields = ['type', 'follower']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['type'] = 'follower'
         return representation
