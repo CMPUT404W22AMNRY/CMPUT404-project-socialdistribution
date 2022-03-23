@@ -62,6 +62,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'put', 'delete']
 
     def get_queryset(self):
+        print("vIEW TRIGGER")
         return Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
 
     @action(methods=['get'], detail=True)
