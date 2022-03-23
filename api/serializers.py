@@ -45,7 +45,7 @@ class FollowersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follow
-        fields = ['items']
+        fields = ['follower']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
