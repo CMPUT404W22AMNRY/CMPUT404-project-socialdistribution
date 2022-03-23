@@ -9,6 +9,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 
 from api.serializers import AuthorSerializer, FollowersSerializer, PostSerializer
 from api.util import page_number_pagination_class_factory
@@ -62,7 +63,8 @@ class FollowersViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'put', 'delete']
 
     def get_queryset(self):
-        try:
-            return Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
-        except e:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        query = Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
+        if query:
+            return query
+        else:
+            return NotFound()
