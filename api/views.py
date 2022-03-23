@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
@@ -12,6 +12,7 @@ from rest_framework.decorators import action
 from api.serializers import AuthorSerializer, PostSerializer
 from api.util import page_number_pagination_class_factory
 from posts.models import Post, ContentType
+from follow.models import Follow
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -50,3 +51,19 @@ class PostViewSet(viewsets.ModelViewSet):
             encoded_img = base64.b64encode(img_file.read()).decode('utf-8')
 
         return HttpResponse(encoded_img, content_type=img.content_type)
+
+class FollowersViewSet(viewsets.ModelViewSet):
+    renderer_classes = [JSONRenderer]
+
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    @action(methods=['get'], detail=True)
+    def get_followers(self, request, **kwargs):
+        author_id = kwargs['author_pk']
+        try:
+            print("trigger")            
+            queryset = get_user_model().objects.get(id=author_id)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        

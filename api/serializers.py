@@ -1,9 +1,10 @@
+from dataclasses import fields
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 
 from posts.models import Post
-
+from follow.models import Follow, Request
 
 class AuthorSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -35,4 +36,16 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
         representation['contentType'] = instance.content_type
         representation['published'] = instance.date_published
         representation['categories'] = [category.category for category in instance.categories.all()]
+        return representation
+
+class FollowersSerializer(serializers.ModelSerializer):
+    items = AuthorSerializer(many=True)
+
+    class Meta:
+        mode = Follow
+        fields = ['items', ]
+
+    def to_representation(self, instance):
+        representation =  super().to_representation(instance)
+        representation['type'] = 'author'
         return representation
