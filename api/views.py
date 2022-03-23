@@ -65,7 +65,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
 
-    def create(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         print('yes')
         print(request.data)
         serializer = self.get_serializer(request.data)

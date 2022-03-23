@@ -46,7 +46,6 @@ class FollowersSerializer(serializers.ModelSerializer):
         'author_pk': 'author__pk',
     }
     follower = AuthorSerializer(many=False, read_only=True)
-    print(parent_lookup_kwargs)
 
     class Meta:
         model = Follow
