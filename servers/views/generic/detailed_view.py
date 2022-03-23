@@ -23,8 +23,8 @@ class ServerDetailView(DetailView):
             # Trim prefix
             resp = server.get(url[len(server.service_address):])
             try:
-                self.to_internal(resp)
+                return self.to_internal(resp)
             except Exception as err:
-                print(f'Failed to internalize {url}, err={err}', file=stderr)
+                print(f'Failed to internalize {url}, err: {err.with_traceback(None)}', file=stderr)
 
         raise Http404
