@@ -1,4 +1,5 @@
 import json
+from click import password_option
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 
@@ -161,6 +162,7 @@ class FollowersTest(TestCase):
         self.author = get_user_model().objects.create_user(username='bob', password='password')
         self.other_user = get_user_model().objects.create_user(username='alice', password='password')
         self.other_user2 = get_user_model().objects.create_user(username='tom', password='password')
+        self.other_user3 = get_user_model().objects.create_user(username='smith', password='password')
         self.follow = Follow.objects.create(
             followee=self.author,
             follower=self.other_user
@@ -192,4 +194,13 @@ class FollowersTest(TestCase):
         self.assertEqual(res.status_code, 403)
 
     def test_add_follower(self):
-        pass
+        self.client.login(username='bob', password='password')
+        data = {
+            'followee': self.author,
+            'follower': self.other_user3
+        }
+        res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3}/', data=data, format='json')
+        print(res.status_code)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(Follow.objects.get(followee=self.author, follower=self.other_user3).count(), 1)
+
