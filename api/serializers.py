@@ -44,8 +44,8 @@ class FollowersSerializer(serializers.ModelSerializer):
     items = AuthorSerializer(many=True)
 
     class Meta:
-        mode = Follow
-        fields = ['items', ]
+        model = Follow
+        fields = ['items']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
