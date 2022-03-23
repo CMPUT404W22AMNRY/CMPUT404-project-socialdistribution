@@ -45,11 +45,11 @@ class FollowersSerializer(serializers.ModelSerializer):
     type = serializers.CharField(default='followers')
     follower = AuthorSerializer(many=False, read_only=True)
     print("yes")
+
     class Meta:
         model = Follow
         fields = ['type', 'follower']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        return representation['type' ,'follower']
-
+        return representation['type', 'follower']
