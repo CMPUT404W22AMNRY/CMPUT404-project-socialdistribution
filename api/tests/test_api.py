@@ -183,7 +183,7 @@ class FollowersTest(TestCase):
         print(body)
         #self.assertEqual(body['type'], 'author')
         #self.assertEqual(len(body['items']), 1)
-        #for follower in body['item']:
+        # for follower in body['item']:
         #    self.assertEqual(follower['type'], 'author')
         #    self.assertEqual(follower['id'], self.other_user.id)
         #    self.assertIn('url', follower)
