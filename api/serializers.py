@@ -41,11 +41,11 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
 
 
 class FollowersSerializer(serializers.ModelSerializer):
-    follower = AuthorSerializer(many=False, read_only=True)
+    items = serializers.ListField(AuthorSerializer(many=False, read_only=True))
 
     class Meta:
         model = Follow
-        fields = ['follower']
+        fields = ['items']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
