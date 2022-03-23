@@ -52,4 +52,5 @@ class FollowersSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        print(representation, 'good')
         return representation['follower']
