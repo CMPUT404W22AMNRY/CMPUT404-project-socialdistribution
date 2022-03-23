@@ -170,7 +170,7 @@ class FollowersTest(TestCase):
 
     def test_get(self):
         self.client.login(username='bob', password='password')
-        res = self.client.get(f'/api/v1/authors/{self.author.id}/followers')
+        res = self.client.get(f'/api/v1/authors/{self.author.id}/followers/')
         print(res)
         self.assertEqual(res.status_code, 200)
         body = json.loads(res.content.decode('utf-8'))
