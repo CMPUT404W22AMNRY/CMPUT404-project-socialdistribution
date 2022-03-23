@@ -185,5 +185,5 @@ class FollowersTest(TestCase):
             self.assertIn('profileImage', follower)
 
     def test_posts_require_login(self):
-        res = self.client.get(f'/api/v1/authors/{self.user.id}/followers')
+        res = self.client.get(f'/api/v1/authors/{self.author.id}/followers')
         self.assertEqual(res.status_code, 403)
