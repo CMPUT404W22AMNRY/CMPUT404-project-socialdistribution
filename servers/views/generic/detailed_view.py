@@ -9,11 +9,12 @@ from servers.models import Server
 
 from posts.models import Post
 
+
 class ServerDetailView(DetailView):
     # Override this method to map their object to ours
     to_internal: Callable[[Response], Any] = None
 
-    def get_object(self, queryset: Optional[models.query.QuerySet]=None) -> Post:
+    def get_object(self, queryset: Optional[models.query.QuerySet] = None) -> Post:
         servers = Server.objects.all()
         url = self.kwargs['url']
         for server in servers:
@@ -25,5 +26,5 @@ class ServerDetailView(DetailView):
                 self.to_internal(resp)
             except Exception as err:
                 print(f'Failed to internalize {url}, err={err}', file=stderr)
-        
+
         raise Http404
