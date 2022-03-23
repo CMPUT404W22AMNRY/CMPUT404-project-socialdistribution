@@ -63,7 +63,9 @@ class FollowersViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         query = list(Follow.objects.filter(followee=self.kwargs['author_pk']))
-        pk_list = [follow.follower.pk for follow in query]
+        for follow in query:
+            print(follow)
+            print(follow.follower)
         return Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
 
     @action(methods=['get'], detail=True)
