@@ -179,11 +179,11 @@ class FollowersTest(TestCase):
         res = self.client.get(f'/api/v1/authors/{self.author.id}/followers/')
         self.assertEqual(res.status_code, 200)
         body = json.loads(res.content.decode('utf-8'))
+        self.assertEqual(body['type'], 'followers')
         for follower in body['items']:
             self.assertEqual(follower['type'], 'author')
             self.assertIn('id', follower)
             self.assertIn('url', follower)
-            #self.assertIn('host', follower)
             self.assertIn('displayName', follower)
             self.assertIn('github', follower)
             self.assertIn('profileImage', follower)

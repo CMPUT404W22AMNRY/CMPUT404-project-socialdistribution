@@ -57,10 +57,10 @@ class PostViewSet(viewsets.ModelViewSet):
 
 class FollowersViewSet(viewsets.ModelViewSet):
     renderer_classes = [JSONRenderer]
-    pagination_class = page_number_pagination_class_factory([('type', 'follower')])
+    pagination_class = page_number_pagination_class_factory([('type', 'followers')])
     serializer_class = FollowersSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['get', 'put', 'delete']
+    http_method_names = ['get']
 
     def get_queryset(self):
         return Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
