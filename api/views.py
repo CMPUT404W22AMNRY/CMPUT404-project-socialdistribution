@@ -64,3 +64,4 @@ class FollowersViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
+    
