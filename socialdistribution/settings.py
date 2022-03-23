@@ -149,3 +149,9 @@ if os.environ.get('DATABASE_URL'):
     # Heroku environment
     import django_heroku  # noqa
     django_heroku.settings(locals())
+
+# Amazon AWS S3
+AWS_ACCESS_KEY_ID='YOUR-IAM-USER-ACCESS-KEY'
+AWS_SECRET_ACCESS_KEY='YOUR-IAM-USER-SECRET-ACCESS-KEY'
+AWS_STORAGE_BUCKET_NAME='YOUR-BUCKET-NAME'
+AWS_URL='https://YOUR-BUCKET-NAME.s3.amazonaws.com/'
