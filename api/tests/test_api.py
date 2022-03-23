@@ -161,11 +161,17 @@ class FollowersTest(TestCase):
         self.client = Client()
         self.author = get_user_model().objects.create_user(username='bob', password='password')
         self.other_user = get_user_model().objects.create_user(username='alice', password='password')
+        self.other_user2 = get_user_model().objects.create_user(username='tom', password='password')
         self.follow = Follow.objects.create(
             followee=self.author,
             follower=self.other_user
         )
+        self.follow2 = Follow.objects.create(
+            followee=self.author,
+            follower=self.other_user2
+        )
         self.follow.save()
+        self.follow2.save()
         return
 
     def test_get(self):
