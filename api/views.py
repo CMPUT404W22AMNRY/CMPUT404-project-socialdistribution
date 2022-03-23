@@ -66,4 +66,3 @@ class FollowersViewSet(viewsets.ModelViewSet):
             return Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
         except e:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
