@@ -44,7 +44,7 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
 class FollowersSerializer(serializers.ModelSerializer):
     type = serializers.CharField(default='followers')
     follower = AuthorSerializer(many=False, read_only=True)
-    print("yes")
+    print(follower)
 
     class Meta:
         model = Follow
