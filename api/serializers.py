@@ -41,7 +41,7 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
 
 
 class FollowersSerializer(serializers.ModelSerializer):
-    items = AuthorSerializer(many=True)
+    follower = AuthorSerializer(many=False, read_only=True)
 
     class Meta:
         model = Follow
