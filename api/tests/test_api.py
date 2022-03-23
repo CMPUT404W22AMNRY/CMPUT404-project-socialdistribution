@@ -177,20 +177,21 @@ class FollowersTest(TestCase):
     def test_get(self):
         self.client.login(username='bob', password='password')
         res = self.client.get(f'/api/v1/authors/{self.author.id}/followers/')
-        print("Good")
         self.assertEqual(res.status_code, 200)
         body = json.loads(res.content.decode('utf-8'))
-        print(body)
-        #self.assertEqual(body['type'], 'author')
-        #self.assertEqual(len(body['items']), 1)
-        # for follower in body['item']:
-        #    self.assertEqual(follower['type'], 'author')
-        #    self.assertEqual(follower['id'], self.other_user.id)
-        #    self.assertIn('url', follower)
-        #    self.assertIn('displayName', follower)
-        #    self.assertIn('github', follower)
-        #    self.assertIn('profileImage', follower)
+        for follower in body['items']:
+            self.assertEqual(follower['type'], 'author')
+            self.assertIn('id', follower)
+            self.assertIn('url', follower)
+            self.assertIn('host', follower)
+            self.assertIn('displayName', follower)
+            self.assertIn('github', follower)
+            self.assertIn('profileImage', follower)
+
+    def test_followers_301(self):
+        res = self.client.get(f'/api/v1/authors/{self.author.id}/followers')
+        self.assertEqual(res.status_code, 301)
 
     def test_followers_require_login(self):
-        res = self.client.get(f'/api/v1/authors/{self.author.id}/followers')
-        self.assertEqual(res.status_code, 403)
+        res = self.client.get(f'/api/v1/authors/100000/followers/')
+        self.assertEqual(res.status_code, 404)
