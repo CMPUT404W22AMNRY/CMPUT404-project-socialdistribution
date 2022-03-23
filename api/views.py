@@ -62,14 +62,8 @@ class FollowersViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'put', 'delete']
 
     def get_queryset(self):
-        return Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
-
-    @action(methods=['get'], detail=True)
-    def get_followers(self, request, **kwargs):
-        print("trigger1")
-        author_id = kwargs['author_pk']
         try:
-            print("trigger2")
-            queryset = get_user_model().objects.get(id=author_id)
+            return Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
         except e:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
