@@ -1,4 +1,5 @@
 import base64
+from cmath import e
 import os
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -60,11 +61,11 @@ class FollowersViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=True)
     def get_followers(self, request, **kwargs):
-        print("trigger1")   
+        print("trigger1")
         author_id = kwargs['author_pk']
         try:
-            print("trigger2")            
+            print("trigger2")  
             queryset = get_user_model().objects.get(id=author_id)
-        except:
+        except e:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
