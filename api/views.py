@@ -60,7 +60,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
     pagination_class = page_number_pagination_class_factory([('type', 'followers')])
     serializer_class = FollowersSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['get']
+    http_method_names = ['get', 'put']
 
     def get_queryset(self):
         return Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
