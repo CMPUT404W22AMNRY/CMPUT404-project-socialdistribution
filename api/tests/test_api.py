@@ -192,9 +192,3 @@ class FollowersTest(TestCase):
         res = self.client.get(f'/api/v1/authors/{self.author.id}/followers/')
         self.assertEqual(res.status_code, 403)
 
-    def test_followee_not_found(self):
-        self.client.login(username='bob', password='password')
-        res = self.client.get(f'/api/v1/authors/100000/followers/')
-        self.assertEqual(res.status_code, 200)
-        body = json.loads(res.content.decode('utf-8'))
-        print(body)
