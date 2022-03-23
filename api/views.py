@@ -69,4 +69,3 @@ class FollowersViewSet(viewsets.ModelViewSet):
             queryset = get_user_model().objects.get(id=author_id)
         except e:
             return Response(status=status.HTTP_404_NOT_FOUND)
-

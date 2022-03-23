@@ -51,4 +51,3 @@ class FollowersSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['type'] = 'author'
         return representation
-
