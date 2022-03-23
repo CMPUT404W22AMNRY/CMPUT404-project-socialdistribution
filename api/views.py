@@ -69,4 +69,3 @@ class FollowersViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(request.data)
 
         return super().create(request, *args, **kwargs)
-    
