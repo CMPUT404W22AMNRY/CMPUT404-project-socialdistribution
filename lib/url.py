@@ -16,17 +16,21 @@ def is_url_valid(url: str) -> bool:
     return True
 
 
-# def is_url_valid_image(url: str) -> bool:
-#     return is_url_valid(url) and is_url_image(url)
+# inspired by MattoTodd on StackOverflow https://stackoverflow.com/a/10543969
+def is_url_image(url: str) -> bool:
+    mimetype = mimetypes.guess_type(url)
+    return (mimetype and mimetype[0] and mimetype[0].startswith('image'))
 
-
-# # inspired by MattoTodd on StackOverflow https://stackoverflow.com/a/10543969
-# def is_url_image(url: str) -> bool:
-#     mimetype = mimetypes.guess_type(url)
-#     return (mimetype and mimetype[0] and mimetype[0].startswith('image'))
 
 def is_url_valid_image(url: str) -> bool:
-    h = requests.head(url)
-    header = h.headers
-    content_type = header.get('content-type')
-    return content_type.startswith('image')
+    # check the returned returned content type
+    head = requests.head(url)
+    if head.headers.get('content-type').startswith('image'):
+        return True
+    elif head.status_code == 403:
+        # if HEAD isn't allowed, try a GET
+        get = requests.get(url)
+        if get.headers.get('content-type').startswith('image'):
+            return True
+
+    return False
