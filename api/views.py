@@ -101,8 +101,5 @@ class FollowersViewSet(viewsets.ModelViewSet):
         except get_user_model().DoesNotExist as e:
             raise Http404
 
-        try:
-            Follow.objects.get(follower=follower, followee=followee)
-            return Response({'check': True}, status=status.HTTP_200_OK)
-        except Follow.DoesNotExist as e:
-            return Response({'check': False}, status=status.HTTP_200_OK)
+        follow = get_object_or_404(Follow.objects, follower=follower, followee=followee)
+        return Response({'check': True}, status=status.HTTP_200_OK)
