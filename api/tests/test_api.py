@@ -205,6 +205,6 @@ class FollowersTest(TestCase):
             data=data,
             header={
                 'content-type': 'application/json'})
-        print(res)
+        print(res.content)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(Follow.objects.get(followee=self.author, follower=self.other_user3).count(), 1)
