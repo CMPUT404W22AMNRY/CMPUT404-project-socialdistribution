@@ -76,8 +76,9 @@ class FollowersViewSet(viewsets.ModelViewSet):
             raise Http404
 
         follow, create = Follow.objects.get_or_create(followee=followee, follower=follower)
+        print(create)
         if create is False:
-            raise Response(status.HTTP_409_CONFLICT)
+            return Response(status.HTTP_409_CONFLICT)
         else:
             return Response(status.HTTP_200_OK)
 
