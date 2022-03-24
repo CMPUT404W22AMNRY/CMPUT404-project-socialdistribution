@@ -200,9 +200,6 @@ class FollowersTest(TestCase):
             'follower': self.other_user3
         }
         res_1 = self.client.get(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3}/')
-        res = self.client.put(
-            f'/api/v1/authors/{self.author.id}/followers/{self.other_user3}/',
-            data=data,
-            format='json')
+        res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3}/', data=data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(Follow.objects.get(followee=self.author, follower=self.other_user3).count(), 1)
