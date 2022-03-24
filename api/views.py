@@ -1,9 +1,7 @@
 import base64
 from cmath import e
 import os
-from urllib import response
-from venv import create
-from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -80,7 +78,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
         try:
             follow = Follow.objects.create(followee=followee, follower=follower)
             return Response(status.HTTP_200_OK)
-        except ValidationError:
+        except IntegrityError:
             raise Response(status.HTTP_409_CONFLICT)
 
     def destroy(self, request, *args, **kwargs):
