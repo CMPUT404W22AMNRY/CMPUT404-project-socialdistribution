@@ -198,7 +198,6 @@ class FollowersTest(TestCase):
         self.client.login(username='bob', password='password')
         data = {
             'id': self.other_user3.id,
-            'url': self.other_user3.url,
         }
         print(self.author._meta.get_all_field_names())
         res = self.client.put(
