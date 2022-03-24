@@ -40,7 +40,12 @@ class Post(models.Model):
     content_type = models.CharField(max_length=18, default=ContentType.PLAIN, choices=ContentType.choices)
     visibility = models.CharField(max_length=7, default=Visibility.PUBLIC, choices=Visibility.choices)
     content = models.TextField()
-    img_content = models.ImageField(null=True, blank=True, storage=ImageStorage(), upload_to=img_content_filename, verbose_name='Image')
+    img_content = models.ImageField(
+        null=True,
+        blank=True,
+        storage=ImageStorage(),
+        upload_to=img_content_filename,
+        verbose_name='Image')
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     date_published = models.DateTimeField(auto_now_add=True)
     unlisted = models.BooleanField()
