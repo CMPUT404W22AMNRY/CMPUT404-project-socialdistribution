@@ -1,8 +1,10 @@
 import base64
 from cmath import e
 import os
+from urllib import response
 from venv import create
-from django.http import Http404, HttpResponse
+from django.core.exceptions import ValidationError
+from django.http import Http404, HttpResponse, Http409
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -75,14 +77,18 @@ class FollowersViewSet(viewsets.ModelViewSet):
         except get_user_model().DoesNotExist as e:
             raise Http404
 
-        follow, create = Follow.objects.get_or_create(followee=followee, follower=follower)
-        print(create)
-        if create is False:
-            return Response(status.HTTP_409_CONFLICT)
-        else:
+        try:
+            follow, create = Follow.objects.create(followee=followee, follower=follower)
             return Response(status.HTTP_200_OK)
+        except ValidationError:
+            raise Response(status.HTTP_409_CONFLICT)
 
     def destroy(self, request, *args, **kwargs):
         followee_id = kwargs['author_pk']
         follower_id = kwargs['pk']
+        try:
+            followee = get_user_model().objects.get(id=followee_id)
+            follower = get_user_model().objects.get(id=follower_id)
+        except get_user_model().DoesNotExist as e:
+            raise Http404
         return Response(status.HTTP_200_OK)
