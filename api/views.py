@@ -73,7 +73,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
             followee = get_user_model().objects.get(id=followee_id)
             follower = get_user_model().objects.get(id=follower_id)
         except get_user_model().DoesNotExist as e:
-            return Http404
+            raise Http404
 
         follow, create = Follow.objects.get_or_create(followee=followee, follower=follower)
         if create is False:
