@@ -78,7 +78,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
             raise Http404
 
         try:
-            follow, create = Follow.objects.create(followee=followee, follower=follower)
+            follow = Follow.objects.create(followee=followee, follower=follower)
             return Response(status.HTTP_200_OK)
         except ValidationError:
             raise Response(status.HTTP_409_CONFLICT)
