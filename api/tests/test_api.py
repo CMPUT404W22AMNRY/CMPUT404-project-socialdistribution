@@ -196,12 +196,18 @@ class FollowersTest(TestCase):
 
     def test_add_follower(self):
         self.client.login(username='bob', password='password')
-        self.assertEqual(len(Follow.objects.filter(followee=self.author)), 2)
         res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/')
-        self.assertEqual(res.status_code, 200)
         self.assertEqual(len(Follow.objects.filter(followee=self.author)), 3)
-    # def test_add_follower(self):
-    #    self.client.login(username='bob', password='password')
-    #    res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/')
-    #    self.assertEqual(res.status_code, 200)
-    #    print(Follow.objects.all())
+        self.assertEqual(res.status_code, 200)
+    
+    def test_add_follower_duplicate(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/')
+        self.assertEqual(len(Follow.objects.filter(followee=self.author)), 3)
+        self.assertEqual(res.status_code, 409)
+    
+    def test_add_follower_not_exit(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/100/')
+        self.assertEqual(len(Follow.objects.filter(followee=self.author)), 3)
+        self.assertEqual(res.status_code, 404)
