@@ -1,4 +1,3 @@
-ealr
 import base64
 from cmath import e
 import os
