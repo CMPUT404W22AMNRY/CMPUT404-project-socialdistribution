@@ -199,6 +199,7 @@ class FollowersTest(TestCase):
         data = {
             "id": self.other_user3.id,
         }
+        print(self.author)
         res = self.client.put(
             f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/',
             data=json.dumps(data),
