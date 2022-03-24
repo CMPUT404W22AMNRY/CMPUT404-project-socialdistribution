@@ -197,8 +197,12 @@ class FollowersTest(TestCase):
     def test_add_follower(self):
         self.client.login(username='bob', password='password')
         data = {
-            'followee': self.author,
-            'follower': self.other_user3
+            "type": self.other_user3.type,
+            "id": self.other_user3.id,
+            "url": self.other_user3.url,
+            "displayname": self.other_user3.displayname,
+            "github": self.other_user3.github,
+            "profileImage": self.other_user3.profileImage
         }
         res = self.client.put(
             f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/',
