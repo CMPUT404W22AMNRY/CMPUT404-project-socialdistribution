@@ -196,14 +196,6 @@ class FollowersTest(TestCase):
 
     def test_add_follower(self):
         self.client.login(username='bob', password='password')
-        data = {
-            'id': self.other_user3.id,
-        }
-        print(self.author._meta.get_fields())
-        res = self.client.put(
-            f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/',
-            data=json.dumps(data),
-            content_type='application/json')
-        print(res.content)
+        res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(Follow.objects.get(followee=self.author, follower=self.other_user3).count(), 1)
