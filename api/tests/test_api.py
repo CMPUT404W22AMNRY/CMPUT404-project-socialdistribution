@@ -200,8 +200,6 @@ class FollowersTest(TestCase):
             'follower': self.other_user3
         }
         res_1 = self.client.get(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3}/')
-        print(res_1)
-        print(res_1.status_code)
         res = self.client.put(
             f'/api/v1/authors/{self.author.id}/followers/{self.other_user3}/',
             data=data,
