@@ -2,7 +2,7 @@ import base64
 from cmath import e
 import os
 from venv import create
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -73,8 +73,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
             followee = get_user_model().objects.get(id=followee_id)
             follower = get_user_model().objects.get(id=follower_id)
         except get_user_model().DoesNotExist as e:
-            print('Yes')
-            return Response(status.HTTP_404_NOT_FOUND)
+            return Http404
 
         follow, create = Follow.objects.get_or_create(followee=followee, follower=follower)
         if create is False:
