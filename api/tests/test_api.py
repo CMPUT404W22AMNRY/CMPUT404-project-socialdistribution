@@ -1,3 +1,4 @@
+from email import header
 import json
 from click import password_option
 from django.test import TestCase, Client
@@ -199,7 +200,6 @@ class FollowersTest(TestCase):
             'followee': self.author,
             'follower': self.other_user3
         }
-        res_1 = self.client.get(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/')
-        res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/', data=data)
+        res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/', data=data, header={ 'content-type': 'application/json' })
         self.assertEqual(res.status_code, 200)
         self.assertEqual(Follow.objects.get(followee=self.author, follower=self.other_user3).count(), 1)
