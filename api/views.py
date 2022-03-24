@@ -78,5 +78,4 @@ class FollowersViewSet(viewsets.ModelViewSet):
         follow = Follow.objects.get_or_create(followee=followee, follower=follower)
         if create is False:
             return Response(status.HTTP_409_CONFLICT)
-        print(Follow.objects.all())
         return Response(status.HTTP_200_OK)
