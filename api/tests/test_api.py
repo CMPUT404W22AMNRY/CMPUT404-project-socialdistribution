@@ -200,7 +200,7 @@ class FollowersTest(TestCase):
             'id': self.other_user3.id,
             'url': self.other_user3.url,
         }
-        print(self.author)
+        print(self.author._meta.get_all_field_names())
         res = self.client.put(
             f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/',
             data=json.dumps(data),
