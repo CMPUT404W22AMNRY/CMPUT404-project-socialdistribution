@@ -91,7 +91,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
             raise Http404
         Follow.objects.unfollow(followee=followee, follower=follower)
         return Response(status.HTTP_204_NO_CONTENT)
-    
+
     def retrieve(self, request, *args, **kwargs):
         followee_id = kwargs['author_pk']
         follower_id = kwargs['pk']
@@ -100,9 +100,9 @@ class FollowersViewSet(viewsets.ModelViewSet):
             follower = get_user_model().objects.get(id=follower_id)
         except get_user_model().DoesNotExist as e:
             raise Http404
-        
+
         try:
             Follow.objects.get(follower=follower, followee=followee)
-            return Response({'check':True}, status=status.HTTP_200_OK)
+            return Response({'check': True}, status=status.HTTP_200_OK)
         except Follow.DoesNotExist as e:
-            return Response({'check':False}, status=status.HTTP_200_OK)
+            return Response({'check': False}, status=status.HTTP_200_OK)
