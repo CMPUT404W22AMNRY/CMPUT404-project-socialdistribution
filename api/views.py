@@ -79,7 +79,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
         if not create:
             return Response(status.HTTP_204_NO_CONTENT)
         else:
-            return Response(status.HTTP_201_CREATED)
+            return Response(status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         followee_id = kwargs['author_pk']
