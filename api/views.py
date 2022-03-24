@@ -78,7 +78,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
         try:
             follow = Follow.objects.create(followee=followee, follower=follower)
             return Response(status.HTTP_200_OK)
-        except:
+        except BaseException:
             raise Response(status.HTTP_409_CONFLICT)
 
     def destroy(self, request, *args, **kwargs):
