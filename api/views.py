@@ -79,7 +79,8 @@ class FollowersViewSet(viewsets.ModelViewSet):
         follow, create = Follow.objects.get_or_create(followee=followee, follower=follower)
         if create is False:
             return Response(status.HTTP_409_CONFLICT)
-        return Response(status.HTTP_200_OK)
+        else:
+            return Response(status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         followee_id = kwargs['author_pk']
