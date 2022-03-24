@@ -27,10 +27,10 @@ def is_url_valid_image(url: str) -> bool:
     head = requests.head(url)
     if head.headers.get('content-type').startswith('image'):
         return True
-    elif head.status_code == 403:
+    
+    if head.status_code == 403:
         # if HEAD isn't allowed, try a GET
         get = requests.get(url)
-        if get.headers.get('content-type').startswith('image'):
-            return True
+        return get.headers.get('content-type').startswith('image')
 
     return False
