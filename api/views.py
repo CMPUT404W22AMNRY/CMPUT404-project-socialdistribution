@@ -12,6 +12,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 
+from socialdistribution.storage import ImageStorage
 from api.serializers import AuthorSerializer, FollowersSerializer, PostSerializer
 from api.util import page_number_pagination_class_factory
 from posts.models import Post, ContentType
@@ -50,12 +51,8 @@ class PostViewSet(viewsets.ModelViewSet):
         if post.content_type != ContentType.PNG and post.content_type != ContentType.JPG:
             return Response(status=404)
 
-        if post.img_content:
-            filepath = os.path.abspath(settings.BASE_DIR) + post.img_content.url
-            with open(filepath, 'rb') as img_file:
-                encoded_img = base64.b64encode(img_file.read())
-        else:
-            encoded_img = base64.b64encode(requests.get(post.content).content)
+        location = post.img_content.url if post.img_content else post.content
+        encoded_img = base64.b64encode(requests.get(location).content)
 
         return HttpResponse(encoded_img, content_type=post.content_type)
 

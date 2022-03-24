@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from socialdistribution.storage import ImageStorage
 from lib.url import is_url_valid_image
 
 STR_MAX_LENGTH = 512
@@ -31,7 +32,7 @@ class Post(models.Model):
     content_type = models.CharField(max_length=18, default=ContentType.PLAIN, choices=ContentType.choices)
     visibility = models.CharField(max_length=7, default=Visibility.PUBLIC, choices=Visibility.choices)
     content = models.TextField()
-    img_content = models.ImageField(null=True, blank=True, upload_to='images/', verbose_name='Image')
+    img_content = models.ImageField(null=True, blank=True, storage=ImageStorage(), verbose_name='Image')
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     date_published = models.DateTimeField(auto_now_add=True)
     unlisted = models.BooleanField()
