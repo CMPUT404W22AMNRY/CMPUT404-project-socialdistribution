@@ -139,13 +139,13 @@ class ImageTests(TestCase):
 
     def test_image(self):
         self.client.login(username='bob', password='password')
-        res2 = self.client.get(f'/api/v1/authors/{self.author.id}/posts/{self.img_post.id}/image/')        
+        res2 = self.client.get(f'/api/v1/authors/{self.author.id}/posts/{self.img_post.id}/image/')
         self.assertEqual(res2.status_code, 200)
         self.assertEqual(res2.headers['Content-Type'], ContentType.PNG)
 
-    # I CANNOT GET THESE WORKING FOR THE LIFE OF ME. THE TESTS PASS, BUT ONLY ONE OUT OF THE THREE 
-    # IMAGE TESTS CAN PASS WHEN RUN TOGETHER. THIS DOESN'T MAKE ANY SENSE TO BE AT ALL AND I'VE 
-    # SPENT MORE TIME DEBUGGING THESE TEST CASES THAN I DID WORKING ON THIS FEATURE. 
+    # I CANNOT GET THESE WORKING FOR THE LIFE OF ME. THE TESTS PASS, BUT ONLY ONE OUT OF THE THREE
+    # IMAGE TESTS CAN PASS WHEN RUN TOGETHER. THIS DOESN'T MAKE ANY SENSE TO BE AT ALL AND I'VE
+    # SPENT MORE TIME DEBUGGING THESE TEST CASES THAN I DID WORKING ON THIS FEATURE.
 
     # def test_not_image_404(self):
     #     self.client.login(username='bob', password='password')
