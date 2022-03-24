@@ -73,9 +73,15 @@ class FollowersViewSet(viewsets.ModelViewSet):
             followee = get_user_model().objects.get(id=followee_id)
             follower = get_user_model().objects.get(id=follower_id)
         except get_user_model().DoesNotExist as e:
+            print('Yes')
             return Response(status.HTTP_404_NOT_FOUND)
 
         follow = Follow.objects.get_or_create(followee=followee, follower=follower)
         if create is False:
             return Response(status.HTTP_409_CONFLICT)
+        return Response(status.HTTP_200_OK)
+    
+    def destroy(self, request, *args, **kwargs):
+        followee_id = kwargs['author_pk']
+        follower_id = kwargs['pk']
         return Response(status.HTTP_200_OK)
