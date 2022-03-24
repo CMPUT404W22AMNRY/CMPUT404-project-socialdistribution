@@ -199,7 +199,7 @@ class FollowersTest(TestCase):
             'followee': self.author,
             'follower': self.other_user3
         }
-        res_1 = self.client.get(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3}/')
-        res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3}/', data=data)
+        res_1 = self.client.get(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/')
+        res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/', data=data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(Follow.objects.get(followee=self.author, follower=self.other_user3).count(), 1)
