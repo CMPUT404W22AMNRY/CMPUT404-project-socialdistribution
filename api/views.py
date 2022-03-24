@@ -4,7 +4,7 @@ import os
 from urllib import response
 from venv import create
 from django.core.exceptions import ValidationError
-from django.http import Http404, HttpResponse, Http409
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.contrib.auth import get_user_model
