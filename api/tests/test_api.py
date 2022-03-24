@@ -198,4 +198,4 @@ class FollowersTest(TestCase):
         self.client.login(username='bob', password='password')
         res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(Follow.objects.get(followee=self.author, follower=self.other_user3).count(), 1)
+        print(Follow.objects.all())
