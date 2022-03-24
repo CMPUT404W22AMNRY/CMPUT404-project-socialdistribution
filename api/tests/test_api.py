@@ -202,7 +202,7 @@ class FollowersTest(TestCase):
         }
         res = self.client.put(
             f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/',
-            data=data,
+            data=json.dumps(data),
             content_type='application/json')
         print(res.content)
         self.assertEqual(res.status_code, 200)
