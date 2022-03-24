@@ -203,6 +203,7 @@ class FollowersTest(TestCase):
     def test_add_follower_duplicate(self):
         self.client.login(username='bob', password='password')
         res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/')
+        res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/{self.other_user3.id}/')
         self.assertEqual(len(Follow.objects.filter(followee=self.author)), 3)
         self.assertEqual(res.status_code, 409)
 

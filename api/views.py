@@ -1,3 +1,4 @@
+ealr
 import base64
 from cmath import e
 import os
@@ -72,7 +73,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
         try:
             followee = get_user_model().objects.get(id=followee_id)
             follower = get_user_model().objects.get(id=follower_id)
-        except e:
+        except get_user_model().DoesNotExist as e:
             return Response(status.HTTP_404_NOT_FOUND)
 
         follow = Follow.objects.get_or_create(followee=followee, follower=follower)
