@@ -1,6 +1,7 @@
 import base64
 from cmath import e
 import os
+from venv import create
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -66,6 +67,16 @@ class FollowersViewSet(viewsets.ModelViewSet):
         return Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
 
     def update(self, request, *args, **kwargs):
-        print(kwargs)
+        followee_id = kwargs['author_pk']
+        follower_id = kwargs['pk']
+        try:
+            followee = get_user_model().objects.get(id=followee_id)
+            follower = get_user_model().objects.get(id=follower_id)
+        except e:
+            return Response(status.HTTP_404_NOT_FOUND)
+
+        follow = Follow.objects.get_or_create(followee=followee, follower=follower)
+        if create is False:
+            return Response(status.HTTP_409_CONFLICT)
 
         return Response(status.HTTP_200_OK)
