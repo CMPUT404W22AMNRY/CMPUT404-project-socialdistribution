@@ -231,7 +231,7 @@ class FollowersTest(TestCase):
         res = self.client.get(f'/api/v1/authors/{self.author.id}/followers/{self.other_user2.id}/')
         self.assertEqual(res.status_code, 200)
         body = json.loads(res.content.decode('utf-8'))
-        self.assertEqual(body['check'], True)
+        self.assertEqual(body['id'], self.other_user2.id)
 
     def test_check_not_follower(self):
         self.client.login(username='bob', password='password')

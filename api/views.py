@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets, permissions, status
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
@@ -102,4 +103,5 @@ class FollowersViewSet(viewsets.ModelViewSet):
             raise Http404
 
         follow = get_object_or_404(Follow.objects, follower=follower, followee=followee)
-        return Response({'check': True}, status=status.HTTP_200_OK)
+        serializer = self.serializer_class(follow, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
