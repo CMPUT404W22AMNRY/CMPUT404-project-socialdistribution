@@ -212,3 +212,15 @@ class FollowersTest(TestCase):
         res = self.client.put(f'/api/v1/authors/{self.author.id}/followers/100/')
         self.assertEqual(len(Follow.objects.filter(followee=self.author)), 2)
         self.assertEqual(res.status_code, 404)
+
+    def test_delete_follower(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.delete(f'/api/v1/authors/{self.author.id}/followers/{self.other_user2.id}/')
+        self.assertEqual(len(Follow.objects.filter(followee=self.author)), 1)
+        self.assertEqual(res.status_code, 204)
+
+    def test_delete_follower_not_exit(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.delete(f'/api/v1/authors/{self.author.id}/followers/100/')
+        self.assertEqual(len(Follow.objects.filter(followee=self.author)), 2)
+        self.assertEqual(res.status_code, 404)

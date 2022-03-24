@@ -61,7 +61,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
     pagination_class = page_number_pagination_class_factory([('type', 'followers')])
     serializer_class = FollowersSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['get', 'put']
+    http_method_names = ['get', 'put', 'delete']
 
     def get_queryset(self):
         return Follow.objects.filter(followee=self.kwargs['author_pk']).order_by('-created')
@@ -89,4 +89,5 @@ class FollowersViewSet(viewsets.ModelViewSet):
             follower = get_user_model().objects.get(id=follower_id)
         except get_user_model().DoesNotExist as e:
             raise Http404
-        return Response(status.HTTP_200_OK)
+        Follow.objects.unfollow(followee=followee, follower=follower)
+        return Response(status.HTTP_204_NO_CONTENT)
