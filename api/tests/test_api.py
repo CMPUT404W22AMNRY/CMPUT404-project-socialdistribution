@@ -197,7 +197,8 @@ class FollowersTest(TestCase):
     def test_add_follower(self):
         self.client.login(username='bob', password='password')
         data = {
-            "id": self.other_user3.id,
+            'id': self.other_user3.id,
+            'url': self.other_user3.url,
         }
         print(self.author)
         res = self.client.put(
