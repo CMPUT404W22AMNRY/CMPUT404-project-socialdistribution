@@ -67,8 +67,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         print('yes')
-        print(request.data)
-        print('true')
+        print(request)
         serializer = self.get_serializer(request.data)
 
         return Response(status.HTTP_200_OK)
