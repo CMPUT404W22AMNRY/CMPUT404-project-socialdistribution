@@ -75,11 +75,11 @@ class FollowersViewSet(viewsets.ModelViewSet):
         except get_user_model().DoesNotExist as e:
             raise Http404
 
-        try:
-            follow = Follow.objects.create(followee=followee, follower=follower)
-            return Response(status.HTTP_200_OK)
-        except IntegrityError:
-            raise Response(status.HTTP_409_CONFLICT)
+        follow, create = Follow.objects.get_or_create(followee=followee, follower=follower)
+        if not create:
+            return Response(status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status.HTTP_201_CREATED)
 
     def destroy(self, request, *args, **kwargs):
         followee_id = kwargs['author_pk']
