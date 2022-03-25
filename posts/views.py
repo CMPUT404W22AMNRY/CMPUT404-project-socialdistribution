@@ -101,7 +101,7 @@ class RemotePostDetailView(LoginRequiredMixin, ServerDetailView):
                 service_address = origin[0:origin.index('/authors')]
                 service_request = origin[origin.index('/authors'):]
                 server = Server.objects.get(service_address=service_address)
-                img_content = server.get(service_request + '/image').content.decode('utf-8')                
+                img_content = server.get(service_request + '/image').content.decode('utf-8')
             except Exception as e:
                 print('warning: ' + e)
 
