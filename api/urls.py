@@ -9,6 +9,7 @@ router.register(r'authors', AuthorViewSet)
 author_router = routers.NestedDefaultRouter(router, r'authors', lookup='author')
 author_router.register(r'posts', PostViewSet, basename='post')
 author_router.register(r'followers', FollowersViewSet, basename='follower')
+author_router.register(r'requests', FollowersViewSet, basename='follower')
 
 urlpatterns = [
     path('', include(router.urls)),

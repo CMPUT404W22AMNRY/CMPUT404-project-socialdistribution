@@ -12,10 +12,10 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 
-from api.serializers import AuthorSerializer, FollowersSerializer, PostSerializer
+from api.serializers import AuthorSerializer, FollowersSerializer, PostSerializer, RequestsSerializer
 from api.util import page_number_pagination_class_factory
 from posts.models import Post, ContentType
-from follow.models import Follow
+from follow.models import Follow, Request
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -103,3 +103,12 @@ class FollowersViewSet(viewsets.ModelViewSet):
 
         follow = get_object_or_404(Follow.objects, follower=follower, followee=followee)
         return Response({'check': True}, status=status.HTTP_200_OK)
+
+class RequestsViewSet(viewsets.ModelViewSet):
+    renderer_classes = [JSONRenderer]
+    serializer_class = RequestsSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get']
+
+    def get_queryset(self):
+        return Request.objects.filter(followee=self.kwargs['author_pk']).all().order_by('-created')

@@ -54,3 +54,23 @@ class FollowersSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         return representation['follower']
+
+class RequestsSerializer(serializers.ModelSerializer):
+    parent_lookup_kwargs = {
+        'author_pk': 'author__pk',
+    }
+    followee = AuthorSerializer(many=False, read_only=True)
+    follower = AuthorSerializer(many=False, read_only=True)
+    class Meta:
+        model = Request
+        fields = ['followee', 'follower']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['type'] = 'Follow'
+        representation['summary'] = instance.follower.get_full_name() + ' wants to follow ' + instance.followee.get_full_name()
+        representation['actor'] = representation['follower']
+        representation['object'] = representation['followee']
+        del representation['follower']
+        del representation['followee']
+        return representation
