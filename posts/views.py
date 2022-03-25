@@ -91,19 +91,18 @@ class RemotePostDetailView(LoginRequiredMixin, ServerDetailView):
     def to_internal(self, response: Response) -> Post:
         json_response = response.json()
         return {
-            'id': json_response['id'],
-            'title': json_response['title'],
-            'description': json_response['description'],
-            'content_type': json_response['contentType'],
-            'content': json_response['content'],
-            'author': json_response['author'],
-            'categories': json_response['categories'],
-            'date_published': json_response['published'],
-            'visibility': json_response['visibility'],
-            'unlisted': json_response['unlisted'],
+            'id': json_response.get('id'),
+            'title': json_response.get('title'),
+            'description': json_response.get('description'),
+            'content_type': json_response.get('contentType') or json_response.get('content_type'),
+            'content': json_response.get('content'),
+            'categories': json_response.get('categories'),
+            'date_published': json_response.get('published'),
+            'visibility': json_response.get('visibility'),
+            'unlisted': json_response.get('unlisted'),
             'author': {
-                'get_full_name': json_response['author']['displayName']
-            }
+                'get_full_name': json_response.get('author').get('displayName') or json_response.get('author').get('display_name')
+            },
         }
 
 

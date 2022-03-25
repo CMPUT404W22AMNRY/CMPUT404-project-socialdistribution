@@ -55,14 +55,14 @@ class StreamView(LoginRequiredMixin, ServerListView):
             post_url = urllib.parse.urljoin(request_url, representation['id'])  # TODO: Update this to source or origin
             absolute_url = reverse('posts:remote-detail', kwargs={'url': post_url})
             return {
-                'title': representation['title'],
-                'description': representation['description'],
-                'content_type': representation['contentType'],
-                'content': representation['content'],
-                'date_published': representation['published'],
+                'title': representation.get('title'),
+                'description': representation.get('description'),
+                'content_type': representation.get('contentType') or representation.get('content_type'),
+                'content': representation.get('content'),
+                'date_published': representation.get('published'),
                 'get_absolute_url': absolute_url,
                 'author': {
-                    'get_full_name': representation['author']['displayName']
+                    'get_full_name': representation.get('author').get('displayName') or representation.get('author').get('display_name')
                 }
             }
 
