@@ -1,12 +1,13 @@
+from .constants import POST_IMG_DATA
+from posts.tests.constants import POST_DATA, COMMENT_DATA
+from posts.tests.constants import POST_DATA
+from posts.models import Post, ContentType, Like
 import json
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from posts.models import Post, ContentType, Comment
 from follow.models import Follow
-
-from posts.tests.constants import POST_DATA, COMMENT_DATA
-from .constants import POST_IMG_DATA
 
 TEST_USERNAME = 'bob'
 TEST_PASSWORD = 'password'
@@ -257,3 +258,44 @@ class FollowersTest(TestCase):
         self.client.login(username='bob', password='password')
         res = self.client.get(f'/api/v1/authors/{self.author.id}/followers/100/')
         self.assertEqual(res.status_code, 404)
+
+
+class LikeTests(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.author = get_user_model().objects.create_user(username='bob', password='password1')
+
+        self.post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.author.id,
+            unlisted=POST_DATA['unlisted'])
+        self.post.full_clean()
+        self.post.save()
+
+        self.other_user = get_user_model().objects.create_user(username='alice', password='password2')
+        self.like_by_other_user = Like.objects.create(
+            author_id=self.other_user.id,
+            post_id=self.post.id,
+        )
+
+        self.like_by_user = Like.objects.create(
+            author_id=self.author.id,
+            post_id=self.post.id,
+        )
+        self.post.save()
+        return
+
+    def test_get(self):
+        self.client.login(username='bob', password='password1')
+        res = self.client.get(f'/api/v1/authors/{self.author.id}/posts/{self.post.id}/likes/')
+        self.assertEqual(res.status_code, 200)
+        body = res.json()
+        self.assertEqual(body['type'], 'likes')
+        self.assertEqual(len(body['items']), len(self.post.like_set.all()))
+        for like in body['items']:
+            self.assertEqual(like['type'], 'Like')
+            self.assertIn('summary', like)
+            self.assertIn('object', like)

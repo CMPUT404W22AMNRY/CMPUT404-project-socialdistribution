@@ -1,18 +1,18 @@
-import base64
-import requests
-from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from rest_framework import viewsets, permissions, status
-from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer
-from rest_framework.decorators import action
-from socialdistribution.storage import ImageStorage
-from api.serializers import AuthorSerializer, FollowersSerializer, PostSerializer
-from api.util import page_number_pagination_class_factory
-from posts.models import Post, ContentType
 from follow.models import Follow
+from posts.models import Post, ContentType
+from api.util import page_number_pagination_class_factory
+from socialdistribution.storage import ImageStorage
+from api.serializers import AuthorSerializer, FollowersSerializer, PostSerializer, LikesSerializer
+from rest_framework.decorators import action
+from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
+from rest_framework import viewsets, permissions, status
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from django.http import Http404, HttpResponse
+import requests
+from django.http import HttpResponse
+import base64
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -101,3 +101,27 @@ class FollowersViewSet(viewsets.ModelViewSet):
         follow = get_object_or_404(Follow.objects, follower=follower, followee=followee)
         serializer = self.serializer_class(follow, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class LikesViewSet(viewsets.ModelViewSet):
+    renderer_classes = [JSONRenderer]
+    pagination_class = page_number_pagination_class_factory([('type', 'likes')])
+
+    serializer_class = LikesSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get']
+
+    def get_queryset(self):
+        return Post.objects.get(pk=self.kwargs['post_pk']).like_set.all().order_by('author_id')
+
+
+class LikedViewSet(viewsets.ModelViewSet):
+    renderer_classes = [JSONRenderer]
+    pagination_class = page_number_pagination_class_factory([('type', 'liked')])
+
+    serializer_class = LikesSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get']
+
+    def get_queryset(self):
+        return Post.objects.get(pk=self.kwargs['author_pk']).like_set.all()

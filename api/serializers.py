@@ -1,11 +1,9 @@
-from dataclasses import fields
 from email.policy import default
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
-
-from posts.models import Post
-from follow.models import Follow, Request
+from posts.models import Post, Like
+from follow.models import Follow
 
 
 class AuthorSerializer(serializers.HyperlinkedModelSerializer):
@@ -57,3 +55,24 @@ class FollowersSerializer(NestedHyperlinkedModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         return representation['follower']
+
+
+class LikesSerializer(serializers.ModelSerializer):
+    parent_lookup_kwargs = {
+        'author_pk': 'author__pk',
+        'post_pk': 'post__pk',
+    }
+    author = AuthorSerializer(many=False, read_only=True)
+    post = PostSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Like
+        fields = ['author', 'post']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['type'] = 'Like'
+        representation['summary'] = instance.author.get_full_name() + ' likes your post'
+        representation['object'] = representation['post']['source']
+        del representation['post']
+        return representation
