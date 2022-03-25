@@ -1,3 +1,4 @@
+from typing import Any
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
@@ -77,17 +78,17 @@ def unfollow_request(request, from_username):
 class UsersView(LoginRequiredMixin, ServerListView):
     model = USER_MODEL
     template_name = 'follow/user_list.html'
-    endpoint = '/authors/'
+    endpoint = '/authors'
 
     def serialize(self, response: Response):
         jsonResponse = response.json()
-        jsonResponse['items']
 
-        def to_internal(representation):
+        def to_internal(representation: dict[str, Any]):
             return {
-                'get_full_name': representation['displayName'],
-                'username': representation['github'],
+                'get_full_name': representation.get('displayName'),
+                'username': representation.get('github'),
             }
+
         return [to_internal(user) for user in jsonResponse['items']]
 
     def get_queryset(self):
