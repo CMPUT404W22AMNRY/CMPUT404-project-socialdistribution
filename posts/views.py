@@ -101,6 +101,9 @@ class RemotePostDetailView(LoginRequiredMixin, ServerDetailView):
             'date_published': json_response['published'],
             'visibility': json_response['visibility'],
             'unlisted': json_response['unlisted'],
+            'author': {
+                'get_full_name': json_response['author']['displayName']
+            }
         }
 
 
