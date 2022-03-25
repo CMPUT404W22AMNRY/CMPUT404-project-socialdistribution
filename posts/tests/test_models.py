@@ -1,9 +1,9 @@
 from django.forms import ValidationError
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from posts.models import Post, Comment, Like
+from posts.models import Post, Comment
 
-from .constants import COMMENT_DATA, POST_DATA, LIKE_DATA
+from .constants import COMMENT_DATA, POST_DATA
 
 CURRENT_USER = 'bob'
 
