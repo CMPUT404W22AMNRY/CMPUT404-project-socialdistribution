@@ -292,9 +292,9 @@ class LikeTests(TestCase):
         self.client.login(username='bob', password='password1')
         res = self.client.get(f'/api/v1/authors/{self.author.id}/posts/{self.post.id}/likes/')
         self.assertEqual(res.status_code, 200)
-        body = json.loads(res.content.decode('utf-8'))
+        body = res.json()
         self.assertEqual(body['type'], 'likes')
-        self.assertEqual(len(self.post.like_set.all()), 2)
+        self.assertEqual(len(body['items']), len(self.post.like_set.all()))
         for like in body['items']:
             self.assertEqual(like['type'], 'Like')
             self.assertIn('summary', like)

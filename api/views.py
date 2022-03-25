@@ -112,7 +112,7 @@ class LikesViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
     def get_queryset(self):
-        return Post.objects.get(pk=self.kwargs['post_pk']).like_set.all()
+        return Post.objects.get(pk=self.kwargs['post_pk']).like_set.all().order_by('author_id')
 
 
 class LikedViewSet(viewsets.ModelViewSet):
