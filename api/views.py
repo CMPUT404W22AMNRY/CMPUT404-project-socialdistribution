@@ -1,5 +1,5 @@
 from follow.models import Follow
-from posts.models import Post, ContentType
+from posts.models import Post, ContentType, Like
 from api.util import page_number_pagination_class_factory
 from socialdistribution.storage import ImageStorage
 from api.serializers import AuthorSerializer, FollowersSerializer, PostSerializer, LikesSerializer
@@ -124,4 +124,4 @@ class LikedViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
     def get_queryset(self):
-        return Post.objects.get(pk=self.kwargs['author_pk']).like_set.all()
+        return Like.objects.filter(author_id=self.kwargs['author_pk'])
