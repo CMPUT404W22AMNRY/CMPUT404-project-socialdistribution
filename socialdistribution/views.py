@@ -64,5 +64,9 @@ class StreamView(LoginRequiredMixin, ServerListView):
                 'get_absolute_url': absolute_url,
             }
 
-        # TODO: Add ['items'] once our groupmates are ready (have the results nested)
-        return [to_internal(post) for post in json_response]
+        # TODO: Remove this if group 13 implements placing posts under items
+        if isinstance(json_response, list):
+            return [to_internal(post) for post in json_response]
+        
+        return [to_internal(post) for post in json_response['items']]
+        
