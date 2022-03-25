@@ -102,6 +102,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(follow, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class RequestsViewSet(viewsets.ModelViewSet):
     renderer_classes = [JSONRenderer]
     pagination_class = page_number_pagination_class_factory([('type', 'requests')])
@@ -111,7 +112,11 @@ class RequestsViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
     def get_queryset(self):
-        return Request.objects.filter(to_user=self.kwargs['author_pk']).order_by('-created')        
+        return Request.objects.filter(to_user=self.kwargs['author_pk']).order_by('-created')
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class LikesViewSet(viewsets.ModelViewSet):
     renderer_classes = [JSONRenderer]

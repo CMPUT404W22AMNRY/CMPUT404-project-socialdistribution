@@ -7,7 +7,7 @@ from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from posts.models import Post, ContentType, Comment
-from follow.models import Follow
+from follow.models import Follow, Request
 
 TEST_USERNAME = 'bob'
 TEST_PASSWORD = 'password'
@@ -257,6 +257,37 @@ class FollowersTest(TestCase):
     def test_follower_not_exist(self):
         self.client.login(username='bob', password='password')
         res = self.client.get(f'/api/v1/authors/{self.author.id}/followers/100/')
+        self.assertEqual(res.status_code, 404)
+
+
+class RequestsTest(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.user1 = get_user_model().objects.create_user(username='rodgers', password='password')
+        self.user2 = get_user_model().objects.create_user(username='brady', password='password')
+
+        self.request = Request.objects.create(
+            from_user=self.user2,
+            to_user=self.user1,
+            title=self.user2.username + "'s request to follow " + self.user1.username
+        )
+        self.request.save()
+
+    def test_requests(self):
+        self.client.login(username='rodgers', password='password')
+        res = self.client.get(f'/api/v1/authors/{self.user1.id}/requests/')
+        self.assertEqual(res.status_code, 200)
+        body = json.loads(res.content.decode('utf-8'))
+        self.assertEqual(body['type'], 'requests')
+        self.assertEqual(len(body['items']), 1)
+
+    def test_requests_requires_login(self):
+        res = self.client.get(f'/api/v1/authors/{self.user1.id}/requests/')
+        self.assertEqual(res.status_code, 403)
+
+    def test_requests_no_detail(self):
+        self.client.login(username='rodgers', password='password')
+        res = self.client.get(f'/api/v1/authors/{self.user1.id}/requests/{1}')
         self.assertEqual(res.status_code, 404)
 
 

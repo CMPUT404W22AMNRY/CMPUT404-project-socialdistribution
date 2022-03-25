@@ -56,13 +56,14 @@ class FollowersSerializer(NestedHyperlinkedModelSerializer):
         representation = super().to_representation(instance)
         return representation['follower']
 
+
 class RequestsSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
         'author_pk': 'author__pk',
     }
     from_user = AuthorSerializer(many=False, read_only=True)
     to_user = AuthorSerializer(many=False, read_only=True)
-    
+
     class Meta:
         model = Request
         fields = ['from_user', 'to_user']
@@ -70,12 +71,14 @@ class RequestsSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['type'] = 'Follow'
-        representation['summary'] = instance.from_user.get_full_name() + ' wants to follow ' + instance.to_user.get_full_name()
+        representation['summary'] = instance.from_user.get_full_name() + ' wants to follow ' + \
+            instance.to_user.get_full_name()
         representation['actor'] = representation['from_user']
         representation['object'] = representation['to_user']
         del representation['from_user']
         del representation['to_user']
         return representation
+
 
 class LikesSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
