@@ -61,6 +61,9 @@ class StreamView(LoginRequiredMixin, ServerListView):
                 'content': representation['content'],
                 'date_published': representation['published'],
                 'get_absolute_url': absolute_url,
+                'author': {
+                    'get_full_name': representation['author']['displayName']
+                }
             }
 
         # TODO: Remove this if group 13 implements placing posts under items
