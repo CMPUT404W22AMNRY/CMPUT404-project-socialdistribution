@@ -1,4 +1,4 @@
-from follow.models import Follow
+from follow.models import Follow, Request
 from posts.models import Post, ContentType
 from api.util import page_number_pagination_class_factory
 from socialdistribution.storage import ImageStorage
@@ -104,12 +104,14 @@ class FollowersViewSet(viewsets.ModelViewSet):
 
 class RequestsViewSet(viewsets.ModelViewSet):
     renderer_classes = [JSONRenderer]
+    pagination_class = page_number_pagination_class_factory([('type', 'requests')])
+
     serializer_class = RequestsSerializer
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ['get']
 
     def get_queryset(self):
-        return Request.objects.filter(followee=self.kwargs['author_pk']).all().order_by('-created')
+        return Request.objects.filter(to_user=self.kwargs['author_pk']).order_by('-created')        
 
 class LikesViewSet(viewsets.ModelViewSet):
     renderer_classes = [JSONRenderer]

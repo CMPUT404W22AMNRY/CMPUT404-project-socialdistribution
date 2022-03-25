@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 from posts.models import Post, Like
-from follow.models import Follow
+from follow.models import Follow, Request
 
 
 class AuthorSerializer(serializers.HyperlinkedModelSerializer):
@@ -60,20 +60,22 @@ class RequestsSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
         'author_pk': 'author__pk',
     }
-    followee = AuthorSerializer(many=False, read_only=True)
-    follower = AuthorSerializer(many=False, read_only=True)
+    from_user = AuthorSerializer(many=False, read_only=True)
+    to_user = AuthorSerializer(many=False, read_only=True)
+    
     class Meta:
         model = Request
-        fields = ['followee', 'follower']
+        fields = ['from_user', 'to_user']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['type'] = 'Follow'
-        representation['summary'] = instance.follower.get_full_name() + ' wants to follow ' + instance.followee.get_full_name()
-        representation['actor'] = representation['follower']
-        representation['object'] = representation['followee']
-        del representation['follower']
-        del representation['followee']
+        representation['summary'] = instance.from_user.get_full_name() + ' wants to follow ' + instance.to_user.get_full_name()
+        representation['actor'] = representation['from_user']
+        representation['object'] = representation['to_user']
+        del representation['from_user']
+        del representation['to_user']
+        return representation
 
 class LikesSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
