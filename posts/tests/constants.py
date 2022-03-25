@@ -14,7 +14,3 @@ COMMENT_DATA = {
     'comment': 'Sick Olde English',
     'content_type': ContentType.PLAIN,
 }
-
-LIKE_DATA = {
-    'summary': "Lara Croft Likes your post",
-}

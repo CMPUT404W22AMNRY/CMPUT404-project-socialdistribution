@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('posts', '0004_merge_0002_comment_0003_post_imgcontent'),
+        ('posts', '0006_like'),
     ]
 
     operations = [
