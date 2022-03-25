@@ -45,7 +45,6 @@ class StreamView(LoginRequiredMixin, ServerListView):
             server_endpoints_tuples.append((server, endpoints))
         return server_endpoints_tuples
 
-
     def serialize(self, response: Response) -> list:
         json_response = response.json()
 
@@ -67,6 +66,5 @@ class StreamView(LoginRequiredMixin, ServerListView):
         # TODO: Remove this if group 13 implements placing posts under items
         if isinstance(json_response, list):
             return [to_internal(post) for post in json_response]
-        
+
         return [to_internal(post) for post in json_response['items']]
-        

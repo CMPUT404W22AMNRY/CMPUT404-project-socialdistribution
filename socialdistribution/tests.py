@@ -66,7 +66,7 @@ class StreamViewTests(TestCase):
 
         with patch.object(StreamView, 'get_server_to_endpoints_mapping') as mock_get_server_to_endpoints_mapping:
             mock_server_to_endpoints_mapping = [(mock_server, ['/authors/1/posts'])]
-            mock_get_server_to_endpoints_mapping.return_value =mock_server_to_endpoints_mapping
+            mock_get_server_to_endpoints_mapping.return_value = mock_server_to_endpoints_mapping
             with patch('servers.models.Server.objects') as MockServerObjects:
                 MockServerObjects.all.return_value = [mock_server]
 
