@@ -1,23 +1,17 @@
 from follow.models import Follow
-from posts.models import Post, ContentType, Like
+from posts.models import Post, ContentType
 from api.util import page_number_pagination_class_factory
-from api.serializers import AuthorSerializer, FollowersSerializer, PostSerializer
 from socialdistribution.storage import ImageStorage
-from api.serializers import AuthorSerializer, FollowersSerializer, PostSerializer, LikesSerializer, InboxSerializer
-from django.http.request import HttpRequest
+from api.serializers import AuthorSerializer, FollowersSerializer, PostSerializer, LikesSerializer
 from rest_framework.decorators import action
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status
 from django.contrib.auth import get_user_model
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.http import Http404, HttpResponse
 import requests
-from django.shortcuts import get_list_or_404, get_object_or_404
 from django.http import HttpResponse
-import os
-from cmath import e
 import base64
 
 

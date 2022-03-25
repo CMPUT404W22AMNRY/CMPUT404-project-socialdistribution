@@ -1,6 +1,6 @@
 from django.urls import include, path
 from rest_framework import routers
-from api.views import AuthorViewSet, PostViewSet, LikesViewSet, InboxViewSet, LikedViewSet
+from api.views import AuthorViewSet, PostViewSet, LikesViewSet, LikedViewSet
 from api.views import AuthorViewSet, PostViewSet, FollowersViewSet
 from rest_framework_nested import routers
 
