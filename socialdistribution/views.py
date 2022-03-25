@@ -32,11 +32,14 @@ class StreamView(LoginRequiredMixin, ServerListView):
         server_endpoints_tuples = []
         for server in Server.objects.all():
             resp = server.get('/authors/')
+            authors_endpoint = server.service_address + '/authors/'
             authors = resp.json()['items']
             endpoints = []
             for author in authors:
-                author_id = author['id']
                 # TODO: Update this to author_url once our groupmates are ready (have the URL field)
+                author_id = author['id']
+                if author_id.startswith(authors_endpoint):
+                    author_id = author_id[len(authors_endpoint):]
                 authors_posts = f'/authors/{author_id}/posts'
                 endpoints.append(authors_posts)
             server_endpoints_tuples.append((server, endpoints))
