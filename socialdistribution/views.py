@@ -52,7 +52,8 @@ class StreamView(LoginRequiredMixin, ServerListView):
             request_url = response.url
             if not request_url.endswith('/'):
                 request_url += '/'
-            post_url = urllib.parse.urljoin(request_url, str(representation['id']))  # TODO: Update this to source or origin
+            # TODO: Update this to source or origin
+            post_url = urllib.parse.urljoin(request_url, str(representation['id']))
             absolute_url = reverse('posts:remote-detail', kwargs={'url': post_url})
             return {
                 'title': representation.get('title'),
