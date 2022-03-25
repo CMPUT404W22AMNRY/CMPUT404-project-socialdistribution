@@ -183,12 +183,15 @@ class PostDetailViewTests(TestCase):
             MockServerObjects.all.return_value = [mock_server]
 
             self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
-            res = self.client.get(reverse('posts:remote-detail', kwargs={'url': 'http://localhost:5555/api/v2/authors/1/posts/1/'}))
+            res = self.client.get(
+                reverse(
+                    'posts:remote-detail',
+                    kwargs={
+                        'url': 'http://localhost:5555/api/v2/authors/1/posts/1/'}))
             self.assertEqual(res.status_code, 200)
 
             self.assertContains(res, mock_json_response['title'])
             self.assertContains(res, mock_json_response['author']['display_name'])
-
 
 
 class PostDeleteViewTests(TestCase):

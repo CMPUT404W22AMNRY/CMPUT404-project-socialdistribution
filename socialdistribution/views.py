@@ -62,9 +62,7 @@ class StreamView(LoginRequiredMixin, ServerListView):
                 'date_published': representation.get('published'),
                 'get_absolute_url': absolute_url,
                 'author': {
-                    'get_full_name': representation.get('author').get('displayName') or representation.get('author').get('display_name')
-                }
-            }
+                    'get_full_name': representation.get('author').get('displayName') or representation.get('author').get('display_name')}}
 
         # TODO: Remove this if group 13 implements placing posts under items
         if isinstance(json_response, list):

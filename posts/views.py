@@ -101,8 +101,7 @@ class RemotePostDetailView(LoginRequiredMixin, ServerDetailView):
             'visibility': json_response.get('visibility'),
             'unlisted': json_response.get('unlisted'),
             'author': {
-                'get_full_name': json_response.get('author').get('displayName') or json_response.get('author').get('display_name')
-            },
+                'get_full_name': json_response.get('author').get('displayName') or json_response.get('author').get('display_name')},
         }
 
 
