@@ -2,7 +2,7 @@
 <div class="card">
   <h2>{{ object.title }}</h2>
   <h3 class="subtitle">{{ object.author.get_full_name }}</h3>
-  {% if object.content_type == 'text' %} <!-- TODO: Update this when our friends have updated their contentType field -->
+  {% if object.content_type == 'text' or object.content_type == 'text/plain' %} <!-- TODO: Update this when our friends have updated their contentType field -->
   <p>{{ object.content }}</p>
   {% elif object.content_type == 'image/png;base64' or object.content_type == 'image/jpeg;base64' %}
   {% if object.img_content %}

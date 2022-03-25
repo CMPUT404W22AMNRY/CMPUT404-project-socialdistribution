@@ -45,27 +45,90 @@ POST_IMG_DATA = {
 }
 
 # TODO: Update this when our groupmates have updated their interface
-SAMPLE_REMOTE_POST = '''
+SAMPLE_REMOTE_POSTS = '''
 [{
-    "title": "anonymouspost",
-    "id": "1",
-    "source": "https://cmput404-project-t12.herokuapp.com/posts/1",
-    "origin": "https://cmput404-project-t12.herokuapp.com/posts/1",
-    "description": "anonymouspost",
-    "contentType": "text",
-    "content": "anonymouspost",
-    "image": null,
-    "image_src": "",
-    "author": "3",
-    "categories": "undefined",
-    "like_count": 3,
-    "comments": "",
-    "published": "2022-03-21T22:44:16.876579Z",
-    "visibility": "PUBLIC",
-    "unlisted": false
+  "id": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6/posts/a8cd37e4-be1c-4f86-99cb-b20b1440606f",
+  "type": "post",
+  "author": {
+    "type": "author",
+    "id": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6",
+    "url": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6",
+    "host": "https://psdt11.herokuapp.com/",
+    "display_name": "Jarrett Knauer",
+    "github": "https://github.com/jlknauer"
+  },
+  "comment_src": [
+    {
+      "type": "comment",
+      "author": {
+        "type": "author",
+        "id": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6",
+        "url": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6",
+        "host": "https://psdt11.herokuapp.com/",
+        "display_name": "Jarrett Knauer",
+        "github": "https://github.com/jlknauer"
+      },
+      "comment": "First comment on the post!",
+      "published": "2022-03-23T00:01:32Z",
+      "id": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6/posts/a8cd37e4-be1c-4f86-99cb-b20b1440606f/comments/e1b71a73-f302-4999-916a-2f5d57c4c626"
+    }
+  ],
+  "title": "Hello from Team 11",
+  "source": "",
+  "origin": "",
+  "description": "This is a test post",
+  "content_type": "text/plain",
+  "content": "Web dev sucks",
+  "count": 0,
+  "comments": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6/posts/a8cd37e4-be1c-4f86-99cb-b20b1440606f/comments",
+  "published": "2022-03-23T00:01:32Z",
+  "visibility": "PUBLIC",
+  "unlisted": false
 }]'''
 
-SAMPLE_AUTHORS = '''
+SAMPLE_REMOTE_POST = '''
+{
+  "id": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6/posts/a8cd37e4-be1c-4f86-99cb-b20b1440606f",
+  "type": "post",
+  "author": {
+    "type": "author",
+    "id": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6",
+    "url": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6",
+    "host": "https://psdt11.herokuapp.com/",
+    "display_name": "Jarrett Knauer",
+    "github": "https://github.com/jlknauer"
+  },
+  "comment_src": [
+    {
+      "type": "comment",
+      "author": {
+        "type": "author",
+        "id": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6",
+        "url": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6",
+        "host": "https://psdt11.herokuapp.com/",
+        "display_name": "Jarrett Knauer",
+        "github": "https://github.com/jlknauer"
+      },
+      "comment": "First comment on the post!",
+      "published": "2022-03-23T00:01:32Z",
+      "id": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6/posts/a8cd37e4-be1c-4f86-99cb-b20b1440606f/comments/e1b71a73-f302-4999-916a-2f5d57c4c626"
+    }
+  ],
+  "title": "Hello from Team 11",
+  "source": "",
+  "origin": "",
+  "description": "This is a test post",
+  "content_type": "text/plain",
+  "content": "Web dev sucks",
+  "count": 0,
+  "comments": "https://psdt11.herokuapp.com/authors/28b32de4-e5cc-4840-a6ea-8c05dca9dae6/posts/a8cd37e4-be1c-4f86-99cb-b20b1440606f/comments",
+  "published": "2022-03-23T00:01:32Z",
+  "visibility": "PUBLIC",
+  "unlisted": false
+}
+'''
+
+SAMPLE_REMOTE_AUTHOR = '''
 {
     "type": "authors",
     "items": [

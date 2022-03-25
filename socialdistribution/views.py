@@ -31,7 +31,7 @@ class StreamView(LoginRequiredMixin, ServerListView):
     def get_server_to_endpoints_mapping(self) -> list[tuple[Server, list[str]]]:
         server_endpoints_tuples = []
         for server in Server.objects.all():
-            resp = server.get('/authors/')
+            resp = server.get('/authors')
             authors_endpoint = server.service_address + '/authors/'
             authors = resp.json()['items']
             endpoints = []
@@ -55,13 +55,14 @@ class StreamView(LoginRequiredMixin, ServerListView):
             post_url = urllib.parse.urljoin(request_url, representation['id'])  # TODO: Update this to source or origin
             absolute_url = reverse('posts:remote-detail', kwargs={'url': post_url})
             return {
-                'title': representation['title'],
-                'description': representation['description'],
-                'content_type': representation['contentType'],
-                'content': representation['content'],
-                'date_published': representation['published'],
+                'title': representation.get('title'),
+                'description': representation.get('description'),
+                'content_type': representation.get('contentType') or representation.get('content_type'),
+                'content': representation.get('content'),
+                'date_published': representation.get('published'),
                 'get_absolute_url': absolute_url,
-            }
+                'author': {
+                    'get_full_name': representation.get('author').get('displayName') or representation.get('author').get('display_name')}}
 
         # TODO: Remove this if group 13 implements placing posts under items
         if isinstance(json_response, list):

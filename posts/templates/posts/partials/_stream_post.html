@@ -1,6 +1,9 @@
 <a href="{{ post.get_absolute_url }}" style="color: inherit">
     <div class="card interactable">
         <h3>{{ post.title }}</h3>
+        <p class="subtitle">
+            {{ post.author.get_full_name }}
+        </p>
         <p>
             {{ post.description }}
         </p>
