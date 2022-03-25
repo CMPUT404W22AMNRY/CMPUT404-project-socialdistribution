@@ -28,17 +28,20 @@ class StreamView(LoginRequiredMixin, ServerListView):
             visibility=Post.Visibility.PUBLIC,
             unlisted=False).order_by('-date_published')
 
-    def get_endpoints(self) -> list[str]:
-        post_endpoints = []
+    def get_server_to_endpoints_mapping(self) -> list[tuple[Server, list[str]]]:
+        server_endpoints_tuples = []
         for server in Server.objects.all():
             resp = server.get('/authors/')
             authors = resp.json()['items']
+            endpoints = []
             for author in authors:
                 author_id = author['id']
                 # TODO: Update this to author_url once our groupmates are ready (have the URL field)
                 authors_posts = f'/authors/{author_id}/posts'
-                post_endpoints.append(authors_posts)
-        return post_endpoints
+                endpoints.append(authors_posts)
+            server_endpoints_tuples.append((server, endpoints))
+        return server_endpoints_tuples
+
 
     def serialize(self, response: Response) -> list:
         json_response = response.json()
