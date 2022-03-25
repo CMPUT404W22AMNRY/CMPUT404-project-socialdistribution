@@ -25,6 +25,6 @@ class ServerDetailView(DetailView):
             try:
                 return self.to_internal(resp)
             except Exception as err:
-                print(f'Failed to internalize {url}, err: {server.service_address}', file=stderr)
+                print(f'Failed to internalize {url}, err: {err.with_traceback(None)}', file=stderr)
 
         raise Http404
