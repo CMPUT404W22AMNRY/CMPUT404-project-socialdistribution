@@ -1,7 +1,5 @@
 import base64
-from cmath import e
-import os
-from django.db import IntegrityError
+import requests
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -11,12 +9,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound
-
-from api.serializers import AuthorSerializer, FollowersSerializer, PostSerializer
+from api.serializers import AuthorSerializer, FollowersSerializer, PostSerializer, RequestsSerializer
+from socialdistribution.storage import ImageStorage
 from api.util import page_number_pagination_class_factory
 from posts.models import Post, ContentType
-from follow.models import Follow
+from follow.models import Follow, Request
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -46,15 +43,15 @@ class PostViewSet(viewsets.ModelViewSet):
         author_id = kwargs['author_pk']
         post_id = kwargs['pk']
 
-        img = get_object_or_404(Post.objects, author_id=author_id, pk=post_id)
+        post = get_object_or_404(Post.objects, author_id=author_id, pk=post_id)
 
-        if img.content_type != ContentType.PNG and img.content_type != ContentType.JPG:
+        if post.content_type != ContentType.PNG and post.content_type != ContentType.JPG:
             return Response(status=404)
 
-        with open(os.path.abspath(settings.BASE_DIR) + img.img_content.url, 'rb') as img_file:
-            encoded_img = base64.b64encode(img_file.read()).decode('utf-8')
+        location = post.img_content.url if post.img_content else post.content
+        encoded_img = base64.b64encode(requests.get(location).content)
 
-        return HttpResponse(encoded_img, content_type=img.content_type)
+        return HttpResponse(encoded_img, content_type=post.content_type)
 
 
 class FollowersViewSet(viewsets.ModelViewSet):
@@ -105,3 +102,12 @@ class FollowersViewSet(viewsets.ModelViewSet):
         follow = get_object_or_404(Follow.objects, follower=follower, followee=followee)
         serializer = self.serializer_class(follow, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class RequestsViewSet(viewsets.ModelViewSet):
+    renderer_classes = [JSONRenderer]
+    serializer_class = RequestsSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get']
+
+    def get_queryset(self):
+        return Request.objects.filter(followee=self.kwargs['author_pk']).all().order_by('-created')
