@@ -27,6 +27,10 @@ class StreamViewTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
         self.user = get_user_model().objects.create_user(username=TEST_USERNAME, password=TEST_PASSWORD)
+        self.user.first_name = 'Bob'
+        self.user.last_name = 'Doyle'
+        self.user.save()
+
         self.num_posts = 10
         for i in range(self.num_posts):
             post = Post.objects.create(
@@ -50,6 +54,7 @@ class StreamViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
 
         self.assertContains(res, POST_DATA['title'], count=self.num_posts)
+        self.assertContains(res, self.user.get_full_name())
 
     def test_displays_remote_posts(self):
         mock_json_response = json.loads(SAMPLE_REMOTE_POST)
