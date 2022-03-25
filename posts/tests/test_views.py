@@ -1,8 +1,14 @@
+import json
+from unittest.mock import MagicMock, patch
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from posts.models import Post, Category, ContentType, Comment, Like
 from django.urls import reverse
+from requests import Response
 
+from servers.models import Server
+from api.tests.constants import SAMPLE_REMOTE_POST
+from api.tests.test_api import TEST_PASSWORD, TEST_USERNAME
 from .constants import COMMENT_DATA, POST_DATA
 
 EDITED_POST_DATA = POST_DATA.copy()
@@ -159,11 +165,30 @@ class PostDetailViewTests(TestCase):
 
 class PostDetailViewTests(TestCase):
     def setUp(self) -> None:
-        pass
+        self.user = get_user_model().objects.create_user(username=TEST_USERNAME, password=TEST_PASSWORD)
 
     def test_remote_detail_view_page(self):
-        # TODO: Add tests
-        pass
+        mock_json_response = json.loads(SAMPLE_REMOTE_POST)
+        mock_response = Response()
+        mock_response.json = MagicMock(return_value=mock_json_response)
+
+        mock_server = Server(
+            service_address="http://localhost:5555/api/v2",
+            username="hello",
+            password="no",
+        )
+        mock_server.get = MagicMock(return_value=mock_response)
+
+        with patch('servers.models.Server.objects') as MockServerObjects:
+            MockServerObjects.all.return_value = [mock_server]
+
+            self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+            res = self.client.get(reverse('posts:remote-detail', kwargs={'url': 'http://localhost:5555/api/v2/authors/1/posts/1/'}))
+            self.assertEqual(res.status_code, 200)
+
+            self.assertContains(res, mock_json_response['title'])
+            self.assertContains(res, mock_json_response['author']['display_name'])
+
 
 
 class PostDeleteViewTests(TestCase):
