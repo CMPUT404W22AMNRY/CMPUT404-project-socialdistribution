@@ -10,7 +10,6 @@ router.register(r'authors', AuthorViewSet)
 author_router = routers.NestedDefaultRouter(router, r'authors', lookup='author')
 author_router.register(r'posts', PostViewSet, basename='post')
 author_router.register(r'followers', FollowersViewSet, basename='follower')
-author_router.register(r'inbox', InboxViewSet, basename='inbox')
 author_router.register(r'liked', LikedViewSet, basename='liked')
 
 post_router = routers.NestedDefaultRouter(author_router, r'posts', lookup='post')

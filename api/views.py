@@ -131,14 +131,3 @@ class LikedViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Post.objects.get(pk=self.kwargs['author_pk']).like_set.all()
-
-
-class InboxViewSet(viewsets.ModelViewSet):
-    renderer_classes = [JSONRenderer]
-    pagination_class = page_number_pagination_class_factory([('type', 'likes')])
-    serializer_class = InboxSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['get']
-
-    def get_queryset(self):
-        return Post.objects.filter(author=self.kwargs['author_pk']).like_set.all()
