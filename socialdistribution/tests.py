@@ -4,7 +4,7 @@ from requests import Response
 from django.test import TestCase, Client
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
-from api.tests.constants import SAMPLE_REMOTE_POST
+from api.tests.constants import SAMPLE_REMOTE_POSTS
 from api.tests.test_api import TEST_PASSWORD, TEST_USERNAME
 
 from posts.models import Post
@@ -57,7 +57,7 @@ class StreamViewTests(TestCase):
         self.assertContains(res, self.user.get_full_name())
 
     def test_displays_remote_posts(self):
-        mock_json_response = json.loads(SAMPLE_REMOTE_POST)
+        mock_json_response = json.loads(SAMPLE_REMOTE_POSTS)
         mock_response = Response()
         mock_response.url = 'http://localhost:5555/api/v2/authors/1/posts'
         mock_response.json = MagicMock(return_value=mock_json_response)

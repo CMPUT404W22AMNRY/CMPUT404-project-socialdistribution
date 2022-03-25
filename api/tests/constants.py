@@ -86,7 +86,7 @@ SAMPLE_REMOTE_POST = '''
   "unlisted": false
 }]'''
 
-SAMPLE_AUTHORS = '''
+SAMPLE_REMOTE_AUTHOR = '''
 {
     "type": "authors",
     "items": [
