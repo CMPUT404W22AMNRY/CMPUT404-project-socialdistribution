@@ -38,7 +38,7 @@ class StreamView(LoginRequiredMixin, ServerListView):
             for author in authors:
                 # TODO: Update this to author_url once our groupmates are ready (have the URL field)
                 author_id = author['id']
-                if author_id.startswith(authors_endpoint):
+                if isinstance(author_id, str) and author_id.startswith(authors_endpoint):
                     author_id = author_id[len(authors_endpoint):]
                 authors_posts = f'/authors/{author_id}/posts'
                 endpoints.append(authors_posts)
@@ -52,7 +52,7 @@ class StreamView(LoginRequiredMixin, ServerListView):
             request_url = response.url
             if not request_url.endswith('/'):
                 request_url += '/'
-            post_url = urllib.parse.urljoin(request_url, representation['id'])  # TODO: Update this to source or origin
+            post_url = urllib.parse.urljoin(request_url, str(representation['id']))  # TODO: Update this to source or origin
             absolute_url = reverse('posts:remote-detail', kwargs={'url': post_url})
             return {
                 'title': representation.get('title'),
