@@ -10,10 +10,12 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from requests import Response
+from requests import Response, get
 
 from posts.models import Post, Category, Comment, Like
+from servers.models import Server
 from servers.views.generic.detailed_view import ServerDetailView
+from lib.http_helper import is_b64_image_content
 
 
 class PostForm(ModelForm):
@@ -90,12 +92,25 @@ class RemotePostDetailView(LoginRequiredMixin, ServerDetailView):
 
     def to_internal(self, response: Response) -> Post:
         json_response = response.json()
+
+        content_type = json_response.get('contentType') or json_response.get('content_type')
+        is_img = is_b64_image_content(content_type)
+        if is_img:
+            try:
+                origin = json_response.get('origin')
+                service_address = origin[0:origin.index('/authors')]
+                service_request = origin[origin.index('/authors'):]
+                server = Server.objects.get(service_address=service_address)
+                img_content = server.get(service_request + '/image').content.decode('utf-8')
+            except Exception as e:
+                print('warning: ' + e)
+
         return {
             'id': json_response.get('id'),
             'title': json_response.get('title'),
             'description': json_response.get('description'),
-            'content_type': json_response.get('contentType') or json_response.get('content_type'),
-            'content': json_response.get('content'),
+            'content_type': content_type,
+            'content': json_response.get('content') if not is_img or not img_content else img_content,
             'categories': json_response.get('categories'),
             'date_published': json_response.get('published'),
             'visibility': json_response.get('visibility'),
