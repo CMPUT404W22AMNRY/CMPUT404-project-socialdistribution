@@ -3,7 +3,12 @@ from rest_framework import routers
 from api.views import AuthorViewSet, PostViewSet, FollowersViewSet
 from rest_framework_nested import routers
 
-router = routers.DefaultRouter()
+class OptionalSlashRouter(routers.DefaultRouter):
+    def __init__(self):
+        super().__init__()
+        self.trailing_slash = '/?'
+
+router = OptionalSlashRouter()
 router.register(r'authors', AuthorViewSet)
 
 author_router = routers.NestedDefaultRouter(router, r'authors', lookup='author')
