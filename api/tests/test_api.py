@@ -11,6 +11,16 @@ from .constants import POST_IMG_DATA
 TEST_USERNAME = 'bob'
 TEST_PASSWORD = 'password'
 
+class RouterTests(TestCase):
+    def setUp(self) -> None:        
+        self.client = Client()
+        get_user_model().objects.create_user(username=TEST_USERNAME, password=TEST_PASSWORD)
+
+    def test_authors_no_trailing_slash(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.get('/api/v1/authors')
+        self.assertEqual(res.status_code, 200)
+
 
 class AuthorTests(TestCase):
     def setUp(self) -> None:
