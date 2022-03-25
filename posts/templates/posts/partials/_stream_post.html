@@ -7,7 +7,8 @@
         <p>
             {{ post.description }}
         </p>
-        {% if post.content_type == 'text/plain' %}
+        <!-- TODO: Update this when our friends have updated their contentType field -->
+        {% if post.content_type == 'text' or post.content_type == 'text/plain' %}
             <p>
                 {{ post.content }}
             </p>
