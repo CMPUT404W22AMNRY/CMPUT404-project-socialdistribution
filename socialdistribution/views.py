@@ -31,7 +31,7 @@ class StreamView(LoginRequiredMixin, ServerListView):
     def get_server_to_endpoints_mapping(self) -> list[tuple[Server, list[str]]]:
         server_endpoints_tuples = []
         for server in Server.objects.all():
-            resp = server.get('/authors/')
+            resp = server.get('/authors')
             authors_endpoint = server.service_address + '/authors/'
             authors = resp.json()['items']
             endpoints = []

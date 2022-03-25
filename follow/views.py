@@ -77,7 +77,7 @@ def unfollow_request(request, from_username):
 class UsersView(LoginRequiredMixin, ServerListView):
     model = USER_MODEL
     template_name = 'follow/user_list.html'
-    endpoint = '/authors/'
+    endpoint = '/authors'
 
     def serialize(self, response: Response):
         jsonResponse = response.json()
