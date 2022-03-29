@@ -20,5 +20,13 @@
 
   <!-- TODO: Re-add comments section -->
   <!-- TODO: Re-add likes section -->
+  <section>
+    <h3>Comments</h3>
+    <ul class="no-indent">
+      {% for comment in object.comment_set.all|dictsort:'date_published' reversed %}
+      <li>{% include 'posts/partials/_comment.html' %}</li>
+      {% endfor %}
+    </ul>
+  </section>
 </div>
 {% endblock content %}
