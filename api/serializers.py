@@ -28,11 +28,15 @@ class CommentSerializer(NestedHyperlinkedModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['id', 'author', 'comment', 'content_type']
+        fields = ['id', 'author', 'comment', 'url']
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: Comment):
         representation = super().to_representation(instance)
+        representation['type'] = 'comment'
+        representation['contentType'] = instance.content_type
         representation['published'] = instance.date_published
+        representation['id'] = representation['url']
+        del representation['url']
         return representation
 
 
@@ -56,7 +60,13 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
         representation['categories'] = [category.category for category in instance.categories.all()]
         representation['origin'] = representation['source']  # TODO: Update this when we have post sharing
         representation['count'] = len(instance.comment_set.all())
-        representation['commentSrc'] = representation['comment_set']
+        representation['commentSrc'] = {
+            'type': 'comments',
+            'page': 1,
+            'post': representation['source'],
+            'id': representation['source'] + 'comments',
+            'comments': representation['comment_set']
+        }
         del representation['comment_set']
         return representation
 
