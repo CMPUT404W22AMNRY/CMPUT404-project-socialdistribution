@@ -65,7 +65,7 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
             'type': 'comments',
             'page': 1,
             'post': representation['source'],
-            'id': representation['source'] + 'comments',
+            'id': representation['source'] + '/comments',
             'comments': representation['comment_set']
         }
         del representation['comment_set']
