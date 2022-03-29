@@ -60,7 +60,7 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
         representation['categories'] = [category.category for category in instance.categories.all()]
         representation['origin'] = representation['source']  # TODO: Update this when we have post sharing
         representation['count'] = len(instance.comment_set.all())
-        representation['commentSrc'] = {
+        representation['commentsSrc'] = {
             'type': 'comments',
             'page': 1,
             'post': representation['source'],

@@ -125,6 +125,36 @@ class PostTests(TestCase):
 
         self.assertEqual(post['count'], len(self.post.comment_set.all()))
 
+    def test_contains_comments(self):
+        comment = Comment.objects.create(
+            comment=COMMENT_DATA['comment'],
+            author_id=self.user.id,
+            post_id=self.post.id,
+            content_type=COMMENT_DATA['content_type'],
+        )
+        comment.save()
+
+        self.client.login(username='bob', password='password')
+        res = self.client.get(f'/api/v1/authors/{self.user.id}/posts/{self.post.id}/')
+        self.assertEqual(res.status_code, 200)
+        post = json.loads(res.content.decode('utf-8'))
+
+        self.assertIn('commentsSrc', post)
+        comments_src = post['commentsSrc']
+        
+        self.assertEqual(len(comments_src['comments']), len(self.post.comment_set.all()))
+        self.assertEqual(comments_src['type'], 'comments')
+        self.assertIn('id', comments_src)
+        self.assertIn('post', comments_src)
+
+        for comment in comments_src['comments']:
+            self.assertEqual('comment', comment['type'])
+            self.assertIn('author', comment)
+            self.assertIn('comment', comment)
+            self.assertIn('contentType', comment)
+            self.assertIn('published', comment)
+            self.assertIn('id', comment)
+
 
 class ImageTests(TestCase):
     def setUp(self) -> None:
