@@ -1,6 +1,6 @@
 from django.urls import include, path
 from rest_framework import routers
-from api.views import AuthorViewSet, PostViewSet, LikesViewSet, LikedViewSet
+from api.views import AuthorViewSet, CommentViewSet, PostViewSet, LikesViewSet, LikedViewSet
 from api.views import AuthorViewSet, PostViewSet, FollowersViewSet
 from rest_framework_nested import routers
 
@@ -21,6 +21,7 @@ author_router.register(r'liked', LikedViewSet, basename='liked')
 
 post_router = routers.NestedDefaultRouter(author_router, r'posts', lookup='post')
 post_router.register(r'likes', LikesViewSet, basename='likes')
+post_router.register(r'comments', CommentViewSet, basename='comment')
 
 urlpatterns = [
     path('', include(router.urls)),
