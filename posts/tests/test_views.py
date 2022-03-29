@@ -1,3 +1,4 @@
+from cgitb import reset
 import json
 from unittest.mock import MagicMock, patch
 from django.test import TestCase, Client
@@ -349,3 +350,33 @@ class CreateLikeViewTest(TestCase):
         res = self.client.post(reverse('posts:like', kwargs={'pk': self.post.id}))
         self.assertEqual(res.status_code, 302)
         self.assertEqual(len(self.post.like_set.all()), 1)
+
+    def test_likes_url(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.get(f'/api/v1/authors/{self.user.id}/posts/{self.post.id}/likes/')
+        self.assertEqual(res.status_code, 200)
+
+
+class CreateLikedViewTest(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.user = get_user_model().objects.create_user(username='alice', password='password')
+        self.post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=True)
+        self.post.save()
+
+    def test_new_like(self):
+        self.client.login(username='alice', password='password')
+        res = self.client.post(reverse('posts:like', kwargs={'pk': self.post.id}))
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(len(self.post.like_set.all()), 1)
+
+    def test_liked_url(self):
+        self.client.login(username='alice', password='password')
+        res = self.client.get(f'/api/v1/authors/{self.user.id}/liked/')
+        self.assertEqual(res.status_code, 200)
