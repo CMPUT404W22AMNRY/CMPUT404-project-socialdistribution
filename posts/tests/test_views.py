@@ -331,26 +331,21 @@ class MyPostsViewTests(TestCase):
         self.assertEqual(res.status_code, 302)
 
 
-class LikeViewTest(TestCase):
+class CreateLikeViewTest(TestCase):
     def setUp(self) -> None:
         self.client = Client()
         self.user = get_user_model().objects.create_user(username='bob', password='password')
-        alice = get_user_model().objects.create_user(username='alice', password='password')
-        self.posts: list[Post] = []
-        self.posts_per_user = 2
-        self.likes: list[Like] = []
+        self.post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=True)
+        self.post.save()
 
-        for user in [self.user, alice]:
-            for _ in range(self.posts_per_user):
-                post = Post.objects.create(
-                    title=POST_DATA['title'],
-                    description=POST_DATA['description'],
-                    content_type=POST_DATA['content_type'],
-                    content=POST_DATA['content'],
-                    author_id=user.id,
-                    unlisted=True)
-                like = Like.objects.create(
-                    author_id=user.id,
-                    post_id=post.id,
-                )
-                post.save()
+    def test_new_like(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.post(reverse('posts:like', kwargs={'pk': self.post.id}))
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(len(self.post.like_set.all()), 1)
