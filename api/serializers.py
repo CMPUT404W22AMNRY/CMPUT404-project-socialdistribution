@@ -2,7 +2,7 @@ from email.policy import default
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
-from posts.models import Post, Like
+from posts.models import Post, Like, Comment
 from follow.models import Follow
 
 
@@ -19,17 +19,34 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
         representation['profileImage'] = instance.profile_image_url
         return representation
 
+class CommentSerializer(NestedHyperlinkedModelSerializer):
+    parent_lookup_kwargs = {
+        'author_pk': 'author__pk',
+        'post_pk': 'post__pk',
+    }
+    author = AuthorSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'author', 'comment', 'content_type']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['published'] = instance.date_published
+        return representation
+
 
 class PostSerializer(NestedHyperlinkedModelSerializer):
     parent_lookup_kwargs = {
         'author_pk': 'author__pk',
     }
     author = AuthorSerializer(many=False, read_only=True)
+    comment_set = CommentSerializer(many=True, read_only=True)
     url_field_name = 'source'
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'description', 'content', 'author', 'visibility', 'unlisted', 'source']
+        fields = ['id', 'title', 'description', 'content', 'author', 'visibility', 'unlisted', 'source', 'comment_set']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -39,6 +56,8 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
         representation['categories'] = [category.category for category in instance.categories.all()]
         representation['origin'] = representation['source']  # TODO: Update this when we have post sharing
         representation['count'] = len(instance.comment_set.all())
+        representation['commentSrc'] = representation['comment_set']
+        del representation['comment_set']
         return representation
 
 
