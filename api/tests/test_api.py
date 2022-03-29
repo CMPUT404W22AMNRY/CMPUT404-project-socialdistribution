@@ -155,6 +155,63 @@ class PostTests(TestCase):
             self.assertIn('published', comment)
             self.assertIn('id', comment)
 
+class CommentsTests(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.user = get_user_model().objects.create_user(username='bob', password='password')
+        self.post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=POST_DATA['unlisted'])
+        self.num_comments = 3
+        self.comments = []
+        for _ in range(self.num_comments):
+            comment = Comment.objects.create(
+                comment=COMMENT_DATA['comment'],
+                author_id=self.user.id,
+                post_id=self.post.id,
+                content_type=COMMENT_DATA['content_type'],
+            )
+            comment.save()
+            self.comments.append(comment)
+    
+    def test_comments(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.get(f'/api/v1/authors/{self.user.id}/posts/{self.post.id}/comments/')
+        self.assertEqual(res.status_code, 200)
+        comments = json.loads(res.content.decode('utf-8'))
+
+        self.assertEqual(comments['type'], 'comments')
+        self.assertIn('comments', comments)
+        self.assertEqual(len(comments['comments']), self.num_comments)
+        
+        for comment in comments['comments']:
+            self.assertEqual('comment', comment['type'])
+            self.assertIn('author', comment)
+            self.assertIn('comment', comment)
+            self.assertIn('contentType', comment)
+            self.assertIn('published', comment)
+            self.assertIn('id', comment)
+        
+
+    def test_comment_detail(self):
+        comment = self.comments[0]
+
+        self.client.login(username='bob', password='password')
+        res = self.client.get(f'/api/v1/authors/{self.user.id}/posts/{self.post.id}/comments/{comment.id}')
+        self.assertEqual(res.status_code, 200)
+        res = json.loads(res.content.decode('utf-8'))
+
+        self.assertEqual('comment', res['type'])
+        self.assertIn('author', res)
+        self.assertIn('comment', res)
+        self.assertIn('contentType', res)
+        self.assertIn('published', res)
+        self.assertIn('id', res)
+        
 
 class ImageTests(TestCase):
     def setUp(self) -> None:
