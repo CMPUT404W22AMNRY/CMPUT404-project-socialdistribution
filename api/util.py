@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
 
-def page_number_pagination_class_factory(additional_fields: list[tuple[str, str]]) -> PageNumberPagination:
+def page_number_pagination_class_factory(
+        additional_fields: list[tuple[str, str]], items_field_name: str = 'items') -> PageNumberPagination:
     """
     Returns a new paginator class that can be used in the `pagination_class` attribute of view sets to
     add additional fields to the root response.
@@ -22,6 +23,6 @@ def page_number_pagination_class_factory(additional_fields: list[tuple[str, str]
         # By Alasdair on Aug 23, 2015 at 19:19
         # https://stackoverflow.com/questions/32170442/remove-count-next-previous-from-response-in-django-rest-framework
         def get_paginated_response(self, data):
-            additional_fields.append(('items', data))
+            additional_fields.append((items_field_name, data))
             return Response(OrderedDict(additional_fields))
     return Pagination

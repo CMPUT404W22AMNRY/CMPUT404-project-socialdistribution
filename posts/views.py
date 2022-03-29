@@ -105,6 +105,28 @@ class RemotePostDetailView(LoginRequiredMixin, ServerDetailView):
             except Exception as e:
                 print('warning: ' + e)
 
+        # Build author field
+        authors_full_name = ''
+        if isinstance(json_response.get('author'), str):
+            authors_full_name = json_response.get('author').get(
+                'displayName') or json_response.get('author').get('display_name')
+
+        # Build comments field
+        def to_comments_internal(json_body: Dict[str, Any]):
+            return {
+                'comment': json_body.get('comment'),
+                'date_published': json_body.get('published'),
+                'author': {
+                    'get_full_name': json_body.get('author').get('displayName') or json_body.get('author').get('display_name')
+                }
+            }
+
+        comments = []
+        try:
+            comments = [to_comments_internal(comment) for comment in json_response.get('comment_src')]
+        except Exception as err:
+            pass
+
         return {
             'id': json_response.get('id'),
             'title': json_response.get('title'),
@@ -116,9 +138,12 @@ class RemotePostDetailView(LoginRequiredMixin, ServerDetailView):
             'visibility': json_response.get('visibility'),
             'unlisted': json_response.get('unlisted'),
             'author': {
-                'get_full_name': '' if isinstance(
-                    json_response.get('author'),
-                    str) else json_response.get('author').get('displayName') or json_response.get('author').get('display_name')}}
+                'get_full_name': authors_full_name
+            },
+            'comment_set': {
+                'all': comments
+            },
+        }
 
 
 class DeletePostView(LoginRequiredMixin, DeleteView):
