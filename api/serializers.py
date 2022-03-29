@@ -19,6 +19,7 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
         representation['profileImage'] = instance.profile_image_url
         return representation
 
+
 class CommentSerializer(NestedHyperlinkedModelSerializer):
     parent_lookup_kwargs = {
         'author_pk': 'author__pk',

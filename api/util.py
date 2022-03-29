@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
 
-def page_number_pagination_class_factory(additional_fields: list[tuple[str, str]], items_field_name: str = 'items') -> PageNumberPagination:
+def page_number_pagination_class_factory(
+        additional_fields: list[tuple[str, str]], items_field_name: str = 'items') -> PageNumberPagination:
     """
     Returns a new paginator class that can be used in the `pagination_class` attribute of view sets to
     add additional fields to the root response.

@@ -141,7 +141,7 @@ class PostTests(TestCase):
 
         self.assertIn('commentsSrc', post)
         comments_src = post['commentsSrc']
-        
+
         self.assertEqual(len(comments_src['comments']), len(self.post.comment_set.all()))
         self.assertEqual(comments_src['type'], 'comments')
         self.assertIn('id', comments_src)
@@ -154,6 +154,7 @@ class PostTests(TestCase):
             self.assertIn('contentType', comment)
             self.assertIn('published', comment)
             self.assertIn('id', comment)
+
 
 class CommentsTests(TestCase):
     def setUp(self) -> None:
@@ -177,7 +178,7 @@ class CommentsTests(TestCase):
             )
             comment.save()
             self.comments.append(comment)
-    
+
     def test_comments(self):
         self.client.login(username='bob', password='password')
         res = self.client.get(f'/api/v1/authors/{self.user.id}/posts/{self.post.id}/comments/')
@@ -187,7 +188,7 @@ class CommentsTests(TestCase):
         self.assertEqual(comments['type'], 'comments')
         self.assertIn('comments', comments)
         self.assertEqual(len(comments['comments']), self.num_comments)
-        
+
         for comment in comments['comments']:
             self.assertEqual('comment', comment['type'])
             self.assertIn('author', comment)
@@ -195,7 +196,6 @@ class CommentsTests(TestCase):
             self.assertIn('contentType', comment)
             self.assertIn('published', comment)
             self.assertIn('id', comment)
-        
 
     def test_comment_detail(self):
         comment = self.comments[0]
@@ -211,7 +211,7 @@ class CommentsTests(TestCase):
         self.assertIn('contentType', res)
         self.assertIn('published', res)
         self.assertIn('id', res)
-        
+
 
 class ImageTests(TestCase):
     def setUp(self) -> None:

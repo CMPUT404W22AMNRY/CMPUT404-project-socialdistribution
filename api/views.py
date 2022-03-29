@@ -126,6 +126,7 @@ class LikedViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Like.objects.filter(author_id=self.kwargs['author_pk'])
 
+
 class CommentViewSet(viewsets.ModelViewSet):
     renderer_classes = [JSONRenderer]
     pagination_class = page_number_pagination_class_factory([('type', 'comments')], items_field_name='comments')
