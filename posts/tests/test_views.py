@@ -163,7 +163,7 @@ class PostDetailViewTests(TestCase):
         self.assertNotContains(res, 'Like')
 
 
-class PostDetailViewTests(TestCase):
+class RemotePostDetailView(TestCase):
     def setUp(self) -> None:
         self.user = get_user_model().objects.create_user(username=TEST_USERNAME, password=TEST_PASSWORD)
 
@@ -192,6 +192,35 @@ class PostDetailViewTests(TestCase):
 
             self.assertContains(res, mock_json_response['title'])
             self.assertContains(res, mock_json_response['author']['display_name'])
+    
+    def test_contains_remote_comments(self):
+        mock_json_response = json.loads(SAMPLE_REMOTE_POST)
+        mock_response = Response()
+        mock_response.json = MagicMock(return_value=mock_json_response)
+
+        mock_server = Server(
+            service_address="http://localhost:5555/api/v2",
+            username="hello",
+            password="no",
+        )
+        mock_server.get = MagicMock(return_value=mock_response)
+
+        with patch('servers.models.Server.objects') as MockServerObjects:
+            MockServerObjects.all.return_value = [mock_server]
+
+            self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+            res = self.client.get(
+                reverse(
+                    'posts:remote-detail',
+                    kwargs={
+                        'url': 'http://localhost:5555/api/v2/authors/1/posts/1/'}))
+            self.assertEqual(res.status_code, 200)
+            self.assertTemplateUsed(res, 'posts/partials/_comment.html')
+
+            for comment in mock_json_response['comment_src']:
+                self.assertContains(res, comment['comment'])
+                self.assertContains(res, comment['published'])
+                self.assertContains(res, comment['author']['display_name'])
 
 
 class PostDeleteViewTests(TestCase):
