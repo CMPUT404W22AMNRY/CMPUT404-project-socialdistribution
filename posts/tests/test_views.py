@@ -300,3 +300,28 @@ class MyPostsViewTests(TestCase):
     def test_new_comment_require_login(self):
         res = self.client.get(reverse('posts:my-posts'))
         self.assertEqual(res.status_code, 302)
+
+
+class LikeViewTest(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.user = get_user_model().objects.create_user(username='bob', password='password')
+        alice = get_user_model().objects.create_user(username='alice', password='password')
+        self.posts: list[Post] = []
+        self.posts_per_user = 2
+        self.likes: list[Like] = []
+
+        for user in [self.user, alice]:
+            for _ in range(self.posts_per_user):
+                post = Post.objects.create(
+                    title=POST_DATA['title'],
+                    description=POST_DATA['description'],
+                    content_type=POST_DATA['content_type'],
+                    content=POST_DATA['content'],
+                    author_id=user.id,
+                    unlisted=True)
+                like = Like.objects.create(
+                    author_id=user.id,
+                    post_id=post.id,
+                )
+                post.save()
