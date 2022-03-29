@@ -192,7 +192,7 @@ class RemotePostDetailView(TestCase):
 
             self.assertContains(res, mock_json_response['title'])
             self.assertContains(res, mock_json_response['author']['display_name'])
-    
+
     def test_contains_remote_comments(self):
         mock_json_response = json.loads(SAMPLE_REMOTE_POST)
         mock_response = Response()

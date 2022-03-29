@@ -108,7 +108,8 @@ class RemotePostDetailView(LoginRequiredMixin, ServerDetailView):
         # Build author field
         authors_full_name = ''
         if isinstance(json_response.get('author'), str):
-            authors_full_name = json_response.get('author').get('displayName') or json_response.get('author').get('display_name')
+            authors_full_name = json_response.get('author').get(
+                'displayName') or json_response.get('author').get('display_name')
 
         # Build comments field
         def to_comments_internal(json_body: Dict[str, Any]):
