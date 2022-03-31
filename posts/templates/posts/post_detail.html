@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+
+{% load post_tags %}
+
 {% block content %}
     <div class="card">
         <h2>{{ object.title }}</h2>
@@ -7,6 +10,10 @@
             <p>
                 {{ object.content }}
             </p>
+        {% elif object.content_type == 'text/markdown' %}
+            <div class='markdown-content'>
+                {{ object.content|convert_markdown|safe }}
+            </div>
         {% elif object.content_type == 'image/png;base64' or object.content_type == 'image/jpeg;base64' %}
             {% if object.img_content %}
                 <img src="{{ object.img_content.url }}"

@@ -259,3 +259,8 @@ form > table td,
 form > table th {
   padding-bottom: 1rem;
 }
+
+.markdown-content img {
+  width: 100%;
+  overflow: hidden;
+}
