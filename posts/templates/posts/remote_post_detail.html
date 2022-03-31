@@ -1,4 +1,9 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} 
+
+{% load post_tags %}
+
+{% block content %}
+
 <div class="card">
   <h2>{{ object.title }}</h2>
   <h3 class="subtitle">{{ object.author.get_full_name }}</h3>
