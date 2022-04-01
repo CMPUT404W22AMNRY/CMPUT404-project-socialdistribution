@@ -1,4 +1,4 @@
-import json
+from json import JSONDecodeError, loads as json_loads
 from typing import Any
 from follow.models import Follow
 from posts.models import Post, ContentType, Like
@@ -41,8 +41,8 @@ class AuthorViewSet(viewsets.ModelViewSet):
         http_method_name = request.method.lower()
         if http_method_name == 'post':
             try:
-                body: dict[str, Any] = json.loads(request.body)
-            except json.JSONDecodeError as err:
+                body: dict[str, Any] = json_loads(request.body)
+            except JSONDecodeError as err:
                 return HttpResponse(err, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
             post_type = body.get('type').lower()
