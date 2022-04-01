@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from posts.models import Post, ContentType, Comment
 from follow.models import Follow
+from rest_framework import status
 
 TEST_USERNAME = 'bob'
 TEST_PASSWORD = 'password'
@@ -44,7 +45,16 @@ class AuthorTests(TestCase):
         self.client.login(username=api_user_username, password=TEST_PASSWORD)
         res = self.client.get('/api/v1/authors/')
         self.assertEqual(res.status_code, 200)
+    
+    def test_disallows_post(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.post('/api/v1/authors/')
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
+    def test_disallows_delete(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.delete('/api/v1/authors/')
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
 class PostTests(TestCase):
     def setUp(self) -> None:
@@ -398,3 +408,18 @@ class LikeTests(TestCase):
             self.assertEqual(like['type'], 'Like')
             self.assertIn('summary', like)
             self.assertIn('object', like)
+
+class InboxTests(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.user = get_user_model().objects.create_user(username=TEST_USERNAME, password=TEST_PASSWORD)
+
+    def test_get(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.get(f'/api/v1/authors/{self.user.id}/inbox')
+        self.assertEqual(res.status_code, status.HTTP_501_NOT_IMPLEMENTED)
+    
+    def test_post(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.post(f'/api/v1/authors/{self.user.id}/inbox')
+        self.assertEqual(res.status_code, status.HTTP_501_NOT_IMPLEMENTED)
