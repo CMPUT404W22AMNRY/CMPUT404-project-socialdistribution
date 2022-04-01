@@ -1,8 +1,13 @@
+from audioop import reverse
 from django.http import HttpResponse
 from django.test import TestCase, Client
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
-
+import json
+from requests import Response
+from api.tests.constants import SAMPLE_REMOTE_AUTHOR
+from unittest.mock import MagicMock, patch
+from servers.models import Server
 
 class ViewsTests(TestCase):
     def setUp(self) -> None:
@@ -63,3 +68,36 @@ class ViewsTests(TestCase):
         res = self.client.post(reverse_lazy('auth_provider:login'), data=login_data)
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, 'error')
+
+
+class RemoteProfileViewTests(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        get_user_model().objects.create_user(username='bob', password='password')
+
+        mock_json_response = json.loads(SAMPLE_REMOTE_AUTHOR)
+        mock_response = Response()
+        mock_response.json = MagicMock(return_value=mock_json_response)
+
+        mock_server = Server(
+            service_address="http://localhost:5555/api/v2",
+            username="hello",
+            password="no",
+        )
+        mock_server.get = MagicMock(return_value=mock_response)
+
+        with patch('servers.models.Server.objects') as MockServerObjects:
+            MockServerObjects.all.return_value = [mock_server]
+
+            self.client.login(username='bob', password='password')
+            res = self.client.get(
+                reverse(
+                    'accounts:remote_profile'
+                    kwargs={
+                        'url': 'http://localhost:5555/api/v2/authors/1/'
+                    }
+                )
+            )
+            self.assertEqual(res.status_code, 200)
+            self.assertContains(res, mock_json_response['display_name'])
+            self.assertContains(res, mock_json_response['github'])
