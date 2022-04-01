@@ -1,7 +1,9 @@
+from webbrowser import get
 from follow.models import Follow
 from posts.models import Post, ContentType, Like
 from api.util import page_number_pagination_class_factory
-from socialdistribution.storage import ImageStorage
+from rest_framework.views import APIView
+from rest_framework.exceptions import MethodNotAllowed
 from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer
 from rest_framework.decorators import action
 from rest_framework.renderers import JSONRenderer
@@ -10,6 +12,7 @@ from rest_framework import viewsets, permissions, status
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.http import Http404, HttpResponse
+from rest_framework.request import Request
 import requests
 from django.http import HttpResponse
 import base64
@@ -22,8 +25,21 @@ class AuthorViewSet(viewsets.ModelViewSet):
     queryset = get_user_model().objects.filter(is_active=True, is_staff=False, is_api_user=False).order_by('id')
     serializer_class = AuthorSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['get']
+    http_method_names = ['get', 'post', 'delete'] # Allow 'post', 'delete' on actions but don't allow POST to create
 
+    def create(self, request, *args, **kwargs):
+        raise MethodNotAllowed('POST')
+
+    def destroy(self, request, *args, **kwargs):
+        raise MethodNotAllowed('DELETE')
+
+    @action(methods=['post', 'get', 'delete'], detail=True, url_path='inbox', name='inbox')
+    def inbox(self, request: Request, **kwargs):
+        if request.method.lower() not in ['post', 'get', 'delete']:
+            raise MethodNotAllowed(request.method)
+        author_id = kwargs['pk']
+        # TODO: Implement
+        return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
 
 class PostViewSet(viewsets.ModelViewSet):
     renderer_classes = [JSONRenderer]
@@ -137,3 +153,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Post.objects.get(pk=self.kwargs['post_pk']).comment_set.all().order_by('-date_published')
+
+class InboxView(APIView):
+    def post(self, request: Request, format=None):
+        # TODO: Implement this
+        return Response({}, status=status.HTTP_501_NOT_IMPLEMENTED)
