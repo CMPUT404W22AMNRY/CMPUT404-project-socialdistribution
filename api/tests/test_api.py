@@ -45,7 +45,7 @@ class AuthorTests(TestCase):
         self.client.login(username=api_user_username, password=TEST_PASSWORD)
         res = self.client.get('/api/v1/authors/')
         self.assertEqual(res.status_code, 200)
-    
+
     def test_disallows_post(self):
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
         res = self.client.post('/api/v1/authors/')
@@ -55,6 +55,7 @@ class AuthorTests(TestCase):
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
         res = self.client.delete('/api/v1/authors/')
         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 class PostTests(TestCase):
     def setUp(self) -> None:
@@ -409,6 +410,7 @@ class LikeTests(TestCase):
             self.assertIn('summary', like)
             self.assertIn('object', like)
 
+
 class InboxTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
@@ -418,7 +420,7 @@ class InboxTests(TestCase):
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
         res = self.client.get(f'/api/v1/authors/{self.user.id}/inbox')
         self.assertEqual(res.status_code, status.HTTP_501_NOT_IMPLEMENTED)
-    
+
     def test_post(self):
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
         res = self.client.post(f'/api/v1/authors/{self.user.id}/inbox')
