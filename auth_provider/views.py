@@ -82,14 +82,14 @@ class RemoteProfileView(ServerDetailView):
             }
 
         actions = [get_action(user_action_generator) 
-                    for user_action_generator in user_action_generators]
+                for user_action_generator in user_action_generators]
         context['user_actions'] = []
         for action in actions:
             if action is not None:
                 context['user_actions'].append(action)
 
         return context
-    
+
     def to_internal(self, response: Response) -> get_user_model():
         json_response = response.json()
 
@@ -102,7 +102,7 @@ class RemoteProfileView(ServerDetailView):
             "get_full_name": author_full_name,
             "github_url": github,
         }
-        
+
 
 class EditProfileView(UpdateView):
     form_class = EditProfileForm
