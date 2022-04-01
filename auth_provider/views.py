@@ -82,7 +82,7 @@ class RemoteProfileView(ServerDetailView):
                 "link": user_action[1],
             }
 
-        actions = [get_action(user_action_generator) 
+        actions = [get_action(user_action_generator)
                    for user_action_generator in user_action_generators]
         context['user_actions'] = []
         for action in actions:
