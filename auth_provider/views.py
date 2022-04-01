@@ -62,6 +62,7 @@ class ProfileView(DetailView):
 
         return context
 
+
 class RemoteProfileView(ServerDetailView):
     model = get_user_model()
     template_name = 'profile/remote_user_profile.html'
@@ -82,7 +83,7 @@ class RemoteProfileView(ServerDetailView):
             }
 
         actions = [get_action(user_action_generator) 
-                for user_action_generator in user_action_generators]
+                   for user_action_generator in user_action_generators]
         context['user_actions'] = []
         for action in actions:
             if action is not None:
