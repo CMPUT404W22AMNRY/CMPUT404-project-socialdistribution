@@ -423,3 +423,8 @@ class InboxTests(TestCase):
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
         res = self.client.post(f'/api/v1/authors/{self.user.id}/inbox')
         self.assertEqual(res.status_code, status.HTTP_501_NOT_IMPLEMENTED)
+
+    def test_delete(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.delete(f'/api/v1/authors/{self.user.id}/inbox')
+        self.assertEqual(res.status_code, status.HTTP_501_NOT_IMPLEMENTED)
