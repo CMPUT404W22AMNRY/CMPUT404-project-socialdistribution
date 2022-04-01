@@ -1,4 +1,5 @@
-from webbrowser import get
+import json
+from typing import Any
 from follow.models import Follow
 from posts.models import Post, ContentType, Like
 from api.util import page_number_pagination_class_factory
@@ -12,6 +13,7 @@ from rest_framework import viewsets, permissions, status
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.http import Http404, HttpResponse
+from django.http.request import HttpRequest
 from rest_framework.request import Request
 import requests
 from django.http import HttpResponse
@@ -25,7 +27,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
     queryset = get_user_model().objects.filter(is_active=True, is_staff=False, is_api_user=False).order_by('id')
     serializer_class = AuthorSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['get', 'post', 'delete'] # Allow 'post', 'delete' on actions but don't allow POST to create
+    http_method_names = ['get', 'post', 'delete']  # Allow 'post', 'delete' on actions but don't allow POST to create
 
     def create(self, request, *args, **kwargs):
         raise MethodNotAllowed('POST')
@@ -34,12 +36,45 @@ class AuthorViewSet(viewsets.ModelViewSet):
         raise MethodNotAllowed('DELETE')
 
     @action(methods=['post', 'get', 'delete'], detail=True, url_path='inbox', name='inbox')
-    def inbox(self, request: Request, **kwargs):
-        if request.method.lower() not in ['post', 'get', 'delete']:
-            raise MethodNotAllowed(request.method)
+    def inbox(self, request: HttpRequest, **kwargs):
         author_id = kwargs['pk']
-        # TODO: Implement
-        return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        http_method_name = request.method.lower()
+        if http_method_name == 'post':
+            try:
+                body: dict[str, Any] = json.loads(request.body)
+            except json.JSONDecodeError as err:
+                return HttpResponse(err, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+            post_type = body.get('type')
+
+            if post_type == 'post':
+                # TODO: Handle post
+                return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+            if post_type == 'follow':
+                # TODO: Handle follow request
+                return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+            if post_type == 'like':
+                # TODO: Handle like
+                return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+            if post_type == 'comment':
+                # TODO: Handle comment
+                return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+            return HttpResponse({'detail': 'Unknown type'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+        if http_method_name == 'get':
+            # TODO: Implement
+            return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+        if http_method_name == 'delete':
+            # TODO: Implement
+            return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+        raise MethodNotAllowed(request.method)
+
 
 class PostViewSet(viewsets.ModelViewSet):
     renderer_classes = [JSONRenderer]
@@ -153,6 +188,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Post.objects.get(pk=self.kwargs['post_pk']).comment_set.all().order_by('-date_published')
+
 
 class InboxView(APIView):
     def post(self, request: Request, format=None):
