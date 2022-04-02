@@ -348,7 +348,8 @@ class FollowersTest(TestCase):
         res = self.client.get(f'/api/v1/authors/{self.author.id}/followers/{self.other_user2.id}/')
         self.assertEqual(res.status_code, 200)
         body = json.loads(res.content.decode('utf-8'))
-        self.assertEqual(body['id'], self.other_user2.id)
+        author_id = int(body['id'].rsplit('/', 1)[-1])
+        self.assertEqual(author_id, self.other_user2.id)
 
     def test_check_not_follower(self):
         self.client.login(username='bob', password='password')
@@ -427,7 +428,7 @@ class InboxTests(TestCase):
     def test_post(self):
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
         res = self.client.post(f'/api/v1/authors/{self.user.id}/inbox')
-        self.assertEqual(res.status_code, status.HTTP_501_NOT_IMPLEMENTED)
+        self.assertEqual(res.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     def test_delete(self):
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
@@ -454,11 +455,10 @@ class InboxTests(TestCase):
             'author': json.loads(author_response),
             'object': post_url
         }
-        print(payload)
 
         self.assertEqual(len(post.like_set.all()), 0)
         
-        resp = self.client.post(f'/api/v1/authors/{self.user.id}/inbox', payload)
-        self.assertEqual(resp.status_code, 204)
+        resp = self.client.post(f'/api/v1/authors/{self.user.id}/inbox', json.dumps(payload), content_type='application/json')
+        self.assertEqual(resp.status_code, 200)
 
         self.assertEqual(len(post.like_set.all()), 1)

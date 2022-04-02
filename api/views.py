@@ -18,6 +18,7 @@ from rest_framework.request import Request
 import requests
 from django.http import HttpResponse
 import base64
+from urllib.parse import urlparse
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -57,38 +58,39 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
             if post_type == 'like':
                 # TODO: Handle like
-                author_id: str = body.get('author').get('id')
+                requesting_author_id: str = body.get('author').get('id')
                 post_or_comment_id: str = body.get('object')
-                if not author_id.startswith(request.get_host()):
+                
+                parsed_post_or_comment_id = urlparse(post_or_comment_id)
+                parsed_author_id = urlparse(requesting_author_id)
+                if not parsed_author_id.hostname == request.get_host():
                     # Remote likes
                     return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
 
-
                 # Get last path of url
                 # https://stackoverflow.com/questions/7253803/how-to-get-everything-after-last-slash-in-a-url
-                author_id = author_id.rsplit('/', 1)[-1]
+                requesting_author_id = parsed_author_id.path.rsplit('/', 1)[-1]
                 
                 if '/comment/' in post_or_comment_id:
                     # Comment like
                     return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
 
-                post_id = post_or_comment_id.rsplit('/', 1)[-1]
+                post_id = parsed_post_or_comment_id.path.rsplit('/', 1)[-1]
                 
                 like = Like.objects.create(
-                    author_id=author_id,
+                    author_id=requesting_author_id,
                     post_id=post_id,
                 )
                 like.save()
 
-                json = LikesSerializer(like).data
-                return JSONRenderer().render(json.data)
-
+                json = LikesSerializer(like, context={'request': request}).data
+                return Response(json)
 
             if post_type == 'comment':
                 # TODO: Handle comment
                 return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
 
-            return HttpResponse({'detail': 'Unknown type'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return HttpResponse({'detail': 'Unknown type'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY, content_type='applicaton/json')
 
         if http_method_name == 'get':
             # TODO: Implement
