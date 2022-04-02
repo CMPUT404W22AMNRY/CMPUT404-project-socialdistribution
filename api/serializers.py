@@ -1,9 +1,12 @@
-from email.policy import default
+import json
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
-from posts.models import Post, Like, Comment
+from posts.models import Post, Like, Comment, RemoteLike
 from follow.models import Follow
+from servers.models import Server
+from urllib.parse import urlparse
+from requests import Response
 
 
 class AuthorSerializer(serializers.HyperlinkedModelSerializer):
@@ -107,4 +110,34 @@ class LikesSerializer(serializers.ModelSerializer):
         representation['summary'] = instance.author.get_full_name() + ' likes your post'
         representation['object'] = representation['post']['source']
         del representation['post']
+        return representation
+
+
+class RemoteLikeSerializer(serializers.ModelSerializer):
+    parent_lookup_kwargs = {
+        'post_pk': 'post__pk',
+    }
+    post = PostSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = RemoteLike
+        fields = ['post']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        for server in Server.objects.all():
+            parsed_author_url = urlparse(instance.author_url)
+            parsed_server_service_address = urlparse(server.service_address)
+            if parsed_author_url.hostname != parsed_server_service_address.hostname:
+                continue
+            author: Response = server.get(parsed_server_service_address.path)
+            json_author = author.json()
+
+            author_name = json_author.get('displayName') or json_author.get('display_name') or ''
+            representation['type'] = 'Like'
+            representation['summary'] = author_name + ' likes your post'
+            representation['object'] = representation['post']['source']
+            representation['author'] = json_author
+            del representation['post']
+            return representation
         return representation
