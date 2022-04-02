@@ -457,8 +457,11 @@ class InboxTests(TestCase):
         }
 
         self.assertEqual(len(post.like_set.all()), 0)
-        
-        resp = self.client.post(f'/api/v1/authors/{self.user.id}/inbox', json.dumps(payload), content_type='application/json')
+
+        resp = self.client.post(
+            f'/api/v1/authors/{self.user.id}/inbox',
+            json.dumps(payload),
+            content_type='application/json')
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.get('Content-Type'), 'application/json')
 
