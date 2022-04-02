@@ -10,12 +10,12 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from requests import Response, get
+from requests import Response
+from lib.http_helper import is_b64_image_content
 
-from posts.models import Post, Category, Comment, Like
+from .models import CommentLike, Post, Category, Comment, Like
 from servers.models import Server
 from servers.views.generic.detailed_view import ServerDetailView
-from lib.http_helper import is_b64_image_content
 
 
 class PostForm(ModelForm):
@@ -201,3 +201,22 @@ def unlike_post_view(request: HttpRequest, pk: int):
     except Like.DoesNotExist:
         pass
     return redirect(Post.objects.get(pk=pk).get_absolute_url())
+
+
+def like_comment_view(request: HttpRequest, post_pk:int, pk: int):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+
+    comment_like, created = CommentLike.objects.get_or_create(author_id=request.user.id, comment_id=pk)
+    return redirect(Post.objects.get(pk=post_pk).get_absolute_url())
+
+def unlike_comment_view(request: HttpRequest, post_pk:int, pk: int):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+
+    try:
+        like = CommentLike.objects.get(author_id=request.user.id, post_id=pk)
+        like.delete()
+    except Like.DoesNotExist:
+        pass
+    return redirect(Post.objects.get(pk=post_pk).get_absolute_url())

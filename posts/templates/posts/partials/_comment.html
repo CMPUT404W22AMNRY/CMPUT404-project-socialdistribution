@@ -4,4 +4,18 @@
     </a>
     <span>{{ comment.date_published }}</span>
     <p>{{ comment.comment }}</p>
+    <div>
+        <li>
+            <form method="POST" action="{% url 'posts:like-comment' comment.post.id comment.id %}">
+                {% csrf_token %}
+                <input type="submit" value="Like" class="link">
+            </form>
+        </li>
+        <li>
+            <form method="POST" action="{% url 'posts:unlike-comment' comment.post.id comment.id %}">
+                {% csrf_token %}
+                <input type="submit" value="Unlike" class="link">
+            </form>
+        </li>
+    </div>
 </div>
