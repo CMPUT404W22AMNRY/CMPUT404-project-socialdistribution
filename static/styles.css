@@ -260,6 +260,11 @@ form > table th {
   padding-bottom: 1rem;
 }
 
+.markdown-content img {
+  width: 100%;
+  overflow: hidden;
+}
+
 .action-bar {
   display: flex;
   flex-direction: row;
