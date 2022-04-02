@@ -2,8 +2,11 @@ from typing import Dict
 from django.db import models
 from requests.auth import HTTPBasicAuth
 import requests
+import requests_cache
 
 STR_MAX_LENGTH = 512
+
+requests_cache.install_cache(expire_after=180)  # Cache GET and HEAD results for 180 seconds
 
 
 class Server(models.Model):
