@@ -1,5 +1,5 @@
 from json import JSONDecodeError, loads as json_loads
-from typing import Any, OrderedDict
+from typing import Any
 from follow.models import Follow
 from posts.models import Post, ContentType, Like, RemoteLike
 from api.util import page_number_pagination_class_factory
