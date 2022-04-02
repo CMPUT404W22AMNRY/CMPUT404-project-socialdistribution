@@ -1,12 +1,13 @@
+from requests import Response
+from urllib.parse import urlparse
+from servers.models import Server
+from follow.models import Follow
+from posts.models import Post, Like, Comment, RemoteLike
+from posts.models import CommentLike, Post, Like, Comment
 import json
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
-from posts.models import Post, Like, Comment, RemoteLike
-from follow.models import Follow
-from servers.models import Server
-from urllib.parse import urlparse
-from requests import Response
 
 
 class AuthorSerializer(serializers.HyperlinkedModelSerializer):
@@ -113,6 +114,26 @@ class LikesSerializer(serializers.ModelSerializer):
         return representation
 
 
+class CommentLikeSerializer(serializers.ModelSerializer):
+    parent_lookup_kwargs = {
+        'author_pk': 'author__pk',
+    }
+    author = AuthorSerializer(many=False, read_only=True)
+    comment = CommentSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = CommentLike
+        fields = ['author', 'comment']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['type'] = 'Like'
+        representation['summary'] = instance.author.get_full_name() + ' likes your comment'
+        representation['object'] = representation['comment']['id']
+        del representation['comment']
+        return representation
+
+
 class RemoteLikeSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
         'post_pk': 'post__pk',
@@ -140,4 +161,3 @@ class RemoteLikeSerializer(serializers.ModelSerializer):
             representation['author'] = json_author
             del representation['post']
             return representation
-        return representation

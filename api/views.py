@@ -1,23 +1,25 @@
+from urllib.parse import urlparse
+import base64
+from django.http import HttpResponse
+import requests
+from rest_framework.request import Request
+from django.http.request import HttpRequest
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+from rest_framework import viewsets, permissions, status
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+from rest_framework.decorators import action
+from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer
+from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, CommentLikeSerializer
+from rest_framework.exceptions import MethodNotAllowed
+from api.util import page_number_pagination_class_factory
+from posts.models import Post, ContentType, Like, RemoteLike
+from posts.models import Post, ContentType, Like, Comment
 from json import JSONDecodeError, loads as json_loads
 from typing import Any
 from follow.models import Follow
-from posts.models import Post, ContentType, Like, RemoteLike
-from api.util import page_number_pagination_class_factory
-from rest_framework.exceptions import MethodNotAllowed
-from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer
-from rest_framework.decorators import action
-from rest_framework.renderers import JSONRenderer
-from rest_framework.response import Response
-from rest_framework import viewsets, permissions, status
-from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
-from django.http import Http404, HttpResponse
-from django.http.request import HttpRequest
-from rest_framework.request import Request
-import requests
-from django.http import HttpResponse
-import base64
-from urllib.parse import urlparse
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -199,6 +201,18 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Post.objects.get(pk=self.kwargs['post_pk']).comment_set.all().order_by('-date_published')
+
+
+class CommentLikesViewSet(viewsets.ModelViewSet):
+    renderer_classes = [JSONRenderer]
+    pagination_class = page_number_pagination_class_factory([('type', 'likes')])
+
+    serializer_class = CommentLikeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get']
+
+    def get_queryset(self):
+        return Comment.objects.get(pk=self.kwargs['comment_pk']).commentlike_set.all()
 
 
 def handle_inbox_like(request: Request, body: dict[str, Any]) -> Response:
