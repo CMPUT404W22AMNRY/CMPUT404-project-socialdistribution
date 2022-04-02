@@ -126,6 +126,6 @@ class CommentLikeSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['type'] = 'Like'
         representation['summary'] = instance.author.get_full_name() + ' likes your comment'
-        representation['object'] = representation['comment']
+        representation['object'] = representation['comment']['id']
         del representation['comment']
         return representation

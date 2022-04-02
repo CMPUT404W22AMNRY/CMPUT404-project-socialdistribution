@@ -388,23 +388,6 @@ class LikeTests(TestCase):
             post_id=self.post.id,
         )
 
-        self.comment_by_user = Comment.objects.create(
-            comment=COMMENT_DATA['comment'],
-            author_id=self.author.id,
-            post_id=self.post.id,
-            content_type=COMMENT_DATA['content_type'],
-        )
-
-        self.like_on_comment = CommentLike.objects.create(
-            author_id=self.author.id,
-            comment_id=self.comment_by_user.id,
-        )
-
-        self.other_user_like_on_comment = CommentLike.objects.create(
-            author_id=self.other_user.id,
-            comment_id=self.comment_by_user.id,
-        )
-        self.post.save()
         return
 
     def test_get_like(self):
@@ -431,10 +414,45 @@ class LikeTests(TestCase):
             self.assertIn('summary', like)
             self.assertIn('object', like)
 
+
+class CommentLikeTests(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.user = get_user_model().objects.create_user(username=TEST_USERNAME, password=TEST_PASSWORD)
+        self.other_user = get_user_model().objects.create_user(username='alice', password='password2')
+
+        self.post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=POST_DATA['unlisted'])
+        self.post.full_clean()
+        self.post.save()
+
+        self.comment_by_user = Comment.objects.create(
+            comment=COMMENT_DATA['comment'],
+            author_id=self.user.id,
+            post_id=self.post.id,
+            content_type=COMMENT_DATA['content_type'],
+        )
+
+        self.like_on_comment = CommentLike.objects.create(
+            author_id=self.user.id,
+            comment_id=self.comment_by_user.id,
+        )
+
+        self.other_user_like_on_comment = CommentLike.objects.create(
+            author_id=self.other_user.id,
+            comment_id=self.comment_by_user.id,
+        )
+        self.post.save()
+
     def test_comment_likes(self):
         self.client.login(username='alice', password='password2')
         res = self.client.get(
-            f'/api/v1/authors/{self.author.id}/posts/{self.post.id}/comments/{self.comment_by_user.id}/likes/')
+            f'/api/v1/authors/{self.user.id}/posts/{self.post.id}/comments/{self.comment_by_user.id}/likes/')
         self.assertEqual(res.status_code, 200)
         body = res.json()
         self.assertEqual(body['type'], 'likes')
