@@ -2,7 +2,7 @@ import json
 from unittest.mock import MagicMock, patch
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
-from posts.models import Post, Category, ContentType, Comment, Like
+from posts.models import CommentLike, Post, Category, ContentType, Comment, Like
 from django.urls import reverse
 from requests import Response
 
@@ -162,6 +162,42 @@ class PostDetailViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertNotContains(res, 'Like')
 
+    def test_like_comment(self):
+        comment = Comment.objects.create(
+            comment=COMMENT_DATA['comment'],
+            author=self.user,
+            content_type=COMMENT_DATA['content_type'],
+            post=self.post,
+        )
+        comment.save()
+
+        self.assertEqual(len(comment.commentlike_set.all()), 0)
+        
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.post(reverse('posts:like-comment', kwargs={'post_pk': self.post.id, 'pk': comment.id}))
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(len(comment.commentlike_set.all()), 1)
+    
+    def test_unlike_comment(self):
+        comment = Comment.objects.create(
+            comment=COMMENT_DATA['comment'],
+            author=self.user,
+            content_type=COMMENT_DATA['content_type'],
+            post=self.post,
+        )
+        comment.save()
+        comment_like = CommentLike.objects.create(
+            author=self.user,
+            comment=comment
+        )
+        comment_like.save()
+
+        self.assertEqual(len(comment.commentlike_set.all()), 1)
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.post(reverse('posts:unlike-comment', kwargs={'post_pk': self.post.id, 'pk': comment.id}))
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(len(comment.commentlike_set.all()), 0)
 
 class RemotePostDetailView(TestCase):
     def setUp(self) -> None:

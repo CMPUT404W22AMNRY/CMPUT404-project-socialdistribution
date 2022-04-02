@@ -215,7 +215,7 @@ def unlike_comment_view(request: HttpRequest, post_pk:int, pk: int):
         return HttpResponseNotAllowed(['POST'])
 
     try:
-        like = CommentLike.objects.get(author_id=request.user.id, post_id=pk)
+        like = CommentLike.objects.get(author_id=request.user.id, comment_id=pk)
         like.delete()
     except Like.DoesNotExist:
         pass
