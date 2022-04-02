@@ -172,12 +172,12 @@ class PostDetailViewTests(TestCase):
         comment.save()
 
         self.assertEqual(len(comment.commentlike_set.all()), 0)
-        
+
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
         res = self.client.post(reverse('posts:like-comment', kwargs={'post_pk': self.post.id, 'pk': comment.id}))
         self.assertEqual(res.status_code, 302)
         self.assertEqual(len(comment.commentlike_set.all()), 1)
-    
+
     def test_unlike_comment(self):
         comment = Comment.objects.create(
             comment=COMMENT_DATA['comment'],
@@ -198,6 +198,7 @@ class PostDetailViewTests(TestCase):
         res = self.client.post(reverse('posts:unlike-comment', kwargs={'post_pk': self.post.id, 'pk': comment.id}))
         self.assertEqual(res.status_code, 302)
         self.assertEqual(len(comment.commentlike_set.all()), 0)
+
 
 class RemotePostDetailView(TestCase):
     def setUp(self) -> None:

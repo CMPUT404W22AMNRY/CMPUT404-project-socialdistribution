@@ -78,6 +78,7 @@ class Like(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
+
 class CommentLike(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)

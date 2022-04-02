@@ -72,6 +72,7 @@ class CommentTests(TestCase):
         )
         self.assertEqual(len(self.post.comment_set.all()), 1)
 
+
 class CommentLikeTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username=CURRENT_USER, password='password')

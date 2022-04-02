@@ -203,14 +203,15 @@ def unlike_post_view(request: HttpRequest, pk: int):
     return redirect(Post.objects.get(pk=pk).get_absolute_url())
 
 
-def like_comment_view(request: HttpRequest, post_pk:int, pk: int):
+def like_comment_view(request: HttpRequest, post_pk: int, pk: int):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
 
     comment_like, created = CommentLike.objects.get_or_create(author_id=request.user.id, comment_id=pk)
     return redirect(Post.objects.get(pk=post_pk).get_absolute_url())
 
-def unlike_comment_view(request: HttpRequest, post_pk:int, pk: int):
+
+def unlike_comment_view(request: HttpRequest, post_pk: int, pk: int):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
 
