@@ -9,6 +9,7 @@ from api.tests.constants import SAMPLE_REMOTE_AUTHOR
 from unittest.mock import MagicMock, patch
 from servers.models import Server
 
+
 class ViewsTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
