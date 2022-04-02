@@ -215,7 +215,7 @@ class RemotePostDetailView(TestCase):
                     kwargs={
                         'url': 'http://localhost:5555/api/v2/authors/1/posts/1/'}))
             self.assertEqual(res.status_code, 200)
-            self.assertTemplateUsed(res, 'posts/partials/_comment.html')
+            self.assertTemplateUsed(res, 'posts/partials/_remote_comment.html')
 
             for comment in mock_json_response['comment_src']:
                 self.assertContains(res, comment['comment'])
