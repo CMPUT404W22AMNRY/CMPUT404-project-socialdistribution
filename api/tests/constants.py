@@ -128,16 +128,38 @@ SAMPLE_REMOTE_POST = '''
 }
 '''
 
+SAMPLE_REMOTE_AUTHORS = '''
+{
+  "type": "authors",
+  "items": [
+    {
+      "type": "author",
+      "id": "https://cmput-404-w22-project-group09.herokuapp.com/service/authors/8e7209b2-5682-4b18-8908-4b1ef1bd3365",
+      "url": "https://cmput-404-w22-project-group09.herokuapp.com/authors/8e7209b2-5682-4b18-8908-4b1ef1bd3365",
+      "host": "https://cmput-404-w22-project-group09.herokuapp.com/",
+      "displayName": "Group 10",
+      "github": "https://cmput-404-w22-project-group09.herokuapp.com/",
+      "profileImage": "https://cmput-404-w22-project-group09.herokuapp.com/"
+    },
+    {
+      "type": "author",
+      "id": "https://cmput-404-w22-project-group09.herokuapp.com/service/authors/4ffc1055-b513-43ce-9fc4-5e3095acb3fd",
+      "url": "https://cmput-404-w22-project-group09.herokuapp.com/authors/4ffc1055-b513-43ce-9fc4-5e3095acb3fd",
+      "host": "https://cmput-404-w22-project-group09.herokuapp.com/",
+      "displayName": "Jejoon Ryu",
+      "github": "https://github.com/rjejoon",
+      "profileImage": "https://avatars.githubusercontent.com/u/55664235?v=4"
+    }
+  ]
+}'''
+
 SAMPLE_REMOTE_AUTHOR = '''
 {
-    "type": "authors",
-    "items": [
-        {
-        "id": "32d6cbd8-3a30-4a78-a4c4-c1d99e208f6a",
-        "host": "https://cmput404-project-t12.herokuapp.com/",
-        "displayName": "zhijian1",
-        "github": "https://github.com/Zhijian-Mei",
-        "profileImage": "/mysite/img/default_mSfB41u.jpeg"
-        }
-    ]
+  "type": "author",
+  "id": "https://cmput-404-w22-project-group09.herokuapp.com/service/authors/8e7209b2-5682-4b18-8908-4b1ef1bd3365",
+  "url": "https://cmput-404-w22-project-group09.herokuapp.com/authors/8e7209b2-5682-4b18-8908-4b1ef1bd3365",
+  "host": "https://cmput-404-w22-project-group09.herokuapp.com/",
+  "displayName": "Group 10",
+  "github": "https://cmput-404-w22-project-group09.herokuapp.com/",
+  "profileImage": "https://cmput-404-w22-project-group09.herokuapp.com/"
 }'''
