@@ -103,6 +103,7 @@ class CommentLikeTests(TestCase):
         comment_like.save()
         self.assertEqual(len(self.comment.commentlike_set.all()), 1)
 
+
 class RemoteLikeTests(TestCase):
     def setUp(self) -> None:
         self.user = get_user_model().objects.create_user(username=CURRENT_USER, password='password')
@@ -118,7 +119,7 @@ class RemoteLikeTests(TestCase):
     def test_post_association(self):
         author = json.loads(SAMPLE_REMOTE_AUTHOR)
         author_url = author.get('url')
-        
+
         self.assertEqual(len(self.post.remotelike_set.all()), 0)
 
         remote_like = RemoteLike.objects.create(
@@ -126,5 +127,5 @@ class RemoteLikeTests(TestCase):
             post_id=self.post.id
         )
         remote_like.save()
-        
+
         self.assertEqual(len(self.post.remotelike_set.all()), 1)

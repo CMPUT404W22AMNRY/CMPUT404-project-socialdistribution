@@ -165,7 +165,7 @@ class LikesViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Post.objects.get(pk=self.kwargs['post_pk']).like_set.all().order_by('author_id')
-    
+
     def list(self, request, *args, **kwargs):
         response: Response = super().list(request, *args, **kwargs)
 

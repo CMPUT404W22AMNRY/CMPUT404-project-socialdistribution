@@ -427,7 +427,7 @@ class LikeTests(TestCase):
 
         mock_response = Response()
         mock_response.json = MagicMock(return_value=author)
-        
+
         mock_server = Server(
             service_address="https://cmput-404-w22-project-group09.herokuapp.com/service",
             username="hello",
@@ -442,13 +442,14 @@ class LikeTests(TestCase):
             self.assertEqual(res.status_code, 200)
             body = res.json()
             self.assertEqual(body['type'], 'likes')
-            
+
             print(body)
             # Find remote like
             for like in body['items']:
                 if like.get('author').get('url') == author_url:
                     return
             self.fail('Could not find remote author in likes')
+
 
 class InboxTests(TestCase):
     def setUp(self) -> None:
@@ -515,7 +516,7 @@ class InboxTests(TestCase):
             unlisted=POST_DATA['unlisted'])
         post.save()
 
-        self.assertEqual(len(post.remotelike_set.all()), 0)       
+        self.assertEqual(len(post.remotelike_set.all()), 0)
 
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
         post_response = self.client.get(f'/api/v1/authors/{self.user.id}/posts/{post.id}').content
@@ -534,4 +535,3 @@ class InboxTests(TestCase):
         self.assertEqual(resp.status_code, 204)
 
         self.assertEqual(len(post.remotelike_set.all()), 1)
-        

@@ -112,6 +112,7 @@ class LikesSerializer(serializers.ModelSerializer):
         del representation['post']
         return representation
 
+
 class RemoteLikeSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
         'post_pk': 'post__pk',
