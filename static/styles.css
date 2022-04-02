@@ -264,3 +264,22 @@ form > table th {
   width: 100%;
   overflow: hidden;
 }
+
+.action-bar {
+  display: flex;
+  flex-direction: row;
+
+  padding: 0;
+  list-style-type: none;
+}
+
+.action-bar > * + * {
+  /* https://tailwindcss.com/docs/space */
+  margin-left: 2rem;
+}
+
+.comment {
+  border: 1px solid #bbb;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
