@@ -1,8 +1,9 @@
-from django.urls import reverse
+from unittest.mock import MagicMock, patch
+from servers.models import Server
 from .constants import POST_IMG_DATA, SAMPLE_REMOTE_AUTHOR
 from posts.tests.constants import POST_DATA, COMMENT_DATA
 from posts.tests.constants import POST_DATA
-from posts.models import Post, ContentType, Like
+from posts.models import Post, ContentType, Like, RemoteLike
 import json
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
@@ -10,8 +11,7 @@ from django.test import TestCase, Client
 from posts.models import Post, ContentType, Comment
 from follow.models import Follow
 from rest_framework import status
-from ..serializers import AuthorSerializer, PostSerializer
-from rest_framework.renderers import JSONRenderer
+from requests import Response
 
 TEST_USERNAME = 'bob'
 TEST_PASSWORD = 'password'
@@ -365,7 +365,7 @@ class FollowersTest(TestCase):
 class LikeTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
-        self.author = get_user_model().objects.create_user(username='bob', password='password1')
+        self.author = get_user_model().objects.create_user(username=TEST_USERNAME, password=TEST_PASSWORD)
 
         self.post = Post.objects.create(
             title=POST_DATA['title'],
@@ -377,7 +377,7 @@ class LikeTests(TestCase):
         self.post.full_clean()
         self.post.save()
 
-        self.other_user = get_user_model().objects.create_user(username='alice', password='password2')
+        self.other_user = get_user_model().objects.create_user(username='alice', password=TEST_PASSWORD)
         self.like_by_other_user = Like.objects.create(
             author_id=self.other_user.id,
             post_id=self.post.id,
@@ -391,7 +391,7 @@ class LikeTests(TestCase):
         return
 
     def test_get_like(self):
-        self.client.login(username='bob', password='password1')
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
         res = self.client.get(f'/api/v1/authors/{self.author.id}/posts/{self.post.id}/likes/')
         self.assertEqual(res.status_code, 200)
         body = res.json()
@@ -403,7 +403,7 @@ class LikeTests(TestCase):
             self.assertIn('object', like)
 
     def test_get_liked(self):
-        self.client.login(username='alice', password='password2')
+        self.client.login(username='alice', password=TEST_PASSWORD)
         res = self.client.get(f'/api/v1/authors/{self.author.id}/liked/')
         self.assertEqual(res.status_code, 200)
         body = res.json()
@@ -414,6 +414,41 @@ class LikeTests(TestCase):
             self.assertIn('summary', like)
             self.assertIn('object', like)
 
+    def test_include_remote_likes(self):
+        author = json.loads(SAMPLE_REMOTE_AUTHOR)
+        author_url = author.get('url')
+        remote_like = RemoteLike.objects.create(
+            author_url=author_url,
+            post_id=self.post.id
+        )
+        remote_like.save()
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+
+        mock_response = Response()
+        mock_response.json = MagicMock(return_value=author)
+        
+        mock_server = Server(
+            service_address="https://cmput-404-w22-project-group09.herokuapp.com/service",
+            username="hello",
+            password="no",
+        )
+        mock_server.get = MagicMock(return_value=mock_response)
+
+        with patch('servers.models.Server.objects') as MockServerObjects:
+            MockServerObjects.all.return_value = [mock_server]
+            res = self.client.get(f'/api/v1/authors/{self.author.id}/posts/{self.post.id}/likes/')
+
+            self.assertEqual(res.status_code, 200)
+            body = res.json()
+            self.assertEqual(body['type'], 'likes')
+            
+            print(body)
+            # Find remote like
+            for like in body['items']:
+                if like.get('author').get('url') == author_url:
+                    return
+            self.fail('Could not find remote author in likes')
 
 class InboxTests(TestCase):
     def setUp(self) -> None:

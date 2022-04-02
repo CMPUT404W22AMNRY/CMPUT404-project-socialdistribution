@@ -1,11 +1,10 @@
 from json import JSONDecodeError, loads as json_loads
-from typing import Any
+from typing import Any, OrderedDict
 from follow.models import Follow
 from posts.models import Post, ContentType, Like, RemoteLike
 from api.util import page_number_pagination_class_factory
-from rest_framework.views import APIView
 from rest_framework.exceptions import MethodNotAllowed
-from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer
+from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer
 from rest_framework.decorators import action
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -166,6 +165,16 @@ class LikesViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Post.objects.get(pk=self.kwargs['post_pk']).like_set.all().order_by('author_id')
+    
+    def list(self, request, *args, **kwargs):
+        response: Response = super().list(request, *args, **kwargs)
+
+        remote_like_query_set = Post.objects.get(pk=self.kwargs['post_pk']).remotelike_set.all().order_by('author_url')
+        serialized_remote_likes = RemoteLikeSerializer(remote_like_query_set, many=True, context={'request': request})
+
+        if len(serialized_remote_likes.data) > 0:
+            response.data['items'] += (serialized_remote_likes.data)
+        return response
 
 
 class LikedViewSet(viewsets.ModelViewSet):
