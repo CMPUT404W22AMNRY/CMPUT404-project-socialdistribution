@@ -9,7 +9,7 @@ from follow.models import Follow
 class AuthorSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ['id', 'url', ]
+        fields = ['url', ]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -17,6 +17,7 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
         representation['displayName'] = instance.get_full_name()
         representation['github'] = instance.github_url
         representation['profileImage'] = instance.profile_image_url
+        representation['id'] = representation['url']
         return representation
 
 
@@ -51,7 +52,7 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'description', 'content', 'author', 'visibility', 'unlisted', 'source', 'comment_set']
+        fields = ['title', 'description', 'content', 'author', 'visibility', 'unlisted', 'source', 'comment_set']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -69,6 +70,7 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
             'comments': representation['comment_set']
         }
         del representation['comment_set']
+        representation['id'] = representation['source']
         return representation
 
 
