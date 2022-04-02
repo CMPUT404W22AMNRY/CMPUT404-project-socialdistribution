@@ -228,7 +228,6 @@ class CommentLikesViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
     def get_queryset(self):
-        print(Comment.objects.get(pk=self.kwargs['comment_pk']).commentlike_set.all())
         return Comment.objects.get(pk=self.kwargs['comment_pk']).commentlike_set.all()
 
 
