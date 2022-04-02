@@ -9,3 +9,5 @@ media/images
 
 staticfiles/
 *.env
+
+http_cache.sqlite

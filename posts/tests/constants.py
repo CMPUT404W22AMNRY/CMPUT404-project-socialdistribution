@@ -10,6 +10,17 @@ POST_DATA = {
     'unlisted': False,
 }
 
+COMMONMARK_POST_DATA = {
+    'title': 'A post title about a post about Markdown!',
+    'description': 'I <3 CommonMark',
+    'content_type': ContentType.MARKDOWN,
+    'content': """# Heading 8-)
+**This is bold text!**""",
+    'categories': 'web',
+    'visibility': Post.Visibility.PUBLIC,
+    'unlisted': False,
+}
+
 COMMENT_DATA = {
     'comment': 'Sick Olde English',
     'content_type': ContentType.PLAIN,

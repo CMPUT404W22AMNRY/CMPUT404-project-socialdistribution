@@ -9,7 +9,7 @@ from requests import Response
 from servers.models import Server
 from api.tests.constants import SAMPLE_REMOTE_POST
 from api.tests.test_api import TEST_PASSWORD, TEST_USERNAME
-from .constants import COMMENT_DATA, POST_DATA
+from .constants import COMMENT_DATA, COMMONMARK_POST_DATA, POST_DATA
 
 EDITED_POST_DATA = POST_DATA.copy()
 EDITED_POST_DATA['content_type'] = ContentType.MARKDOWN
@@ -108,6 +108,13 @@ class PostDetailViewTests(TestCase):
             content=POST_DATA['content'],
             author_id=self.user.id,
             unlisted=True)
+        self.post2 = Post.objects.create(
+            title=COMMONMARK_POST_DATA['title'],
+            description=COMMONMARK_POST_DATA['description'],
+            content_type=COMMONMARK_POST_DATA['content_type'],
+            content=COMMONMARK_POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=True)
         self.post.save()
 
     def test_detail_view_page(self):
@@ -161,6 +168,13 @@ class PostDetailViewTests(TestCase):
         res = self.client.get(reverse('posts:detail', kwargs={'pk': self.post.id}))
         self.assertEqual(res.status_code, 200)
         self.assertNotContains(res, 'Like')
+
+    def test_commonmark(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.get(reverse('posts:detail', kwargs={'pk': self.post2.id}))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, '<h1>Heading 8-)</h1>')
+        self.assertContains(res, '<p><strong>This is bold text!</strong></p>')
 
     def test_like_comment(self):
         comment = Comment.objects.create(

@@ -1,3 +1,4 @@
+from django.urls import reverse
 from .constants import POST_IMG_DATA
 from posts.tests.constants import POST_DATA, COMMENT_DATA
 from posts.tests.constants import POST_DATA
@@ -8,6 +9,9 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from posts.models import Post, ContentType, Comment
 from follow.models import Follow
+from rest_framework import status
+from ..serializers import AuthorSerializer, PostSerializer
+from rest_framework.renderers import JSONRenderer
 
 TEST_USERNAME = 'bob'
 TEST_PASSWORD = 'password'
@@ -44,6 +48,16 @@ class AuthorTests(TestCase):
         self.client.login(username=api_user_username, password=TEST_PASSWORD)
         res = self.client.get('/api/v1/authors/')
         self.assertEqual(res.status_code, 200)
+
+    def test_disallows_post(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.post('/api/v1/authors/')
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_disallows_delete(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.delete('/api/v1/authors/')
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class PostTests(TestCase):
@@ -334,7 +348,8 @@ class FollowersTest(TestCase):
         res = self.client.get(f'/api/v1/authors/{self.author.id}/followers/{self.other_user2.id}/')
         self.assertEqual(res.status_code, 200)
         body = json.loads(res.content.decode('utf-8'))
-        self.assertEqual(body['id'], self.other_user2.id)
+        author_id = int(body['id'].rsplit('/', 1)[-1])
+        self.assertEqual(author_id, self.other_user2.id)
 
     def test_check_not_follower(self):
         self.client.login(username='bob', password='password')
@@ -428,3 +443,59 @@ class LikeTests(TestCase):
             self.assertEqual(like['type'], 'Like')
             self.assertIn('summary', like)
             self.assertIn('object', like)
+
+
+class InboxTests(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.user = get_user_model().objects.create_user(username=TEST_USERNAME, password=TEST_PASSWORD)
+
+    def test_get(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.get(f'/api/v1/authors/{self.user.id}/inbox')
+        self.assertEqual(res.status_code, status.HTTP_501_NOT_IMPLEMENTED)
+
+    def test_post(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.post(f'/api/v1/authors/{self.user.id}/inbox')
+        self.assertEqual(res.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+    def test_delete(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.delete(f'/api/v1/authors/{self.user.id}/inbox')
+        self.assertEqual(res.status_code, status.HTTP_501_NOT_IMPLEMENTED)
+
+    def test_like(self):
+        post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=POST_DATA['unlisted'])
+        post.save()
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        author_response = self.client.get(f'/api/v1/authors/{self.user.id}').content
+        post_response = self.client.get(f'/api/v1/authors/{self.user.id}/posts/{post.id}').content
+        post_url = json.loads(post_response).get('id')
+
+        payload = {
+            'type': 'Like',
+            'author': json.loads(author_response),
+            'object': post_url
+        }
+
+        self.assertEqual(len(post.like_set.all()), 0)
+
+        resp = self.client.post(
+            f'/api/v1/authors/{self.user.id}/inbox',
+            json.dumps(payload),
+            content_type='application/json')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.get('Content-Type'), 'application/json')
+
+        self.assertEqual(len(post.like_set.all()), 1)
+
+        body = json.loads(resp.content)
+        self.assertEqual(body.get('type'), 'Like')

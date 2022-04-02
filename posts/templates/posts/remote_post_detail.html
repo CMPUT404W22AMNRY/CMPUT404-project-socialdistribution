@@ -1,9 +1,18 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} 
+
+{% load post_tags %}
+
+{% block content %}
+
 <div class="card">
   <h2>{{ object.title }}</h2>
   <h3 class="subtitle">{{ object.author.get_full_name }}</h3>
   {% if object.content_type == 'text' or object.content_type == 'text/plain' %} <!-- TODO: Update this when our friends have updated their contentType field -->
   	<p>{{ object.content }}</p>
+  {% elif object.content_type == 'text/markdown' %}
+  	<div class='markdown-content'>
+      {{ object.content|convert_markdown|safe }}
+    </div>
   {% elif object.content_type == 'image/png;base64' or object.content_type == 'image/jpeg;base64' %}  
   	<img src="data:{{ object.content_type }},{{ object.content }}" height="auto" width="100%" alt="alt" />  
   {% endif %}
