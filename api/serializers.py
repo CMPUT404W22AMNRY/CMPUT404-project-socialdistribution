@@ -117,7 +117,6 @@ class LikesSerializer(serializers.ModelSerializer):
 class CommentLikeSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
         'author_pk': 'author__pk',
-        'post_pk': 'post__pk',
     }
     author = AuthorSerializer(many=False, read_only=True)
     comment = CommentSerializer(many=False, read_only=True)
