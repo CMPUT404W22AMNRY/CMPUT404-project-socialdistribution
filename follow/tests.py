@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from unittest.mock import MagicMock, patch
 from requests import Response
-from api.tests.constants import SAMPLE_REMOTE_AUTHOR
+from api.tests.constants import SAMPLE_REMOTE_AUTHORS
 
 from servers.models import Server
 from follow.admin import AddFriendAction
@@ -89,7 +89,7 @@ class UsersViewTests(TestCase):
         self.assertNotContains(res, self.api_user.username)
 
     def test_contains_users_from_other_servers(self):
-        mock_json_response = json.loads(SAMPLE_REMOTE_AUTHOR)
+        mock_json_response = json.loads(SAMPLE_REMOTE_AUTHORS)
         mock_response = Response()
         mock_response.json = MagicMock(return_value=mock_json_response)
 

@@ -1,24 +1,25 @@
+from urllib.parse import urlparse
+import base64
+from django.http import HttpResponse
+import requests
+from rest_framework.request import Request
+from django.http.request import HttpRequest
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+from rest_framework import viewsets, permissions, status
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+from rest_framework.decorators import action
+from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer
+from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, CommentLikeSerializer
+from rest_framework.exceptions import MethodNotAllowed
+from api.util import page_number_pagination_class_factory
+from posts.models import Post, ContentType, Like, RemoteLike
+from posts.models import Post, ContentType, Like, Comment
 from json import JSONDecodeError, loads as json_loads
 from typing import Any
 from follow.models import Follow
-from posts.models import Post, ContentType, Like, Comment
-from api.util import page_number_pagination_class_factory
-from rest_framework.views import APIView
-from rest_framework.exceptions import MethodNotAllowed
-from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, CommentLikeSerializer
-from rest_framework.decorators import action
-from rest_framework.renderers import JSONRenderer
-from rest_framework.response import Response
-from rest_framework import viewsets, permissions, status
-from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
-from django.http import Http404, HttpResponse
-from django.http.request import HttpRequest
-from rest_framework.request import Request
-import requests
-from django.http import HttpResponse
-import base64
-from urllib.parse import urlparse
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -57,34 +58,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
                 return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
 
             if post_type == 'like':
-                # TODO: Handle like
-                requesting_author_id: str = body.get('author').get('id')
-                post_or_comment_id: str = body.get('object')
-
-                parsed_post_or_comment_id = urlparse(post_or_comment_id)
-                parsed_author_id = urlparse(requesting_author_id)
-                if not parsed_author_id.hostname == request.get_host():
-                    # Remote likes
-                    return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
-
-                # Get last path of url
-                # https://stackoverflow.com/questions/7253803/how-to-get-everything-after-last-slash-in-a-url
-                requesting_author_id = parsed_author_id.path.rsplit('/', 1)[-1]
-
-                if '/comment/' in post_or_comment_id:
-                    # Comment like
-                    return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
-
-                post_id = parsed_post_or_comment_id.path.rsplit('/', 1)[-1]
-
-                like = Like.objects.create(
-                    author_id=requesting_author_id,
-                    post_id=post_id,
-                )
-                like.save()
-
-                serialized = LikesSerializer(like, context={'request': request}).data
-                return Response(serialized)
+                return handle_inbox_like(request, body)
 
             if post_type == 'comment':
                 # TODO: Handle comment
@@ -194,6 +168,16 @@ class LikesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Post.objects.get(pk=self.kwargs['post_pk']).like_set.all().order_by('author_id')
 
+    def list(self, request, *args, **kwargs):
+        response: Response = super().list(request, *args, **kwargs)
+
+        remote_like_query_set = Post.objects.get(pk=self.kwargs['post_pk']).remotelike_set.all().order_by('author_url')
+        serialized_remote_likes = RemoteLikeSerializer(remote_like_query_set, many=True, context={'request': request})
+
+        if len(serialized_remote_likes.data) > 0:
+            response.data['items'] += (serialized_remote_likes.data)
+        return response
+
 
 class LikedViewSet(viewsets.ModelViewSet):
     renderer_classes = [JSONRenderer]
@@ -231,7 +215,35 @@ class CommentLikesViewSet(viewsets.ModelViewSet):
         return Comment.objects.get(pk=self.kwargs['comment_pk']).commentlike_set.all()
 
 
-class InboxView(APIView):
-    def post(self, request: Request, format=None):
-        # TODO: Implement this
-        return Response({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+def handle_inbox_like(request: Request, body: dict[str, Any]) -> Response:
+    author_id: str = body.get('author').get('id')
+    post_or_comment_id: str = body.get('object')
+
+    parsed_post_or_comment_id = urlparse(post_or_comment_id)
+    parsed_author_id = urlparse(author_id)
+
+    if '/comment/' in post_or_comment_id:
+        # Comment like
+        return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+    post_id = parsed_post_or_comment_id.path.rsplit('/', 1)[-1]
+
+    if not parsed_author_id.hostname == request.get_host():
+        # Remote likes
+        remote_like = RemoteLike.objects.create(author_url=author_id, post_id=post_id)
+        remote_like.save()
+
+        return HttpResponse({}, status=status.HTTP_204_NO_CONTENT)
+
+    # Get last path of url
+    # https://stackoverflow.com/questions/7253803/how-to-get-everything-after-last-slash-in-a-url
+    local_author_id = parsed_author_id.path.rsplit('/', 1)[-1]
+
+    like = Like.objects.create(
+        author_id=local_author_id,
+        post_id=post_id,
+    )
+    like.save()
+
+    serialized = LikesSerializer(like, context={'request': request}).data
+    return Response(serialized)
