@@ -14,13 +14,6 @@
             <p>
                 {{ post.content }}
             </p>
-        {% elif post.content_type == 'text/markdown' %}
-            <!-- TODO: Decide how to display markdown on the stream -->
-            {% comment %} 
-            <div class='markdown-content'>
-                {{ post.content|convert_markdown|safe }}
-            </div> 
-            {% endcomment %}
         {% elif post.content_type == 'image/png;base64' or post.content_type == 'image/jpeg;base64' %}
             {% if post.img_content %}
                 <img src="{{ post.img_content.url }}"                     
