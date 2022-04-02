@@ -57,34 +57,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
                 return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
 
             if post_type == 'like':
-                # TODO: Handle like
-                requesting_author_id: str = body.get('author').get('id')
-                post_or_comment_id: str = body.get('object')
-
-                parsed_post_or_comment_id = urlparse(post_or_comment_id)
-                parsed_author_id = urlparse(requesting_author_id)
-                if not parsed_author_id.hostname == request.get_host():
-                    # Remote likes
-                    return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
-
-                # Get last path of url
-                # https://stackoverflow.com/questions/7253803/how-to-get-everything-after-last-slash-in-a-url
-                requesting_author_id = parsed_author_id.path.rsplit('/', 1)[-1]
-
-                if '/comment/' in post_or_comment_id:
-                    # Comment like
-                    return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
-
-                post_id = parsed_post_or_comment_id.path.rsplit('/', 1)[-1]
-
-                like = Like.objects.create(
-                    author_id=requesting_author_id,
-                    post_id=post_id,
-                )
-                like.save()
-
-                serialized = LikesSerializer(like, context={'request': request}).data
-                return Response(serialized)
+                return handle_inbox_like(request, body)
 
             if post_type == 'comment':
                 # TODO: Handle comment
@@ -223,3 +196,32 @@ class InboxView(APIView):
     def post(self, request: Request, format=None):
         # TODO: Implement this
         return Response({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+def handle_inbox_like(request: Request, body: dict[str, Any]) -> Response:
+    requesting_author_id: str = body.get('author').get('id')
+    post_or_comment_id: str = body.get('object')
+
+    parsed_post_or_comment_id = urlparse(post_or_comment_id)
+    parsed_author_id = urlparse(requesting_author_id)
+    if not parsed_author_id.hostname == request.get_host():
+        # Remote likes
+        return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+    # Get last path of url
+    # https://stackoverflow.com/questions/7253803/how-to-get-everything-after-last-slash-in-a-url
+    requesting_author_id = parsed_author_id.path.rsplit('/', 1)[-1]
+
+    if '/comment/' in post_or_comment_id:
+        # Comment like
+        return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+    post_id = parsed_post_or_comment_id.path.rsplit('/', 1)[-1]
+
+    like = Like.objects.create(
+        author_id=requesting_author_id,
+        post_id=post_id,
+    )
+    like.save()
+
+    serialized = LikesSerializer(like, context={'request': request}).data
+    return Response(serialized)
