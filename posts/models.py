@@ -1,5 +1,3 @@
-import os
-from tarfile import StreamError
 import uuid
 from django.db import models
 from django.forms import ValidationError
