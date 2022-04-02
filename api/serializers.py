@@ -2,7 +2,7 @@ from email.policy import default
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
-from posts.models import Post, Like, Comment
+from posts.models import CommentLike, Post, Like, Comment
 from follow.models import Follow
 
 
@@ -107,4 +107,25 @@ class LikesSerializer(serializers.ModelSerializer):
         representation['summary'] = instance.author.get_full_name() + ' likes your post'
         representation['object'] = representation['post']['source']
         del representation['post']
+        return representation
+
+
+class CommentLikeSerializer(serializers.ModelSerializer):
+    parent_lookup_kwargs = {
+        'author_pk': 'author__pk',
+        'post_pk': 'post__pk',
+    }
+    author = AuthorSerializer(many=False, read_only=True)
+    comment = CommentSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = CommentLike
+        fields = ['author', 'comment']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['type'] = 'Like'
+        representation['summary'] = instance.author.get_full_name() + ' likes your comment'
+        representation['object'] = representation['comment']
+        del representation['comment']
         return representation

@@ -5,7 +5,7 @@ from posts.models import Post, ContentType, Like, Comment
 from api.util import page_number_pagination_class_factory
 from rest_framework.views import APIView
 from rest_framework.exceptions import MethodNotAllowed
-from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer
+from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, CommentLikeSerializer
 from rest_framework.decorators import action
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -223,15 +223,13 @@ class CommentLikesViewSet(viewsets.ModelViewSet):
     renderer_classes = [JSONRenderer]
     pagination_class = page_number_pagination_class_factory([('type', 'likes')])
 
-    serializer_class = LikesSerializer
+    serializer_class = CommentLikeSerializer
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ['get']
 
-    def retrieve(self, *args, **kwargs):
-        return kwargs['pk']
-
     def get_queryset(self):
-        return Comment.objects.get(pk=self.kwargs['pk']).commentlike_set.all()
+        print(Comment.objects.get(pk=self.kwargs['comment_pk']).commentlike_set.all())
+        return Comment.objects.get(pk=self.kwargs['comment_pk']).commentlike_set.all()
 
 
 class InboxView(APIView):
