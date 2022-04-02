@@ -1,14 +1,14 @@
-<div>
+<div class="comment">
     <a href="{{ comment.author.get_absolute_url }}" style="color:inherit">
         <h4>{{ comment.author.get_full_name }}</h4>
     </a>
     <span>{{ comment.date_published }}</span>
     <p>{{ comment.comment }}</p>
-    <div>
+    <ul class="action-bar">
         <li>
             <form method="POST" action="{% url 'posts:like-comment' comment.post.id comment.id %}">
                 {% csrf_token %}
-                <input type="submit" value="Like" class="link">
+                <input type="submit" value="Like ({{ comment.commentlike_set.all | length }})" class="link">
             </form>
         </li>
         <li>
@@ -17,5 +17,5 @@
                 <input type="submit" value="Unlike" class="link">
             </form>
         </li>
-    </div>
+    </ul>
 </div>
