@@ -1,4 +1,5 @@
 import os
+from tarfile import StreamError
 import uuid
 from django.db import models
 from django.forms import ValidationError
@@ -78,6 +79,9 @@ class Like(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
+class RemoteLike(models.Model):
+    author_url = models.CharField(max_length=STR_MAX_LENGTH)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
 class CommentLike(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
