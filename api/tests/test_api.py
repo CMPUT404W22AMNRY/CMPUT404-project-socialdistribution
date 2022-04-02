@@ -1,5 +1,5 @@
 from django.urls import reverse
-from .constants import POST_IMG_DATA
+from .constants import POST_IMG_DATA, SAMPLE_REMOTE_AUTHOR
 from posts.tests.constants import POST_DATA, COMMENT_DATA
 from posts.tests.constants import POST_DATA
 from posts.models import Post, ContentType, Like
@@ -469,3 +469,34 @@ class InboxTests(TestCase):
 
         body = json.loads(resp.content)
         self.assertEqual(body.get('type'), 'Like')
+
+    def test_remote_like(self):
+        post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=POST_DATA['unlisted'])
+        post.save()
+
+        self.assertEqual(len(post.remotelike_set.all()), 0)       
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        post_response = self.client.get(f'/api/v1/authors/{self.user.id}/posts/{post.id}').content
+        post_url = json.loads(post_response).get('id')
+
+        payload = {
+            'type': 'Like',
+            'author': json.loads(SAMPLE_REMOTE_AUTHOR),
+            'object': post_url
+        }
+
+        resp = self.client.post(
+            f'/api/v1/authors/{self.user.id}/inbox',
+            json.dumps(payload),
+            content_type='application/json')
+        self.assertEqual(resp.status_code, 204)
+
+        self.assertEqual(len(post.remotelike_set.all()), 1)
+        

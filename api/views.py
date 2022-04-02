@@ -1,7 +1,7 @@
 from json import JSONDecodeError, loads as json_loads
 from typing import Any
 from follow.models import Follow
-from posts.models import Post, ContentType, Like
+from posts.models import Post, ContentType, Like, RemoteLike
 from api.util import page_number_pagination_class_factory
 from rest_framework.views import APIView
 from rest_framework.exceptions import MethodNotAllowed
@@ -192,24 +192,12 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Post.objects.get(pk=self.kwargs['post_pk']).comment_set.all().order_by('-date_published')
 
 
-class InboxView(APIView):
-    def post(self, request: Request, format=None):
-        # TODO: Implement this
-        return Response({}, status=status.HTTP_501_NOT_IMPLEMENTED)
-
 def handle_inbox_like(request: Request, body: dict[str, Any]) -> Response:
-    requesting_author_id: str = body.get('author').get('id')
+    author_id: str = body.get('author').get('id')
     post_or_comment_id: str = body.get('object')
 
     parsed_post_or_comment_id = urlparse(post_or_comment_id)
-    parsed_author_id = urlparse(requesting_author_id)
-    if not parsed_author_id.hostname == request.get_host():
-        # Remote likes
-        return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
-
-    # Get last path of url
-    # https://stackoverflow.com/questions/7253803/how-to-get-everything-after-last-slash-in-a-url
-    requesting_author_id = parsed_author_id.path.rsplit('/', 1)[-1]
+    parsed_author_id = urlparse(author_id)
 
     if '/comment/' in post_or_comment_id:
         # Comment like
@@ -217,8 +205,19 @@ def handle_inbox_like(request: Request, body: dict[str, Any]) -> Response:
 
     post_id = parsed_post_or_comment_id.path.rsplit('/', 1)[-1]
 
+    if not parsed_author_id.hostname == request.get_host():
+        # Remote likes
+        remote_like = RemoteLike.objects.create(author_url=author_id, post_id=post_id)
+        remote_like.save()
+
+        return HttpResponse({}, status=status.HTTP_204_NO_CONTENT)
+
+    # Get last path of url
+    # https://stackoverflow.com/questions/7253803/how-to-get-everything-after-last-slash-in-a-url
+    local_author_id = parsed_author_id.path.rsplit('/', 1)[-1]
+
     like = Like.objects.create(
-        author_id=requesting_author_id,
+        author_id=local_author_id,
         post_id=post_id,
     )
     like.save()
