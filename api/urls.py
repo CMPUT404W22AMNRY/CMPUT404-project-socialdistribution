@@ -23,8 +23,12 @@ post_router = routers.NestedDefaultRouter(author_router, r'posts', lookup='post'
 post_router.register(r'likes', LikesViewSet, basename='likes')
 post_router.register(r'comments', CommentViewSet, basename='comment')
 
+comment_router = routers.NestedDefaultRouter(post_router, r'comments', lookup='comment')
+comment_router.register(r'likes', LikesViewSet, basename='likes')
+
 urlpatterns = [
     path('', include(router.urls)),
     path('', include(author_router.urls)),
-    path('', include(post_router.urls))
+    path('', include(post_router.urls)),
+    path('', include(comment_router.urls))
 ]
