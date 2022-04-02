@@ -2,7 +2,7 @@ from django.urls import reverse
 from .constants import POST_IMG_DATA
 from posts.tests.constants import POST_DATA, COMMENT_DATA
 from posts.tests.constants import POST_DATA
-from posts.models import Post, ContentType, Like
+from posts.models import CommentLike, Post, ContentType, Like
 import json
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
@@ -395,14 +395,14 @@ class LikeTests(TestCase):
             content_type=COMMENT_DATA['content_type'],
         )
 
-        self.like_on_comment = Like.objects.create(
+        self.like_on_comment = CommentLike.objects.create(
             author_id=self.author.id,
-            post_id=self.post.id,
+            comment_id=self.comment_by_user.id,
         )
 
-        self.other_user_like_on_comment = Like.objects.create(
+        self.other_user_like_on_comment = CommentLike.objects.create(
             author_id=self.other_user.id,
-            post_id=self.post.id,
+            comment_id=self.comment_by_user.id,
         )
         self.post.save()
         return
@@ -425,7 +425,7 @@ class LikeTests(TestCase):
         self.assertEqual(res.status_code, 200)
         body = res.json()
         self.assertEqual(body['type'], 'liked')
-        self.assertEqual(len(body['items']), 2)
+        self.assertEqual(len(body['items']), 1)
         for like in body['items']:
             self.assertEqual(like['type'], 'Like')
             self.assertIn('summary', like)
@@ -438,7 +438,7 @@ class LikeTests(TestCase):
         self.assertEqual(res.status_code, 200)
         body = res.json()
         self.assertEqual(body['type'], 'likes')
-        self.assertEqual(len(body['items']), 4)
+        self.assertEqual(len(body['items']), 2)
         for like in body['items']:
             self.assertEqual(like['type'], 'Like')
             self.assertIn('summary', like)
