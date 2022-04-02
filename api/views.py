@@ -83,8 +83,8 @@ class AuthorViewSet(viewsets.ModelViewSet):
                 )
                 like.save()
 
-                json = LikesSerializer(like, context={'request': request}).data
-                return Response(json)
+                serialized = LikesSerializer(like, context={'request': request}).data
+                return Response(serialized)
 
             if post_type == 'comment':
                 # TODO: Handle comment
