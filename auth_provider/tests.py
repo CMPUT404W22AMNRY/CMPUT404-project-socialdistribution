@@ -93,7 +93,7 @@ class RemoteProfileViewTests(TestCase):
             self.client.login(username='bob', password='password')
             res = self.client.get(
                 reverse(
-                    'accounts:remote_profile'
+                    'accounts:remote_profile',
                     kwargs={
                         'url': 'http://localhost:5555/api/v2/authors/1/'
                     }
