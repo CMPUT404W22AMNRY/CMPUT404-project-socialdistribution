@@ -372,6 +372,23 @@ class LikeTests(TestCase):
             author_id=self.author.id,
             post_id=self.post.id,
         )
+
+        self.comment_by_user = Comment.objects.create(
+            comment=COMMENT_DATA['comment'],
+            author_id=self.author.id,
+            post_id=self.post.id,
+            content_type=COMMENT_DATA['content_type'],
+        )
+
+        self.like_on_comment = Like.objects.create(
+            author_id=self.author.id,
+            post_id=self.post.id,
+        )
+
+        self.other_user_like_on_comment = Like.objects.create(
+            author_id=self.other_user.id,
+            post_id=self.post.id,
+        )
         self.post.save()
         return
 
@@ -393,7 +410,20 @@ class LikeTests(TestCase):
         self.assertEqual(res.status_code, 200)
         body = res.json()
         self.assertEqual(body['type'], 'liked')
-        self.assertEqual(len(body['items']), 1)
+        self.assertEqual(len(body['items']), 2)
+        for like in body['items']:
+            self.assertEqual(like['type'], 'Like')
+            self.assertIn('summary', like)
+            self.assertIn('object', like)
+
+    def test_comment_likes(self):
+        self.client.login(username='alice', password='password2')
+        res = self.client.get(
+            f'/api/v1/authors/{self.author.id}/posts/{self.post.id}/comments/{self.comment_by_user.id}/likes/')
+        self.assertEqual(res.status_code, 200)
+        body = res.json()
+        self.assertEqual(body['type'], 'likes')
+        self.assertEqual(len(body['items']), 4)
         for like in body['items']:
             self.assertEqual(like['type'], 'Like')
             self.assertIn('summary', like)

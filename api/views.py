@@ -1,5 +1,5 @@
 from follow.models import Follow
-from posts.models import Post, ContentType, Like
+from posts.models import Post, ContentType, Like, Comment
 from api.util import page_number_pagination_class_factory
 from socialdistribution.storage import ImageStorage
 from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer
@@ -137,3 +137,18 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Post.objects.get(pk=self.kwargs['post_pk']).comment_set.all().order_by('-date_published')
+
+
+class CommentLikesViewSet(viewsets.ModelViewSet):
+    renderer_classes = [JSONRenderer]
+    pagination_class = page_number_pagination_class_factory([('type', 'likes')])
+
+    serializer_class = LikesSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get']
+
+    def retrieve(self, *args, **kwargs):
+        return kwargs['pk']
+
+    def get_queryset(self):
+        return Comment.objects.get(pk=self.kwargs['pk']).commentlike_set.all()
