@@ -1,4 +1,4 @@
-from audioop import reverse
+from django.urls import reverse
 from django.http import HttpResponse
 from django.test import TestCase, Client
 from django.urls import reverse_lazy
@@ -76,6 +76,7 @@ class RemoteProfileViewTests(TestCase):
         self.client = Client()
         get_user_model().objects.create_user(username='bob', password='password')
 
+    def test_remote_profile_view(self):
         mock_json_response = json.loads(SAMPLE_REMOTE_AUTHOR)
         mock_response = Response()
         mock_response.json = MagicMock(return_value=mock_json_response)
