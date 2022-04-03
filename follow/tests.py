@@ -37,6 +37,7 @@ class FriendRequestsViewTests(TestCase):
         self.client.login(username='bob', password='password')
         res = self.client.get(reverse('follow:friend_requests'))
         print(res.context)
+        self.assertTemplateUsed(res, 'follow/request_list.html')
         self.assertContains(res, url)
 
 
