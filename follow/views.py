@@ -103,7 +103,7 @@ class FriendRequestsView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Request.objects.filter(to_user=self.request.user)
-    
+
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super(FriendRequestsView, self).get_context_data(**kwargs)
         context['Remote_Requests'] = RemoteRequest.objects.filter(to_user=self.request.user)
