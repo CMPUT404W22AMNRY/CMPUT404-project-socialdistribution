@@ -274,10 +274,10 @@ def handle_inbox_follow(request: Request, body: dict[str, Any]) -> Response:
     except get_user_model().DoesNotExist as e:
         return Http404
 
-    request = Request.objects.create(from_user=local_from_user, to_user=to_user)
-    request.save()
+    local_request = Request.objects.create(from_user=local_from_user, to_user=to_user)
+    local_request.save()
 
-    #serialized = RequestSerializer(request, context={'request': request}).data
+    serialized = RequestSerializer(local_request, context={'request': request}).data
     return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
