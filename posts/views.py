@@ -222,7 +222,7 @@ def share_post_view(request: HttpRequest, pk: int):
     shared_post.pk = None
     print(shared_post)
     shared_post.save()
-    author = User.objects.get(from_user=request.user)
+    author = User.objects.get(username=request.user)
     shared_post.author = author
     return redirect(shared_post.get_absolute_url())
 
