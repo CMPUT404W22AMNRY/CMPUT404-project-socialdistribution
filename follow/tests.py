@@ -33,7 +33,7 @@ class FriendRequestsViewTests(TestCase):
 
     def test_remote_friend_request(self):
         url = "http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471"
-        RemoteFollow.objects.create(from_user_url=url, to_user=self.bob)
+        RemoteFollow.objects.create(follower_url=url, to_user=self.bob)
         self.client.login(username='bob', password='password')
         res = self.client.get(reverse('follow:friend_requests'))
         print(res)
