@@ -263,7 +263,6 @@ def handle_inbox_follow(request: Request, body: dict[str, Any]) -> Response:
         return Http404
 
     if parsed_from_user_id.hostname != request.get_host():
-        print('trigger')
         remote_request = RemoteRequest.objects.create(from_user_url=from_user_id_url, to_user=to_user)
         remote_request.save()
         return HttpResponse({}, status=status.HTTP_204_NO_CONTENT)
@@ -278,7 +277,7 @@ def handle_inbox_follow(request: Request, body: dict[str, Any]) -> Response:
     request = Request.objects.create(from_user=local_from_user, to_user=to_user)
     request.save()
 
-    serialized = RequestSerializer(request, context={'request': request}).data
+    #serialized = RequestSerializer(request, context={'request': request}).data
     return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
