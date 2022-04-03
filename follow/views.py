@@ -77,26 +77,26 @@ def unfollow_request(request, from_username):
         return redirect(from_user.get_absolute_url())
 
 
-def accept_remote_follow_request(request, follower_url):
+def accept_remote_follow_request(request, from_user_url):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
     try:
-        RemoteFollow.objects.create(followee=request.user, follower_url=follower_url)
+        RemoteFollow.objects.create(followee=request.user, follower_url=from_user_url)
     except AlreadyExistsError:
         pass
     finally:
-        return redirect(reverse('auth_provider:remote_profile', kwargs={'url':follower_url}))
+        return redirect(reverse('auth_provider:remote_profile', kwargs={'url': from_user_url}))
 
 
-def reject_remote_follow_request(request, follower_url):
+def reject_remote_follow_request(request, from_user_url):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
     try:
-        RemoteRequest.objects.delete(followee=request.user, follower_url=follower_url)
+        RemoteRequest.objects.delete(followee=request.user, follower_url=from_user_url)
     except RemoteRequest.DoesNotExist:
         pass
     finally:
-        return redirect(reverse('auth_provider:remote_profile', kwargs={'url':follower_url}))
+        return redirect(reverse('auth_provider:remote_profile', kwargs={'url': from_user_url}))
 
 
 class UsersView(LoginRequiredMixin, ServerListView):
@@ -126,7 +126,7 @@ class FriendRequestsView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Request.objects.filter(to_user=self.request.user)
-    
+
     def get_context_data(self, **kwargs: Any):
         context = super(FriendRequestsView, self).get_context_data(**kwargs)
         context['remote_requests'] = RemoteRequest.objects.filter(to_user=self.request.user)
