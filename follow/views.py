@@ -1,9 +1,10 @@
+from multiprocessing import context
 from typing import Any
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.views.generic.list import ListView
-from follow.models import AlreadyExistsError, Follow, Request
+from follow.models import AlreadyExistsError, Follow, Request, RemoteRequest
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -97,10 +98,16 @@ class UsersView(LoginRequiredMixin, ServerListView):
 
 class FriendRequestsView(LoginRequiredMixin, ListView):
     model = Request
+    context_object_name = 'Requests'
     template_name = 'follow/request_list.html'
 
     def get_queryset(self):
         return Request.objects.filter(to_user=self.request.user)
+    
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super(FriendRequestsView, self).get_context_data(**kwargs)
+        context['Remote_Requests'] = RemoteRequest.objects.filter(to_user=self.request.user)
+        return context
 
 
 class MyFriendsView(LoginRequiredMixin, ListView):
