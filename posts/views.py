@@ -15,6 +15,7 @@ from lib.http_helper import is_b64_image_content
 from django.core.exceptions import PermissionDenied
 
 from .models import CommentLike, Post, Category, Comment, Like
+from auth_provider.models import User
 from servers.models import Server
 from servers.views.generic.detailed_view import ServerDetailView
 
@@ -212,6 +213,19 @@ def unlike_post_view(request: HttpRequest, pk: int):
     except Like.DoesNotExist:
         pass
     return redirect(Post.objects.get(pk=pk).get_absolute_url())
+
+
+def share_post_view(request: HttpRequest, author_id, post_id):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+
+    last_author = Author.object.get
+    last_url = last_post.url
+
+    # duplicate the post
+    shared_post = last_post
+    shared_post.pk = None
+    shared_post.save()
 
 
 def like_comment_view(request: HttpRequest, post_pk: int, pk: int):
