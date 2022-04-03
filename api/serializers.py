@@ -77,6 +77,11 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
         representation['id'] = representation['source']
         return representation
 
+    def to_internal_value(self, data):
+        internal_value = super().to_internal_value(data)
+        internal_value['author_id'] = data['author_id']
+        return internal_value
+
 
 class FollowersSerializer(NestedHyperlinkedModelSerializer):
     parent_lookup_kwargs = {

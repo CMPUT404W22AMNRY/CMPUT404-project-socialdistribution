@@ -169,6 +169,26 @@ class PostTests(TestCase):
             self.assertIn('published', comment)
             self.assertIn('id', comment)
 
+    def test_create(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+
+        initial_post_count = len(Post.objects.filter(author=self.user))
+        payload = POST_DATA
+        res = self.client.post(f'/api/v1/authors/{self.user.id}/posts/', payload)
+        self.assertTrue(res.status_code >= 200 and res.status_code < 300)
+        self.assertTrue(len(Post.objects.filter(author=self.user)), initial_post_count + 1)
+
+
+    def test_remote_create(self):
+        api_user_username = 'api_user'
+        api_user = get_user_model().objects.create_user(username=api_user_username, password=TEST_PASSWORD)
+        api_user.is_api_user = True
+        api_user.save()
+
+        self.client.login(username=api_user_username, password=TEST_PASSWORD)
+        res = self.client.post(f'/api/v1/authors/{self.user.id}/posts/')
+        self.assertEqual(res.status_code, 403)
+
 
 class CommentsTests(TestCase):
     def setUp(self) -> None:
@@ -443,7 +463,6 @@ class LikeTests(TestCase):
             body = res.json()
             self.assertEqual(body['type'], 'likes')
 
-            print(body)
             # Find remote like
             for like in body['items']:
                 if like.get('author').get('url') == author_url:

@@ -11,6 +11,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer
 from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, CommentLikeSerializer
 from rest_framework.exceptions import MethodNotAllowed
@@ -85,7 +86,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['get']
+    http_method_names = ['get', 'post']
 
     def get_queryset(self):
         return Post.objects.filter(author=self.kwargs['author_pk']).order_by('-date_published')
@@ -105,6 +106,17 @@ class PostViewSet(viewsets.ModelViewSet):
         encoded_img = base64.b64encode(requests.get(location).content)
 
         return HttpResponse(encoded_img, content_type=post.content_type)
+
+    def create(self, request: Request, *args, **kwargs):
+        if request.user.is_api_user:
+            raise PermissionDenied(detail='No access to local objects', code=status.HTTP_403_FORBIDDEN)
+        if request.user.id != int(kwargs['author_pk']):
+            raise PermissionDenied(detail='Cannot create post on behalf of another user', code=status.HTTP_403_FORBIDDEN)
+        # https://stackoverflow.com/questions/44717442/this-querydict-instance-is-immutable
+        request.data._mutable = True
+        request.data['author_id'] = kwargs['author_pk']
+        request.data._mutable = False
+        return super().create(request, *args, **kwargs)
 
 
 class FollowersViewSet(viewsets.ModelViewSet):
