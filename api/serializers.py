@@ -1,7 +1,9 @@
+from pyexpat import model
+from attr import field
 from requests import Response
 from urllib.parse import urlparse
 from servers.models import Server
-from follow.models import Follow
+from follow.models import Follow, Request, RemoteFollow, RemoteRquest
 from posts.models import Post, Like, Comment, RemoteLike
 from posts.models import CommentLike, Post, Like, Comment
 import json
@@ -91,6 +93,56 @@ class FollowersSerializer(NestedHyperlinkedModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         return representation['follower']
+
+class RequestSerializer(NestedHyperlinkedModelSerializer):
+    parent_lookup_kwargs = {
+        'author_pk': 'author__pk'
+    }
+    from_user = AuthorSerializer(many=False, read_only=True)
+    to_user = AuthorSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Request
+        field = ['from_user', 'to_user']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['type'] = 'Follow'
+        representation['summary'] = instance.from_user.get_full_name() + " wants to follow " + instance.to_user.get_full_name()
+        representation['actor'] = representation['from_user']
+        del representation['from_user']
+        representation['object'] = representation['to_user']
+        del representation['to_user']
+
+        return representation
+    
+class RemoteRequestSerializer(NestedHyperlinkedModelSerializer):
+    parent_lookup_kwargs = {
+        'author_pk': 'author__pk'
+    }
+    to_user = AuthorSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = RemoteRquest
+        fields = ['to_user']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        for server in Server.objects.all():
+            parsed_from_user_url = urlparse(instance.from_user_url)
+            parsed_server_service_address = urlparse(server.service_address)
+            if parsed_from_user_url.hostname != parsed_server_service_address.hostname:
+                continue
+            from_user_response: Response = server.get(parsed_server_service_address.path)
+            json_from_user = from_user_response.json()
+
+            from_user_name = json_from_user.get('displayName') or json_from_user.get('display_name') or ''
+            representation['type'] = 'Follow'
+            representation['summary'] = from_user_name + ' wants to follow ' + instance.to_user.get_full_name()
+            representation['actor'] = json_from_user
+            representation['object'] = representation['to_user']
+            del representation['to_user']
+            return representation
 
 
 class LikesSerializer(serializers.ModelSerializer):

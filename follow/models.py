@@ -9,7 +9,7 @@ from follow.signals import (
     request_accept,
 )
 
-
+STR_MAX_LENGTH = 512
 USER_MODEL = get_user_model()
 
 
@@ -168,3 +168,12 @@ class Request(models.Model):
         request_cancel.send(sender=self)
         self.delete()
         return True
+
+class RemoteFollow(models.Model):
+    followee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    follower_url = models.ForeignKey(max_length=STR_MAX_LENGTH)
+    
+class RemoteRquest(models.Model):
+    from_user_url = models.CharField(max_length=STR_MAX_LENGTH)
+    to_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+

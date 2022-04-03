@@ -1,3 +1,7 @@
+from gzip import READ
+from multiprocessing import context
+import re
+from tkinter import EW
 from urllib.parse import urlparse
 import base64
 from django.http import HttpResponse
@@ -11,7 +15,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
-from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer
+from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer, RequestSerializer, RemoteRequestSerializer
 from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, CommentLikeSerializer
 from rest_framework.exceptions import MethodNotAllowed
 from api.util import page_number_pagination_class_factory
@@ -19,7 +23,7 @@ from posts.models import Post, ContentType, Like, RemoteLike
 from posts.models import Post, ContentType, Like, Comment
 from json import JSONDecodeError, loads as json_loads
 from typing import Any
-from follow.models import Follow
+from follow.models import Follow, Request, RemoteRquest
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -54,8 +58,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
                 return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
 
             if post_type == 'follow':
-                # TODO: Handle follow request
-                return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+                return handle_inbox_follow(request, body)
 
             if post_type == 'like':
                 return handle_inbox_like(request, body)
@@ -213,6 +216,39 @@ class CommentLikesViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Comment.objects.get(pk=self.kwargs['comment_pk']).commentlike_set.all()
+
+
+def handle_inbox_request(request: Request, body: dict[str, Any]) -> Response:
+    from_user_id_url: str = body.get('actor').get('id')
+    to_user_id_url: str = body.get('object').get('id')
+
+    parsed_to_user_id = urlparse(to_user_id_url)
+    parsed_from_user_id = urlparse(from_user_id_url)
+
+    to_user_id = parsed_to_user_id.path.rsplit('/', 1)[-1]
+
+    try:
+        to_user = get_user_model().objects.get(id=to_user_id)
+    except get_user_model().DoesNotExist as e:
+        return Http404
+
+    if not parsed_from_user_id.hostname == request.get_host():
+        remote_request = RemoteRquest.objects.create(from_user_url=from_user_id_url, to_user=to_user)
+        remote_request.save()
+        return HttpResponse({}, status=status.HTTP_204_NO_CONTENT)
+    
+    local_from_user_id = parsed_from_user_id.path.rsplit('/', 1)[-1]
+
+    try:
+        local_from_user = get_user_model().objects.get(id=local_from_user_id)
+    except get_user_model().DoesNotExist as e:
+        return Http404
+
+    request = Request.objects.create(from_user=local_from_user, to_user=to_user)
+    request.save()
+
+    serialized = RequestSerializer(request, context={'request':request}).data
+    return Response(serialized)
 
 
 def handle_inbox_like(request: Request, body: dict[str, Any]) -> Response:
