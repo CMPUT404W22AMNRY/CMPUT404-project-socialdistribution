@@ -262,7 +262,8 @@ def handle_inbox_follow(request: Request, body: dict[str, Any]) -> Response:
     except get_user_model().DoesNotExist as e:
         return Http404
 
-    if not parsed_from_user_id.hostname == request.get_host():
+    if parsed_from_user_id.hostname != request.get_host():
+        print('trigger')
         remote_request = RemoteRequest.objects.create(from_user_url=from_user_id_url, to_user=to_user)
         remote_request.save()
         return HttpResponse({}, status=status.HTTP_204_NO_CONTENT)

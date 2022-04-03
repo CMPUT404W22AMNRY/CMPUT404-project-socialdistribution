@@ -109,7 +109,7 @@ class RequestSerializer(NestedHyperlinkedModelSerializer):
 
     class Meta:
         model = Request
-        field = ['from_user', 'to_user']
+        fields = ['from_user', 'to_user']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
