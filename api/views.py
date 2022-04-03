@@ -188,7 +188,7 @@ class LikedViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
     def get_queryset(self):
-        return Like.objects.filter(author_id=self.kwargs['author_pk'])
+        return Like.objects.filter(author_id=self.kwargs['author_pk']).order_by('author_id')
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -212,7 +212,7 @@ class CommentLikesViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
     def get_queryset(self):
-        return Comment.objects.get(pk=self.kwargs['comment_pk']).commentlike_set.all()
+        return Comment.objects.get(pk=self.kwargs['comment_pk']).commentlike_set.all().order_by('author_id')
 
 
 def handle_inbox_like(request: Request, body: dict[str, Any]) -> Response:
