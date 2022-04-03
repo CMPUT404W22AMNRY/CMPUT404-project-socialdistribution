@@ -35,6 +35,7 @@ class FriendRequestsViewTests(TestCase):
         RemoteFollow.objects.create(follower_url=url, followee=self.bob)
         self.client.login(username='bob', password='password')
         res = self.client.get(reverse('follow:friend_requests'))
+        print(res.context_data)
         print(res['remote_request'])
         self.assertContains(res, url)
 
