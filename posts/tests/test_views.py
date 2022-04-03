@@ -95,6 +95,24 @@ class EditPostViewTests(TestCase):
         self.client.login(username='bob', password='password')
         res = self.client.post(reverse('posts:edit', kwargs={'pk': 900}), data=EDITED_POST_DATA)
         self.assertEqual(res.status_code, 404)
+    
+    def test_edit_page_as_another_user(self):
+        username = 'alice'
+        password = TEST_PASSWORD
+        get_user_model().objects.create_user(username=username, password=password)
+
+        self.client.login(username=username, password=password)
+        res = self.client.get(reverse('posts:edit', kwargs={'pk': self.post_id}))
+        self.assertEqual(res.status_code, 403)
+
+    def test_edit_as_another_user(self):
+        username = 'alice'
+        password = TEST_PASSWORD
+        get_user_model().objects.create_user(username=username, password=password)
+
+        self.client.login(username=username, password=password)
+        res = self.client.post(reverse('posts:edit', kwargs={'pk': self.post_id}), data=EDITED_POST_DATA)
+        self.assertEqual(res.status_code, 403)
 
 
 class PostDetailViewTests(TestCase):
