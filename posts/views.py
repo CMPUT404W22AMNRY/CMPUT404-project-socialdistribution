@@ -12,6 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from requests import Response
 from lib.http_helper import is_b64_image_content
+from django.core.exceptions import PermissionDenied
 
 from .models import CommentLike, Post, Category, Comment, Like
 from servers.models import Server
@@ -62,6 +63,16 @@ class EditPostView(LoginRequiredMixin, UpdateView):
                 form.instance.categories.add(db_category)
             form.save()
         return redirect(form.instance.get_absolute_url())
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if self.get_object().author_id != request.user.id:
+            raise PermissionDenied("User not allowed to edit another user's post")
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if self.get_object().author_id != request.user.id:
+            raise PermissionDenied("User not allowed to edit another user's post")
+        return super().post(request, *args, **kwargs)
 
 
 class PostDetailView(LoginRequiredMixin, DetailView):
