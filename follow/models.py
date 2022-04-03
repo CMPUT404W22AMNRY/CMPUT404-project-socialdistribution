@@ -169,11 +169,12 @@ class Request(models.Model):
         self.delete()
         return True
 
+
 class RemoteFollow(models.Model):
     followee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     follower_url = models.ForeignKey(max_length=STR_MAX_LENGTH)
-    
+
+
 class RemoteRquest(models.Model):
     from_user_url = models.CharField(max_length=STR_MAX_LENGTH)
     to_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-
