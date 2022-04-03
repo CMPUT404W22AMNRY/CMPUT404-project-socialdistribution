@@ -1,44 +1,52 @@
-{% extends "base.html" %} {% block content %}
-<style>
-  img {
-    max-width: 250px;
-    border-radius: 50%;
-  }
-</style>
-<div class="card">
-  {% include 'profile/partials/_summary.html' %}
-
-  <section id="github-activity">
-    <h3>GitHub Activity</h3>
-    <p>GitHub activity in the last 90 days.</p>
-    {% if github_activity %}
-      <ul>
-        <li>Pull Requests: {{ github_activity.pull_requests }}</li>
-        <li>Commits: {{ github_activity.commits }}</li>
-      </ul>
-    {% else %}
-      <p>GitHub activity could not be loaded.</p>
-    {% endif %}
-  </section>
-
-  <section id="manage">
-    <h3>Manage</h3>
-    <ul>
-      <li>
-        <a href="{% url 'auth_provider:edit_profile' %}">Edit Profile</a>
-      </li>
-    </ul>
-  </section>
-
-  <section id="resources">
-    <h3>My Resources</h3>
-    <ul>
-      {% for user_resource in user_resources %}
-      <li>
-        <a href="{{ user_resource.link }}">{{ user_resource.name }}</a>
-      </li>
-      {% endfor %}
-    </ul>
-  </section>
-</div>
+{% extends "base.html" %}
+{% block content %}
+    <style>
+		img.profile-pic {
+			max-width: 250px;
+			border-radius: 50%;
+		}
+    </style>
+    <div class="card">
+        {% include 'profile/partials/_summary.html' %}
+        <section id="github-activity">
+            <h3>GitHub Activity</h3>
+            {% if github_activity %}
+                <img src="https://ghchart.rshah.org/{{ github_activity.username }}"
+                     width="100%"
+                     height="auto"
+                     alt="GitHub contribution graph"/>
+                <p>
+                    GitHub activity in the last 90 days
+                </p>
+                <ul>
+                    <li>Commits: {{ github_activity.commits }}</li>
+                    <li>Pull Requests: {{ github_activity.pull_requests }}</li>
+                    <li>Reviews: {{ github_activity.reviews }}</li>
+                    <li>Issues Opened: {{ github_activity.issues }}</li>
+                </ul>
+            {% else %}
+                <p>
+                    GitHub activity could not be loaded.
+                </p>
+            {% endif %}
+        </section>
+        <section id="manage">
+            <h3>Manage</h3>
+            <ul>
+                <li>
+                    <a href="{% url 'auth_provider:edit_profile' %}">Edit Profile</a>
+                </li>
+            </ul>
+        </section>
+        <section id="resources">
+            <h3>My Resources</h3>
+            <ul>
+                {% for user_resource in user_resources %}
+                    <li>
+                        <a href="{{ user_resource.link }}">{{ user_resource.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
 {% endblock content %}
