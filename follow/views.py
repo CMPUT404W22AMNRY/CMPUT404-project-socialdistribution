@@ -92,7 +92,7 @@ def reject_remote_follow_request(request, from_user_url):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
     try:
-        RemoteRequest.objects.delete(followee=request.user, follower_url=from_user_url)
+        RemoteRequest.objects.delete(to_user=request.user, from_user_url=from_user_url)
     except RemoteRequest.DoesNotExist:
         pass
     finally:
