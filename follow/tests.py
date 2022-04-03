@@ -28,7 +28,6 @@ class FriendRequestsViewTests(TestCase):
         Follow.objects.follow_request(from_user=self.alice, to_user=self.bob)
         self.client.login(username='bob', password='password')
         res = self.client.get(reverse('follow:friend_requests'))
-        print(res.context)
         self.assertContains(res, self.alice.username)
 
     def test_remote_friend_request(self):
@@ -36,7 +35,6 @@ class FriendRequestsViewTests(TestCase):
         RemoteFollow.objects.create(follower_url=url, followee=self.bob)
         self.client.login(username='bob', password='password')
         res = self.client.get(reverse('follow:friend_requests'))
-        print(res.context)
         self.assertTemplateUsed(res, 'follow/request_list.html')
         self.assertContains(res, url)
 
