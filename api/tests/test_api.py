@@ -4,7 +4,9 @@ from .constants import POST_IMG_DATA, SAMPLE_REMOTE_AUTHOR
 from posts.tests.constants import POST_DATA, COMMENT_DATA
 from posts.tests.constants import POST_DATA
 from posts.models import Post, ContentType, Like, RemoteLike, CommentLike
+from follow.models import Request, RemoteRequest
 import json
+from rest_framework.exceptions import PermissionDenied
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
@@ -503,6 +505,7 @@ class InboxTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
         self.user = get_user_model().objects.create_user(username=TEST_USERNAME, password=TEST_PASSWORD)
+        self.user2 = get_user_model().objects.create_user(username='sam', password='password')
 
     def test_get(self):
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
@@ -583,3 +586,41 @@ class InboxTests(TestCase):
         self.assertEqual(resp.status_code, 204)
 
         self.assertEqual(len(post.remotelike_set.all()), 1)
+    
+    def test_request(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        actor_response = self.client.get(f'/api/v1/authors/{self.user.id}').content
+        object_response = self.client.get(f'/api/v1/authors/{self.user2.id}').content
+        self.assertEqual(len(Request.objects.all()), 0)
+        payload = {
+            "type": "Follow",
+            "actor": json.loads(actor_response),
+            "object": json.loads(object_response)
+        }
+
+        resp = self.client.post(
+            f'/api/v1/authors/{self.user2.id}/inbox',
+            json.dumps(payload),
+            content_type='application/json'
+        )
+        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(len(Request.objects.all()), 1)
+
+    def test_remote_request(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        object_response = self.client.get(f'/api/v1/authors/{self.user.id}').content
+        self.assertEqual(len(Request.objects.all()), 0)
+        payload = {
+            "type": "Follow",
+            "actor": json.loads(SAMPLE_REMOTE_AUTHOR),
+            "object": json.loads(object_response)
+        }
+
+        resp = self.client.post(
+            f'/api/v1/authors/{self.user2.id}/inbox',
+            json.dumps(payload),
+            content_type='application/json'
+        )
+        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(len(Request.objects.all()), 1)
+
