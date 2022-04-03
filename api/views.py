@@ -86,7 +86,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['get', 'post', 'delete']
+    http_method_names = ['get', 'post', 'delete', 'put']
 
     def get_queryset(self):
         return Post.objects.filter(author=self.kwargs['author_pk']).order_by('-date_published')
@@ -117,12 +117,21 @@ class PostViewSet(viewsets.ModelViewSet):
         request.data['author_id'] = kwargs['author_pk']
         request.data._mutable = False
         return super().create(request, *args, **kwargs)
+
     def destroy(self, request, *args, **kwargs):
         if request.user.is_api_user:
             raise PermissionDenied(detail='No access to local objects', code=status.HTTP_403_FORBIDDEN)
         if request.user.id != int(kwargs['author_pk']):
             raise PermissionDenied(detail='Cannot delete post on behalf of another user', code=status.HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        if request.user.is_api_user:
+            raise PermissionDenied(detail='No access to local objects', code=status.HTTP_403_FORBIDDEN)
+        if request.user.id != int(kwargs['author_pk']):
+            raise PermissionDenied(detail='Cannot update post on behalf of another user', code=status.HTTP_403_FORBIDDEN)
+        request.data['author_id'] = kwargs['author_pk']
+        return super().update(request, *args, **kwargs)
 
 
 class FollowersViewSet(viewsets.ModelViewSet):

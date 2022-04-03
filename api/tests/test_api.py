@@ -217,6 +217,25 @@ class PostTests(TestCase):
         res = self.client.delete(f'/api/v1/authors/{self.user.id}/posts/{self.post.id}')
         self.assertEqual(res.status_code, 403)
 
+    def test_put_update(self):
+        post = Post.objects.create(
+                    title=POST_DATA['title'],
+                    description=POST_DATA['description'],
+                    content_type=POST_DATA['content_type'],
+                    content=POST_DATA['content'],
+                    author_id=self.user.id,
+                    unlisted=POST_DATA['unlisted'])
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+
+        payload = POST_DATA
+        new_title = 'This is a new title'
+        payload['title'] = new_title
+        res = self.client.put(f'/api/v1/authors/{self.user.id}/posts/{post.id}/', json.dumps(payload), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+
+        self.assertEqual(Post.objects.get(pk=post.id).title, new_title)
+
 class CommentsTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
