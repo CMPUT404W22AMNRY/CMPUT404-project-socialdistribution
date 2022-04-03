@@ -151,7 +151,7 @@ class RemoteLikeSerializer(serializers.ModelSerializer):
             parsed_server_service_address = urlparse(server.service_address)
             if parsed_author_url.hostname != parsed_server_service_address.hostname:
                 continue
-            author: Response = server.get(parsed_server_service_address.path)
+            author: Response = server.get(parsed_author_url.path)
             json_author = author.json()
 
             author_name = json_author.get('displayName') or json_author.get('display_name') or ''
