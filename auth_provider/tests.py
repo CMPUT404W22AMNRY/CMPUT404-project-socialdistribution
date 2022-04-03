@@ -101,6 +101,7 @@ class RemoteProfileViewTests(TestCase):
                     }
                 )
             )
+            print(res)
             self.assertEqual(res.status_code, 200)
             self.assertContains(res, mock_json_response['display_name'])
             self.assertContains(res, mock_json_response['github'])

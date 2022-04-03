@@ -149,7 +149,6 @@ class RemoteProfileView(ServerDetailView):
         github = json_response.get('github')
 
         return {
-            'id': 1,
             'profile_image_url': profile_image_url,
             "get_full_name": author_full_name,
             "github_url": github,
