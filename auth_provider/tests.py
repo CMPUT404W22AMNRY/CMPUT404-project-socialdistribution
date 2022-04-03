@@ -11,7 +11,6 @@ from servers.models import Server
 from api.tests.test_api import TEST_PASSWORD, TEST_USERNAME
 
 
-
 class ViewsTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
@@ -72,6 +71,7 @@ class ViewsTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, 'error')
 
+
 class RemoteProfileViewTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
@@ -104,6 +104,7 @@ class RemoteProfileViewTests(TestCase):
             self.assertEqual(res.status_code, 200)
             self.assertContains(res, mock_json_response['display_name'])
             self.assertContains(res, mock_json_response['github'])
+
 
 class ProfileTests(TestCase):
     def setUp(self) -> None:
