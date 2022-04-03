@@ -236,7 +236,7 @@ def handle_inbox_request(request: Request, body: dict[str, Any]) -> Response:
         remote_request = RemoteRquest.objects.create(from_user_url=from_user_id_url, to_user=to_user)
         remote_request.save()
         return HttpResponse({}, status=status.HTTP_204_NO_CONTENT)
-    
+
     local_from_user_id = parsed_from_user_id.path.rsplit('/', 1)[-1]
 
     try:
@@ -247,7 +247,7 @@ def handle_inbox_request(request: Request, body: dict[str, Any]) -> Response:
     request = Request.objects.create(from_user=local_from_user, to_user=to_user)
     request.save()
 
-    serialized = RequestSerializer(request, context={'request':request}).data
+    serialized = RequestSerializer(request, context={'request': request}).data
     return Response(serialized)
 
 

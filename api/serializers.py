@@ -94,6 +94,7 @@ class FollowersSerializer(NestedHyperlinkedModelSerializer):
         representation = super().to_representation(instance)
         return representation['follower']
 
+
 class RequestSerializer(NestedHyperlinkedModelSerializer):
     parent_lookup_kwargs = {
         'author_pk': 'author__pk'
@@ -108,14 +109,16 @@ class RequestSerializer(NestedHyperlinkedModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['type'] = 'Follow'
-        representation['summary'] = instance.from_user.get_full_name() + " wants to follow " + instance.to_user.get_full_name()
+        representation['summary'] = instance.from_user.get_full_name() + " wants to follow " + \
+            instance.to_user.get_full_name()
         representation['actor'] = representation['from_user']
         del representation['from_user']
         representation['object'] = representation['to_user']
         del representation['to_user']
 
         return representation
-    
+
+
 class RemoteRequestSerializer(NestedHyperlinkedModelSerializer):
     parent_lookup_kwargs = {
         'author_pk': 'author__pk'

@@ -172,7 +172,7 @@ class Request(models.Model):
 
 class RemoteFollow(models.Model):
     followee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    follower_url = models.ForeignKey(max_length=STR_MAX_LENGTH)
+    follower_url = models.CharField(max_length=STR_MAX_LENGTH)
 
 
 class RemoteRquest(models.Model):
