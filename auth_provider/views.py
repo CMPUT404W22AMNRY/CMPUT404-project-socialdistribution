@@ -65,7 +65,7 @@ class MyProfileView(DetailView):
 
     def parse_github_activity(self, activity: dict, json: dict):        
         for event in json:
-            if event['type'] == GitHub_EventType.PullRequestEvent:
+            if event['type'] == GitHub_EventType.PullRequestEvent and event['payload']['action'] == 'closed':
                 activity['pull_requests'] += 1
             if event['type'] == GitHub_EventType.PushEvent:
                 activity['commits'] += event['payload']['distinct_size']        
