@@ -586,7 +586,7 @@ class InboxTests(TestCase):
         self.assertEqual(resp.status_code, 204)
 
         self.assertEqual(len(post.remotelike_set.all()), 1)
-    
+
     def test_request(self):
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
         actor_response = self.client.get(f'/api/v1/authors/{self.user.id}').content
@@ -623,4 +623,3 @@ class InboxTests(TestCase):
         )
         self.assertEqual(resp.status_code, 204)
         self.assertEqual(len(Request.objects.all()), 1)
-
