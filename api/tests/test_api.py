@@ -702,7 +702,7 @@ class InboxTests(TestCase):
     def test_remote_request(self):
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
         object_response = self.client.get(f'/api/v1/authors/{self.user.id}').content
-        self.assertEqual(len(Request.objects.all()), 0)
+        self.assertEqual(len(RemoteRequest.objects.all()), 0)
         payload = {
             "type": "Follow",
             "actor": json.loads(SAMPLE_REMOTE_AUTHOR),
@@ -710,9 +710,9 @@ class InboxTests(TestCase):
         }
 
         resp = self.client.post(
-            f'/api/v1/authors/{self.user2.id}/inbox',
+            f'/api/v1/authors/{self.user.id}/inbox',
             json.dumps(payload),
             content_type='application/json'
         )
         self.assertEqual(resp.status_code, 204)
-        self.assertEqual(len(Request.objects.all()), 1)
+        self.assertEqual(len(RemoteRequest.objects.all()), 1)
