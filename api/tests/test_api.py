@@ -171,6 +171,100 @@ class PostTests(TestCase):
             self.assertIn('published', comment)
             self.assertIn('id', comment)
 
+    def test_create(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+
+        initial_post_count = len(Post.objects.filter(author=self.user))
+        payload = POST_DATA
+        res = self.client.post(f'/api/v1/authors/{self.user.id}/posts/', payload)
+        self.assertEqual(res.status_code, 201)
+        self.assertTrue(len(Post.objects.filter(author=self.user)), initial_post_count + 1)
+
+    def test_remote_create(self):
+        api_user_username = 'api_user'
+        api_user = get_user_model().objects.create_user(username=api_user_username, password=TEST_PASSWORD)
+        api_user.is_api_user = True
+        api_user.save()
+
+        self.client.login(username=api_user_username, password=TEST_PASSWORD)
+        res = self.client.post(f'/api/v1/authors/{self.user.id}/posts/')
+        self.assertEqual(res.status_code, 403)
+
+    def test_destroy(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+
+        post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=POST_DATA['unlisted'])
+        post.save()
+
+        res = self.client.delete(f'/api/v1/authors/{self.user.id}/posts/{post.id}')
+        self.assertEqual(res.status_code, 204)
+
+        with self.assertRaises(Post.DoesNotExist):
+            Post.objects.get(pk=post.id)
+
+    def test_remote_destroy(self):
+        api_user_username = 'api_user'
+        api_user = get_user_model().objects.create_user(username=api_user_username, password=TEST_PASSWORD)
+        api_user.is_api_user = True
+        api_user.save()
+
+        self.client.login(username=api_user_username, password=TEST_PASSWORD)
+        res = self.client.delete(f'/api/v1/authors/{self.user.id}/posts/{self.post.id}')
+        self.assertEqual(res.status_code, 403)
+
+    def test_put_update(self):
+        post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=POST_DATA['unlisted'])
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+
+        payload = POST_DATA
+        new_title = 'This is a new title'
+        payload['title'] = new_title
+        res = self.client.put(
+            f'/api/v1/authors/{self.user.id}/posts/{post.id}/',
+            json.dumps(payload),
+            content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+
+        self.assertEqual(Post.objects.get(pk=post.id).title, new_title)
+
+    def test_remote_update(self):
+        post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=POST_DATA['unlisted'])
+
+        api_user_username = 'api_user'
+        api_user = get_user_model().objects.create_user(username=api_user_username, password=TEST_PASSWORD)
+        api_user.is_api_user = True
+        api_user.save()
+
+        self.client.login(username=api_user_username, password=TEST_PASSWORD)
+
+        payload = POST_DATA
+        new_title = 'This is a new title'
+        payload['title'] = new_title
+        res = self.client.put(
+            f'/api/v1/authors/{self.user.id}/posts/{post.id}/',
+            json.dumps(payload),
+            content_type='application/json')
+        self.assertEqual(res.status_code, 403)
+
 
 class CommentsTests(TestCase):
     def setUp(self) -> None:
@@ -445,7 +539,6 @@ class LikeTests(TestCase):
             body = res.json()
             self.assertEqual(body['type'], 'likes')
 
-            print(body)
             # Find remote like
             for like in body['items']:
                 if like.get('author').get('url') == author_url:

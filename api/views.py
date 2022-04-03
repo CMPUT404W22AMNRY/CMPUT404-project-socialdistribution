@@ -12,6 +12,9 @@ from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
 from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer, RequestSerializer, RemoteRequestSerializer
+from rest_framework.exceptions import PermissionDenied
+from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer
+
 from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, CommentLikeSerializer
 from rest_framework.exceptions import MethodNotAllowed
 from api.util import page_number_pagination_class_factory
@@ -84,7 +87,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['get']
+    http_method_names = ['get', 'post', 'delete', 'put']
 
     def get_queryset(self):
         return Post.objects.filter(author=self.kwargs['author_pk']).order_by('-date_published')
@@ -104,6 +107,38 @@ class PostViewSet(viewsets.ModelViewSet):
         encoded_img = base64.b64encode(requests.get(location).content)
 
         return HttpResponse(encoded_img, content_type=post.content_type)
+
+    def create(self, request: Request, *args, **kwargs):
+        if request.user.is_api_user:
+            raise PermissionDenied(detail='No access to local objects', code=status.HTTP_403_FORBIDDEN)
+        if request.user.id != int(kwargs['author_pk']):
+            raise PermissionDenied(
+                detail='Cannot create post on behalf of another user',
+                code=status.HTTP_403_FORBIDDEN)
+        # https://stackoverflow.com/questions/44717442/this-querydict-instance-is-immutable
+        request.data._mutable = True
+        request.data['author_id'] = kwargs['author_pk']
+        request.data._mutable = False
+        return super().create(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        if request.user.is_api_user:
+            raise PermissionDenied(detail='No access to local objects', code=status.HTTP_403_FORBIDDEN)
+        if request.user.id != int(kwargs['author_pk']):
+            raise PermissionDenied(
+                detail='Cannot delete post on behalf of another user',
+                code=status.HTTP_403_FORBIDDEN)
+        return super().destroy(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        if request.user.is_api_user:
+            raise PermissionDenied(detail='No access to local objects', code=status.HTTP_403_FORBIDDEN)
+        if request.user.id != int(kwargs['author_pk']):
+            raise PermissionDenied(
+                detail='Cannot update post on behalf of another user',
+                code=status.HTTP_403_FORBIDDEN)
+        request.data['author_id'] = kwargs['author_pk']
+        return super().update(request, *args, **kwargs)
 
 
 class FollowersViewSet(viewsets.ModelViewSet):
@@ -187,7 +222,7 @@ class LikedViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
     def get_queryset(self):
-        return Like.objects.filter(author_id=self.kwargs['author_pk'])
+        return Like.objects.filter(author_id=self.kwargs['author_pk']).order_by('author_id')
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -211,7 +246,7 @@ class CommentLikesViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
     def get_queryset(self):
-        return Comment.objects.get(pk=self.kwargs['comment_pk']).commentlike_set.all()
+        return Comment.objects.get(pk=self.kwargs['comment_pk']).commentlike_set.all().order_by('author_id')
 
 
 def handle_inbox_follow(request: Request, body: dict[str, Any]) -> Response:
