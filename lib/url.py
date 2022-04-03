@@ -37,9 +37,10 @@ def is_url_valid_image(url: str) -> bool:
 
     return False
 
+
 def get_github_user_from_url(url: str):
     parsed_url = parse.urlparse(url)
     if parsed_url.scheme == 'http' or parsed_url.scheme == 'https':
-        if 'github' in parsed_url.hostname and parsed_url.path:        
+        if 'github' in parsed_url.hostname and parsed_url.path:
             return parsed_url.path.strip('/')
     return None
