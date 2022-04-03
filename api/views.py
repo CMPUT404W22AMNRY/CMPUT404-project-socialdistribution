@@ -1,7 +1,3 @@
-from gzip import READ
-from multiprocessing import context
-import re
-from tkinter import EW
 from urllib.parse import urlparse
 import base64
 from django.http import HttpResponse
@@ -23,7 +19,7 @@ from posts.models import Post, ContentType, Like, RemoteLike
 from posts.models import Post, ContentType, Like, Comment
 from json import JSONDecodeError, loads as json_loads
 from typing import Any
-from follow.models import Follow, Request, RemoteRquest
+from follow.models import Follow, Request, RemoteRequest
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -218,7 +214,7 @@ class CommentLikesViewSet(viewsets.ModelViewSet):
         return Comment.objects.get(pk=self.kwargs['comment_pk']).commentlike_set.all()
 
 
-def handle_inbox_request(request: Request, body: dict[str, Any]) -> Response:
+def handle_inbox_follow(request: Request, body: dict[str, Any]) -> Response:
     from_user_id_url: str = body.get('actor').get('id')
     to_user_id_url: str = body.get('object').get('id')
 
@@ -227,13 +223,12 @@ def handle_inbox_request(request: Request, body: dict[str, Any]) -> Response:
 
     to_user_id = parsed_to_user_id.path.rsplit('/', 1)[-1]
 
-    try:
-        to_user = get_user_model().objects.get(id=to_user_id)
-    except get_user_model().DoesNotExist as e:
-        return Http404
-
     if not parsed_from_user_id.hostname == request.get_host():
-        remote_request = RemoteRquest.objects.create(from_user_url=from_user_id_url, to_user=to_user)
+        try:
+            to_user = get_user_model().objects.get(id=to_user_id)
+        except get_user_model().DoesNotExist as e:
+            return Http404
+        remote_request = RemoteRequest.objects.create(from_user_url=from_user_id_url, to_user=to_user)
         remote_request.save()
         return HttpResponse({}, status=status.HTTP_204_NO_CONTENT)
 
@@ -248,7 +243,7 @@ def handle_inbox_request(request: Request, body: dict[str, Any]) -> Response:
     request.save()
 
     serialized = RequestSerializer(request, context={'request': request}).data
-    return Response(serialized)
+    return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
 def handle_inbox_like(request: Request, body: dict[str, Any]) -> Response:

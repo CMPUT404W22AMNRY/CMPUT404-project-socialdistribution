@@ -3,7 +3,7 @@ from attr import field
 from requests import Response
 from urllib.parse import urlparse
 from servers.models import Server
-from follow.models import Follow, Request, RemoteFollow, RemoteRquest
+from follow.models import Follow, Request, RemoteFollow, RemoteRequest
 from posts.models import Post, Like, Comment, RemoteLike
 from posts.models import CommentLike, Post, Like, Comment
 import json
@@ -126,7 +126,7 @@ class RemoteRequestSerializer(NestedHyperlinkedModelSerializer):
     to_user = AuthorSerializer(many=False, read_only=True)
 
     class Meta:
-        model = RemoteRquest
+        model = RemoteRequest
         fields = ['to_user']
 
     def to_representation(self, instance):

@@ -175,6 +175,6 @@ class RemoteFollow(models.Model):
     follower_url = models.CharField(max_length=STR_MAX_LENGTH)
 
 
-class RemoteRquest(models.Model):
+class RemoteRequest(models.Model):
     from_user_url = models.CharField(max_length=STR_MAX_LENGTH)
     to_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
