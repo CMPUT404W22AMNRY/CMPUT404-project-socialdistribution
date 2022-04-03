@@ -31,8 +31,7 @@ class MyProfileView(DetailView):
         context = super().get_context_data(**kwargs)
 
         github_username = get_github_user_from_url(self.object.github_url)
-        if github_username:
-            print(github_username)
+        if github_username:            
             context['github_activity'] = self.get_github_activity(github_username)
 
         context['user_resources'] = [{'name': user_resource[0], 'link': user_resource[1]}
@@ -53,10 +52,10 @@ class MyProfileView(DetailView):
                 # activity.append(self.parse_github_activity(github_activity_request.json))
                 activity += self.parse_github_activity(github_activity_request.json())
             else:
-                print('request failed with code ' + github_activity_request.status_code)
+                print('GitHub activity request failed with code ' + github_activity_request.status_code)
                 break
 
-            if 'rel="next"' in github_activity_request.headers['Link']:
+            if 'Link' in github_activity_request.headers and 'rel="next"' in github_activity_request.headers['Link']:
                 page += 1
             else:
                 break
