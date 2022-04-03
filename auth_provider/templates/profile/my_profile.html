@@ -13,7 +13,8 @@
     <p>GitHub activity in the last 90 days.</p>
     {% if github_activity %}
       <ul>
-        <li>Pull Requests: {{ github_activity }}</li>
+        <li>Pull Requests: {{ github_activity.pull_requests }}</li>
+        <li>Commits: {{ github_activity.commits }}</li>
       </ul>
     {% else %}
       <p>GitHub activity could not be loaded.</p>

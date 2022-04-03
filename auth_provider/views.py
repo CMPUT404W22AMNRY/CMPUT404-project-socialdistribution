@@ -43,14 +43,15 @@ class MyProfileView(DetailView):
             return requests.get(
                 f'https://api.github.com/users/{user}/events?accept=application/vnd.github.v3+json&per_page=100&page={page}')
 
-        page = 1
-        # activity = []
-        activity = 0
+        page = 1        
+        activity = {
+            'pull_requests': 0,
+            'commits': 0
+        }
         while True:
             github_activity_request = send_get_github_activity(user, page)            
             if github_activity_request.status_code == 200:
-                # activity.append(self.parse_github_activity(github_activity_request.json))
-                activity += self.parse_github_activity(github_activity_request.json())
+                self.parse_github_activity(activity, github_activity_request.json())
             else:
                 print('GitHub activity request failed with code ' + github_activity_request.status_code)
                 break
@@ -62,12 +63,12 @@ class MyProfileView(DetailView):
 
         return activity
 
-    def parse_github_activity(self, json: dict):
-        count = 0
+    def parse_github_activity(self, activity: dict, json: dict):        
         for event in json:
             if event['type'] == GitHub_EventType.PullRequestEvent:
-                count += 1        
-        return count
+                activity['pull_requests'] += 1
+            if event['type'] == GitHub_EventType.PushEvent:
+                activity['commits'] += event['payload']['distinct_size']        
 
 
 class ProfileView(DetailView):
