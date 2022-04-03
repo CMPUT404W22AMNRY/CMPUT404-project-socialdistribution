@@ -8,6 +8,8 @@ from requests import Response
 from api.tests.constants import SAMPLE_REMOTE_AUTHOR
 from unittest.mock import MagicMock, patch
 from servers.models import Server
+from api.tests.test_api import TEST_PASSWORD, TEST_USERNAME
+
 
 
 class ViewsTests(TestCase):
@@ -70,7 +72,6 @@ class ViewsTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, 'error')
 
-
 class RemoteProfileViewTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
@@ -103,3 +104,18 @@ class RemoteProfileViewTests(TestCase):
             self.assertEqual(res.status_code, 200)
             self.assertContains(res, mock_json_response['display_name'])
             self.assertContains(res, mock_json_response['github'])
+
+class ProfileTests(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.user = get_user_model().objects.create_user(username=TEST_USERNAME, password=TEST_PASSWORD)
+        self.user.first_name = 'Bob'
+        self.user.last_name = 'Doyle'
+        self.user.github_url = 'https://www.github.com/reillykeele'
+        self.user.save()
+
+    def test_my_profile(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.get(reverse_lazy('auth_provider:my_profile'))
+        self.assertEqual(res.status_code, 200)
+        self.assertTemplateUsed(res, 'profile/my_profile.html')

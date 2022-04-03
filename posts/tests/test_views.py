@@ -2,14 +2,14 @@ import json
 from unittest.mock import MagicMock, patch
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
-from posts.models import Post, Category, ContentType, Comment, Like
+from posts.models import CommentLike, Post, Category, ContentType, Comment, Like
 from django.urls import reverse
 from requests import Response
 
 from servers.models import Server
 from api.tests.constants import SAMPLE_REMOTE_POST
 from api.tests.test_api import TEST_PASSWORD, TEST_USERNAME
-from .constants import COMMENT_DATA, POST_DATA
+from .constants import COMMENT_DATA, COMMONMARK_POST_DATA, POST_DATA
 
 EDITED_POST_DATA = POST_DATA.copy()
 EDITED_POST_DATA['content_type'] = ContentType.MARKDOWN
@@ -96,6 +96,24 @@ class EditPostViewTests(TestCase):
         res = self.client.post(reverse('posts:edit', kwargs={'pk': 900}), data=EDITED_POST_DATA)
         self.assertEqual(res.status_code, 404)
 
+    def test_edit_page_as_another_user(self):
+        username = 'alice'
+        password = TEST_PASSWORD
+        get_user_model().objects.create_user(username=username, password=password)
+
+        self.client.login(username=username, password=password)
+        res = self.client.get(reverse('posts:edit', kwargs={'pk': self.post_id}))
+        self.assertEqual(res.status_code, 403)
+
+    def test_edit_as_another_user(self):
+        username = 'alice'
+        password = TEST_PASSWORD
+        get_user_model().objects.create_user(username=username, password=password)
+
+        self.client.login(username=username, password=password)
+        res = self.client.post(reverse('posts:edit', kwargs={'pk': self.post_id}), data=EDITED_POST_DATA)
+        self.assertEqual(res.status_code, 403)
+
 
 class PostDetailViewTests(TestCase):
     def setUp(self) -> None:
@@ -106,6 +124,13 @@ class PostDetailViewTests(TestCase):
             description=POST_DATA['description'],
             content_type=POST_DATA['content_type'],
             content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=True)
+        self.post2 = Post.objects.create(
+            title=COMMONMARK_POST_DATA['title'],
+            description=COMMONMARK_POST_DATA['description'],
+            content_type=COMMONMARK_POST_DATA['content_type'],
+            content=COMMONMARK_POST_DATA['content'],
             author_id=self.user.id,
             unlisted=True)
         self.post.save()
@@ -162,6 +187,50 @@ class PostDetailViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertNotContains(res, 'Like')
 
+    def test_commonmark(self):
+        self.client.login(username='bob', password='password')
+        res = self.client.get(reverse('posts:detail', kwargs={'pk': self.post2.id}))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, '<h1>Heading 8-)</h1>')
+        self.assertContains(res, '<p><strong>This is bold text!</strong></p>')
+
+    def test_like_comment(self):
+        comment = Comment.objects.create(
+            comment=COMMENT_DATA['comment'],
+            author=self.user,
+            content_type=COMMENT_DATA['content_type'],
+            post=self.post,
+        )
+        comment.save()
+
+        self.assertEqual(len(comment.commentlike_set.all()), 0)
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.post(reverse('posts:like-comment', kwargs={'post_pk': self.post.id, 'pk': comment.id}))
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(len(comment.commentlike_set.all()), 1)
+
+    def test_unlike_comment(self):
+        comment = Comment.objects.create(
+            comment=COMMENT_DATA['comment'],
+            author=self.user,
+            content_type=COMMENT_DATA['content_type'],
+            post=self.post,
+        )
+        comment.save()
+        comment_like = CommentLike.objects.create(
+            author=self.user,
+            comment=comment
+        )
+        comment_like.save()
+
+        self.assertEqual(len(comment.commentlike_set.all()), 1)
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.post(reverse('posts:unlike-comment', kwargs={'post_pk': self.post.id, 'pk': comment.id}))
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(len(comment.commentlike_set.all()), 0)
+
 
 class RemotePostDetailView(TestCase):
     def setUp(self) -> None:
@@ -215,7 +284,7 @@ class RemotePostDetailView(TestCase):
                     kwargs={
                         'url': 'http://localhost:5555/api/v2/authors/1/posts/1/'}))
             self.assertEqual(res.status_code, 200)
-            self.assertTemplateUsed(res, 'posts/partials/_comment.html')
+            self.assertTemplateUsed(res, 'posts/partials/_remote_comment.html')
 
             for comment in mock_json_response['comment_src']:
                 self.assertContains(res, comment['comment'])

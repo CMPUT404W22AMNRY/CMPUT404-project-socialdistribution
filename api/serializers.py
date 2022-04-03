@@ -1,15 +1,19 @@
-from email.policy import default
+from requests import Response
+from urllib.parse import urlparse
+from servers.models import Server
+from follow.models import Follow
+from posts.models import Post, Like, Comment, RemoteLike
+from posts.models import CommentLike, Post, Like, Comment
+import json
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
-from posts.models import Post, Like, Comment
-from follow.models import Follow
 
 
 class AuthorSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ['id', 'url', ]
+        fields = ['url', ]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -17,6 +21,7 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
         representation['displayName'] = instance.get_full_name()
         representation['github'] = instance.github_url
         representation['profileImage'] = instance.profile_image_url
+        representation['id'] = representation['url']
         return representation
 
 
@@ -51,7 +56,7 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'description', 'content', 'author', 'visibility', 'unlisted', 'source', 'comment_set']
+        fields = ['title', 'description', 'content', 'author', 'visibility', 'unlisted', 'source', 'comment_set']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -69,7 +74,13 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
             'comments': representation['comment_set']
         }
         del representation['comment_set']
+        representation['id'] = representation['source']
         return representation
+
+    def to_internal_value(self, data):
+        internal_value = super().to_internal_value(data)
+        internal_value['author_id'] = data['author_id']
+        return internal_value
 
 
 class FollowersSerializer(NestedHyperlinkedModelSerializer):
@@ -106,3 +117,52 @@ class LikesSerializer(serializers.ModelSerializer):
         representation['object'] = representation['post']['source']
         del representation['post']
         return representation
+
+
+class CommentLikeSerializer(serializers.ModelSerializer):
+    parent_lookup_kwargs = {
+        'author_pk': 'author__pk',
+    }
+    author = AuthorSerializer(many=False, read_only=True)
+    comment = CommentSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = CommentLike
+        fields = ['author', 'comment']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['type'] = 'Like'
+        representation['summary'] = instance.author.get_full_name() + ' likes your comment'
+        representation['object'] = representation['comment']['id']
+        del representation['comment']
+        return representation
+
+
+class RemoteLikeSerializer(serializers.ModelSerializer):
+    parent_lookup_kwargs = {
+        'post_pk': 'post__pk',
+    }
+    post = PostSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = RemoteLike
+        fields = ['post']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        for server in Server.objects.all():
+            parsed_author_url = urlparse(instance.author_url)
+            parsed_server_service_address = urlparse(server.service_address)
+            if parsed_author_url.hostname != parsed_server_service_address.hostname:
+                continue
+            author: Response = server.get(parsed_author_url.path)
+            json_author = author.json()
+
+            author_name = json_author.get('displayName') or json_author.get('display_name') or ''
+            representation['type'] = 'Like'
+            representation['summary'] = author_name + ' likes your post'
+            representation['object'] = representation['post']['source']
+            representation['author'] = json_author
+            del representation['post']
+            return representation
