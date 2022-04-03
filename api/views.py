@@ -111,7 +111,9 @@ class PostViewSet(viewsets.ModelViewSet):
         if request.user.is_api_user:
             raise PermissionDenied(detail='No access to local objects', code=status.HTTP_403_FORBIDDEN)
         if request.user.id != int(kwargs['author_pk']):
-            raise PermissionDenied(detail='Cannot create post on behalf of another user', code=status.HTTP_403_FORBIDDEN)
+            raise PermissionDenied(
+                detail='Cannot create post on behalf of another user',
+                code=status.HTTP_403_FORBIDDEN)
         # https://stackoverflow.com/questions/44717442/this-querydict-instance-is-immutable
         request.data._mutable = True
         request.data['author_id'] = kwargs['author_pk']
@@ -122,14 +124,18 @@ class PostViewSet(viewsets.ModelViewSet):
         if request.user.is_api_user:
             raise PermissionDenied(detail='No access to local objects', code=status.HTTP_403_FORBIDDEN)
         if request.user.id != int(kwargs['author_pk']):
-            raise PermissionDenied(detail='Cannot delete post on behalf of another user', code=status.HTTP_403_FORBIDDEN)
+            raise PermissionDenied(
+                detail='Cannot delete post on behalf of another user',
+                code=status.HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if request.user.is_api_user:
             raise PermissionDenied(detail='No access to local objects', code=status.HTTP_403_FORBIDDEN)
         if request.user.id != int(kwargs['author_pk']):
-            raise PermissionDenied(detail='Cannot update post on behalf of another user', code=status.HTTP_403_FORBIDDEN)
+            raise PermissionDenied(
+                detail='Cannot update post on behalf of another user',
+                code=status.HTTP_403_FORBIDDEN)
         request.data['author_id'] = kwargs['author_pk']
         return super().update(request, *args, **kwargs)
 

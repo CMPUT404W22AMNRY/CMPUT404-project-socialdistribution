@@ -178,7 +178,6 @@ class PostTests(TestCase):
         self.assertEqual(res.status_code, 201)
         self.assertTrue(len(Post.objects.filter(author=self.user)), initial_post_count + 1)
 
-
     def test_remote_create(self):
         api_user_username = 'api_user'
         api_user = get_user_model().objects.create_user(username=api_user_username, password=TEST_PASSWORD)
@@ -188,7 +187,7 @@ class PostTests(TestCase):
         self.client.login(username=api_user_username, password=TEST_PASSWORD)
         res = self.client.post(f'/api/v1/authors/{self.user.id}/posts/')
         self.assertEqual(res.status_code, 403)
-    
+
     def test_destroy(self):
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
 
@@ -207,7 +206,7 @@ class PostTests(TestCase):
         with self.assertRaises(Post.DoesNotExist):
             Post.objects.get(pk=post.id)
 
-    def test_remote_destroy(self):    
+    def test_remote_destroy(self):
         api_user_username = 'api_user'
         api_user = get_user_model().objects.create_user(username=api_user_username, password=TEST_PASSWORD)
         api_user.is_api_user = True
@@ -219,31 +218,34 @@ class PostTests(TestCase):
 
     def test_put_update(self):
         post = Post.objects.create(
-                    title=POST_DATA['title'],
-                    description=POST_DATA['description'],
-                    content_type=POST_DATA['content_type'],
-                    content=POST_DATA['content'],
-                    author_id=self.user.id,
-                    unlisted=POST_DATA['unlisted'])
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=POST_DATA['unlisted'])
 
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
 
         payload = POST_DATA
         new_title = 'This is a new title'
         payload['title'] = new_title
-        res = self.client.put(f'/api/v1/authors/{self.user.id}/posts/{post.id}/', json.dumps(payload), content_type='application/json')
+        res = self.client.put(
+            f'/api/v1/authors/{self.user.id}/posts/{post.id}/',
+            json.dumps(payload),
+            content_type='application/json')
         self.assertEqual(res.status_code, 200)
 
         self.assertEqual(Post.objects.get(pk=post.id).title, new_title)
 
     def test_remote_update(self):
         post = Post.objects.create(
-                    title=POST_DATA['title'],
-                    description=POST_DATA['description'],
-                    content_type=POST_DATA['content_type'],
-                    content=POST_DATA['content'],
-                    author_id=self.user.id,
-                    unlisted=POST_DATA['unlisted'])
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=POST_DATA['unlisted'])
 
         api_user_username = 'api_user'
         api_user = get_user_model().objects.create_user(username=api_user_username, password=TEST_PASSWORD)
@@ -255,7 +257,10 @@ class PostTests(TestCase):
         payload = POST_DATA
         new_title = 'This is a new title'
         payload['title'] = new_title
-        res = self.client.put(f'/api/v1/authors/{self.user.id}/posts/{post.id}/', json.dumps(payload), content_type='application/json')
+        res = self.client.put(
+            f'/api/v1/authors/{self.user.id}/posts/{post.id}/',
+            json.dumps(payload),
+            content_type='application/json')
         self.assertEqual(res.status_code, 403)
 
 
