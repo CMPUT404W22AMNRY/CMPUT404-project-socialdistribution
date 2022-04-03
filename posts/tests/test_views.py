@@ -95,7 +95,7 @@ class EditPostViewTests(TestCase):
         self.client.login(username='bob', password='password')
         res = self.client.post(reverse('posts:edit', kwargs={'pk': 900}), data=EDITED_POST_DATA)
         self.assertEqual(res.status_code, 404)
-    
+
     def test_edit_page_as_another_user(self):
         username = 'alice'
         password = TEST_PASSWORD

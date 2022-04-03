@@ -74,6 +74,7 @@ class EditPostView(LoginRequiredMixin, UpdateView):
             raise PermissionDenied("User not allowed to edit another user's post")
         return super().post(request, *args, **kwargs)
 
+
 class PostDetailView(LoginRequiredMixin, DetailView):
     model = Post
 
