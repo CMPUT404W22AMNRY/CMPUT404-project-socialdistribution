@@ -5,6 +5,8 @@ import requests
 
 import mimetypes
 
+from urllib import parse
+
 
 def is_url_valid(url: str) -> bool:
     validate = URLValidator()
@@ -34,3 +36,11 @@ def is_url_valid_image(url: str) -> bool:
         return get.headers.get('content-type').startswith('image')
 
     return False
+
+
+def get_github_user_from_url(url: str):
+    parsed_url = parse.urlparse(url)
+    if parsed_url.scheme == 'http' or parsed_url.scheme == 'https':
+        if 'github' in parsed_url.hostname and parsed_url.path:
+            return parsed_url.path.strip('/')
+    return None
