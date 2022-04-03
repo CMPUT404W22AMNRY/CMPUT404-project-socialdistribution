@@ -175,7 +175,7 @@ class PostTests(TestCase):
         initial_post_count = len(Post.objects.filter(author=self.user))
         payload = POST_DATA
         res = self.client.post(f'/api/v1/authors/{self.user.id}/posts/', payload)
-        self.assertTrue(res.status_code >= 200 and res.status_code < 300)
+        self.assertEqual(res.status_code, 201)
         self.assertTrue(len(Post.objects.filter(author=self.user)), initial_post_count + 1)
 
 
@@ -188,6 +188,24 @@ class PostTests(TestCase):
         self.client.login(username=api_user_username, password=TEST_PASSWORD)
         res = self.client.post(f'/api/v1/authors/{self.user.id}/posts/')
         self.assertEqual(res.status_code, 403)
+    
+    def test_destroy(self):
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+
+        post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=self.user.id,
+            unlisted=POST_DATA['unlisted'])
+        post.save()
+
+        res = self.client.delete(f'/api/v1/authors/{self.user.id}/posts/{post.id}')
+        self.assertEqual(res.status_code, 204)
+
+        with self.assertRaises(Post.DoesNotExist):
+            Post.objects.get(pk=post.id)
 
 
 class CommentsTests(TestCase):
