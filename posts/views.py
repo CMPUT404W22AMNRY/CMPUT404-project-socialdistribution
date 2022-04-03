@@ -215,17 +215,16 @@ def unlike_post_view(request: HttpRequest, pk: int):
     return redirect(Post.objects.get(pk=pk).get_absolute_url())
 
 
-def share_post_view(request: HttpRequest, author_id, post_id):
-    if request.method != 'POST':
-        return HttpResponseNotAllowed(['POST'])
-
-    last_author = Author.object.get
-    last_url = last_post.url
+def share_post_view(request: HttpRequest, pk: int):
 
     # duplicate the post
-    shared_post = last_post
+    shared_post = Post.objects.get(pk=pk)
     shared_post.pk = None
+    print(shared_post)
     shared_post.save()
+    author = User.objects.get(from_user=request.user)
+    shared_post.author = author
+    return redirect(shared_post.get_absolute_url())
 
 
 def like_comment_view(request: HttpRequest, post_pk: int, pk: int):
