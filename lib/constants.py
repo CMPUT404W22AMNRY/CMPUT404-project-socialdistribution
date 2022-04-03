@@ -1,0 +1,18 @@
+# https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types
+class GitHub_EventType:
+    CommitCommentEvent = 'CommitCommentEvent'
+    CreateEvent = 'CreateEvent'
+    DeleteEvent = 'DeleteEvent'
+    ForkEvent = 'ForkEvent'
+    GollumEvent = 'GollumEvent'
+    IssueCommentEvent = 'IssueCommentEvent'
+    IssuesEvent = 'IssuesEvent'
+    MemberEvent = 'MemberEvent'
+    PublicEvent = 'PublicEvent'
+    PullRequestEvent = 'PullRequestEvent'
+    PullRequestReviewEvent = 'PullRequestReviewEvent'
+    PullRequestReviewCommentEvent = 'PullRequestReviewCommentEvent'
+    PushEvent = 'PushEvent'
+    ReleaseEvent = 'ReleaseEvent'
+    SponsorshipEvent = 'SponsorshipEvent'
+    WatchEvent = 'WatchEvent'
