@@ -178,4 +178,4 @@ class RemoteFollow(models.Model):
 class RemoteRequest(models.Model):
     from_user_url = models.CharField(max_length=STR_MAX_LENGTH)
     to_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    from_user_name = models.CharField(max_length=STR_MAX_LENGTH)
+    from_user_name = models.CharField(max_length=STR_MAX_LENGTH, default='')

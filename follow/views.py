@@ -1,10 +1,11 @@
 from multiprocessing import context
 from typing import Any
+from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.views.generic.list import ListView
-from follow.models import AlreadyExistsError, Follow, Request, RemoteRequest
+from follow.models import AlreadyExistsError, Follow, RemoteFollow, Request, RemoteRequest
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -76,6 +77,28 @@ def unfollow_request(request, from_username):
         return redirect(from_user.get_absolute_url())
 
 
+def accept_remote_follow_request(request, follower_url):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    try:
+        RemoteFollow.objects.create(followee=request.user, follower_url=follower_url)
+    except AlreadyExistsError:
+        pass
+    finally:
+        return redirect(reverse('auth_provider:remote_profile', kwargs={'url':follower_url}))
+
+
+def reject_remote_follow_request(request, follower_url):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    try:
+        RemoteRequest.objects.delete(followee=request.user, follower_url=follower_url)
+    except RemoteRequest.DoesNotExist:
+        pass
+    finally:
+        return redirect(reverse('auth_provider:remote_profile', kwargs={'url':follower_url}))
+
+
 class UsersView(LoginRequiredMixin, ServerListView):
     model = USER_MODEL
     template_name = 'follow/user_list.html'
@@ -104,7 +127,7 @@ class FriendRequestsView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Request.objects.filter(to_user=self.request.user)
     
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+    def get_context_data(self, **kwargs: Any):
         context = super(FriendRequestsView, self).get_context_data(**kwargs)
         context['remote_requests'] = RemoteRequest.objects.filter(to_user=self.request.user)
         return context

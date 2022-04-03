@@ -9,7 +9,7 @@ from api.tests.constants import SAMPLE_REMOTE_AUTHORS
 from servers.models import Server
 from follow.admin import AddFriendAction
 
-from .models import Follow
+from .models import Follow, RemoteFollow
 
 
 class FriendRequestsViewTests(TestCase):
@@ -30,6 +30,14 @@ class FriendRequestsViewTests(TestCase):
         res = self.client.get(reverse('follow:friend_requests'))
 
         self.assertContains(res, self.alice.username)
+    
+    def test_remote_friend_request(self):
+        url = "http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471"
+        RemoteFollow.objects.create(from_user_url=url, to_user=self.bob)
+        self.client.login(username='bob', password='password')
+        res = self.client.get(reverse('follow:friend_requests'))
+        print(res)
+        self.assertContains(res, url)
 
 
 class AddFriendActionTests(TestCase):
