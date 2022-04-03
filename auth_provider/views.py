@@ -7,7 +7,6 @@ from django.contrib.auth import get_user_model, logout
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from requests import Response
-from auth_provider.models import User
 
 from servers.views.generic.detailed_view import ServerDetailView
 
@@ -142,7 +141,7 @@ class RemoteProfileView(ServerDetailView):
 
         return context
 
-    def to_internal(self, response: Response) -> User:
+    def to_internal(self, response: Response) -> get_user_model():
         json_response = response.json()
 
         profile_image_url = json_response.get('profileImage') or json_response.get('profile_image')
@@ -150,6 +149,7 @@ class RemoteProfileView(ServerDetailView):
         github = json_response.get('github')
 
         return {
+            'id': json_response.get('id'),
             'profile_image_url': profile_image_url,
             "get_full_name": author_full_name,
             "github_url": github,
