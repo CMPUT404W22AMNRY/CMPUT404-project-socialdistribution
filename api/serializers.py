@@ -77,6 +77,11 @@ class PostSerializer(NestedHyperlinkedModelSerializer):
         representation['id'] = representation['source']
         return representation
 
+    def to_internal_value(self, data):
+        internal_value = super().to_internal_value(data)
+        internal_value['author_id'] = data['author_id']
+        return internal_value
+
 
 class FollowersSerializer(NestedHyperlinkedModelSerializer):
     parent_lookup_kwargs = {
@@ -151,7 +156,7 @@ class RemoteLikeSerializer(serializers.ModelSerializer):
             parsed_server_service_address = urlparse(server.service_address)
             if parsed_author_url.hostname != parsed_server_service_address.hostname:
                 continue
-            author: Response = server.get(parsed_server_service_address.path)
+            author: Response = server.get(parsed_author_url.path)
             json_author = author.json()
 
             author_name = json_author.get('displayName') or json_author.get('display_name') or ''
