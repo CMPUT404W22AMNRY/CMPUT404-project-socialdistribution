@@ -1,3 +1,5 @@
+import requests
+import json
 from typing import Any, Dict, Optional
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -5,6 +7,8 @@ from django.contrib.auth import get_user_model, logout
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
 
+from lib.constants import GitHub_EventType
+from lib.url import get_github_user_from_url
 from .user_resources import user_resources
 from .forms import SignUpForm, EditProfileForm
 from .user_action_generators import UserActionGenerator, user_action_generators
@@ -25,9 +29,46 @@ class MyProfileView(DetailView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
+
+        github_username = get_github_user_from_url(self.object.github_url)
+        if github_username:
+            print(github_username)
+            context['github_activity'] = self.get_github_activity(github_username)
+
         context['user_resources'] = [{'name': user_resource[0], 'link': user_resource[1]}
                                      for user_resource in user_resources]
         return context
+
+    def get_github_activity(self, user: str):
+        def send_get_github_activity(user: str, page: int = 1):
+            return requests.get(
+                f'https://api.github.com/users/{user}/events?accept=application/vnd.github.v3+json&per_page=100&page={page}')
+
+        page = 1
+        # activity = []
+        activity = 0
+        while True:
+            github_activity_request = send_get_github_activity(user, page)            
+            if github_activity_request.status_code == 200:
+                # activity.append(self.parse_github_activity(github_activity_request.json))
+                activity += self.parse_github_activity(github_activity_request.json())
+            else:
+                print('request failed with code ' + github_activity_request.status_code)
+                break
+
+            if 'rel="next"' in github_activity_request.headers['Link']:
+                page += 1
+            else:
+                break
+
+        return activity
+
+    def parse_github_activity(self, json: dict):
+        count = 0
+        for event in json:
+            if event['type'] == GitHub_EventType.PullRequestEvent:
+                count += 1        
+        return count
 
 
 class ProfileView(DetailView):

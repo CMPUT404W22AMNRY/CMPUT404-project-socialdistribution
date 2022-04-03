@@ -8,6 +8,18 @@
 <div class="card">
   {% include 'profile/partials/_summary.html' %}
 
+  <section id="github-activity">
+    <h3>GitHub Activity</h3>
+    <p>GitHub activity in the last 90 days.</p>
+    {% if github_activity %}
+      <ul>
+        <li>Pull Requests: {{ github_activity }}</li>
+      </ul>
+    {% else %}
+      <p>GitHub activity could not be loaded.</p>
+    {% endif %}
+  </section>
+
   <section id="manage">
     <h3>Manage</h3>
     <ul>
@@ -18,7 +30,7 @@
   </section>
 
   <section id="resources">
-    <h3>My resources</h3>
+    <h3>My Resources</h3>
     <ul>
       {% for user_resource in user_resources %}
       <li>
