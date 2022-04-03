@@ -207,6 +207,15 @@ class PostTests(TestCase):
         with self.assertRaises(Post.DoesNotExist):
             Post.objects.get(pk=post.id)
 
+    def test_remote_destroy(self):    
+        api_user_username = 'api_user'
+        api_user = get_user_model().objects.create_user(username=api_user_username, password=TEST_PASSWORD)
+        api_user.is_api_user = True
+        api_user.save()
+
+        self.client.login(username=api_user_username, password=TEST_PASSWORD)
+        res = self.client.delete(f'/api/v1/authors/{self.user.id}/posts/{self.post.id}')
+        self.assertEqual(res.status_code, 403)
 
 class CommentsTests(TestCase):
     def setUp(self) -> None:
