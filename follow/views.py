@@ -98,7 +98,7 @@ class UsersView(LoginRequiredMixin, ServerListView):
 
 class FriendRequestsView(LoginRequiredMixin, ListView):
     model = Request
-    context_object_name = 'Requests'
+    context_object_name = 'requests'
     template_name = 'follow/request_list.html'
 
     def get_queryset(self):
@@ -106,7 +106,7 @@ class FriendRequestsView(LoginRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super(FriendRequestsView, self).get_context_data(**kwargs)
-        context['Remote_Requests'] = RemoteRequest.objects.filter(to_user=self.request.user)
+        context['remote_requests'] = RemoteRequest.objects.filter(to_user=self.request.user)
         return context
 
 
