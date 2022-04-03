@@ -36,7 +36,7 @@ class FriendRequestsViewTests(TestCase):
         self.client.login(username='bob', password='password')
         res = self.client.get(reverse('follow:friend_requests'))
         print(res.context_data)
-        print(res['remote_request'])
+        print(res['remote_requests'])
         self.assertContains(res, url)
 
 
