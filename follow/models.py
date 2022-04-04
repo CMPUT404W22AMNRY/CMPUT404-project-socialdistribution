@@ -193,7 +193,7 @@ class RemoteRequest(models.Model):
         relation.save()
         self.delete()
         return True
-    
+
     def reject(self):
         self.delete()
         return True
