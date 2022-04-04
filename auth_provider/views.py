@@ -123,22 +123,8 @@ class RemoteProfileView(ServerDetailView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
-        def get_action(user_action_generator: UserActionGenerator):
-            user_action = user_action_generator(self.request.user, self.get_object())
-            if user_action is None:
-                return None
-            return {
-                "name": user_action[0],
-                "link": user_action[1],
-            }
-
-        actions = [get_action(user_action_generator)
-                   for user_action_generator in user_action_generators]
+        # TODO: Get user actions for remote users
         context['user_actions'] = []
-        for action in actions:
-            if action is not None:
-                context['user_actions'].append(action)
-
         return context
 
     def to_internal(self, response: Response) -> get_user_model():
