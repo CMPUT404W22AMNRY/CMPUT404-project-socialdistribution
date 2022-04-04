@@ -5,7 +5,6 @@ from servers.models import Server
 from requests import Response
 from django.urls import reverse
 from posts.models import CommentLike, Post, Category, ContentType, Comment, Like, RemoteComment
-from posts.models import CommentLike, Post, Category, ContentType, Comment, Like, SharedPost
 import json
 from unittest.mock import MagicMock, patch
 from django.test import TestCase, Client
