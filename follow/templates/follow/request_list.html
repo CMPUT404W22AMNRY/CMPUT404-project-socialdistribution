@@ -2,9 +2,14 @@
 
 <h1>Friend requests</h1>
 <ul class="no-indent large-gap">
-    {% for object in object_list %}
+    {% for request in requests %}
     <li>
         {% include 'follow/partials/_friend_request.html' %}
+    </li>
+    {% endfor %}
+    {% for remote_request in remote_requests %}
+    <li>
+        {% include 'follow/partials/_remote_friend_request.html' %}
     </li>
     {% empty %}
     <li>No friend requests</li>

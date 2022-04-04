@@ -1,16 +1,17 @@
 <div class="card">
     <div style="display: flex; flex-direction:row; align-items: center;">
         <div>
-            <h3>{{ request.from_user.get_full_name }}</h3>
-            <h4>{{ request.from_user.username }}</h4>
+            <!--TODO: Change url to username-->
+            <h3>{{ remote_request.from_user_url }}</h3>
+            <h4>Remote</h4>
         </div>
         <span style="flex-grow:1"></span>
         <div style="display: flex; flex-direction: row; gap: 1rem">
-            <form method="post" action="{% url 'follow:accept_follow_request' request.from_user.username %}">
+            <form method="post" action="{% url 'follow:accept_remote_request' remote_request.from_user_url %}">
                 {% csrf_token %}
                 <input type="submit" class="primarybtn" value="Accept" />
             </form>
-            <form method="post" action="{% url 'follow:reject_follow_request' request.from_user.username %}">
+            <form method="post" action="{% url 'follow:reject_remote_request' remote_request.from_user_url %}">
                 {% csrf_token %}
                 <input type="submit" class="button secondary" value="Reject" />
             </form>
