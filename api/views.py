@@ -270,7 +270,7 @@ def handle_inbox_follow(request: Request, body: dict[str, Any]) -> Response:
 
     try:
         local_from_user = get_user_model().objects.get(id=local_from_user_id)
-    except get_user_model().DoesNotExist as e:
+    except get_user_model().DoesNotExist:
         return Http404
 
     local_request = Request.objects.create(from_user=local_from_user, to_user=to_user)
