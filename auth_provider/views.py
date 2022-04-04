@@ -2,7 +2,7 @@ import requests
 import json
 from typing import Any, Dict, Optional
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.contrib.auth import get_user_model, logout
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
@@ -33,54 +33,10 @@ class MyProfileView(DetailView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
-        github_username = get_github_user_from_url(self.object.github_url)
-        if github_username:
-            context['github_activity'] = self.get_github_activity(github_username)
-
+        context['github_activity'] = get_github_activity(self.object.github_url)
         context['user_resources'] = [{'name': user_resource[0], 'link': user_resource[1]}
                                      for user_resource in user_resources]
         return context
-
-    def get_github_activity(self, user: str):
-        def send_get_github_activity(user: str, page: int = 1):
-            return requests.get(
-                f'https://api.github.com/users/{user}/events?accept=application/vnd.github.v3+json&per_page=100&page={page}')
-
-        page = 1
-        activity = {
-            'username': user,
-            'commits': 0,
-            'pull_requests': 0,
-            'reviews': 0,
-            'issues': 0,
-        }
-        success = False
-        while True:
-            github_activity_request = send_get_github_activity(user, page)
-            if github_activity_request.status_code == 200:
-                self.parse_github_activity(activity, github_activity_request.json())
-                success |= True
-            else:
-                print('GitHub activity request failed with code ' + github_activity_request.status_code)
-                break
-
-            if 'Link' in github_activity_request.headers and 'rel="next"' in github_activity_request.headers['Link']:
-                page += 1
-            else:
-                break
-
-        return activity if success else None
-
-    def parse_github_activity(self, activity: dict, json: dict):
-        for event in json:
-            if event['type'] == GitHub_EventType.PushEvent:
-                activity['commits'] += event['payload']['distinct_size']
-            if event['type'] == GitHub_EventType.PullRequestEvent and event['payload']['action'] == 'opened':
-                activity['pull_requests'] += 1
-            if event['type'] == GitHub_EventType.PullRequestReviewEvent:
-                activity['reviews'] += 1
-            if event['type'] == GitHub_EventType.IssuesEvent:
-                activity['issues'] += 1
 
 
 class ProfileView(DetailView):
@@ -102,6 +58,7 @@ class ProfileView(DetailView):
                 'link': user_action[1],
             }
 
+        context['github_activity'] = get_github_activity(self.object.github_url)
         # TODO: Clean this up with a lambda
         actions = [get_action(user_action_generator)
                    for user_action_generator in user_action_generators]
@@ -124,6 +81,7 @@ class RemoteProfileView(ServerDetailView):
         context = super().get_context_data(**kwargs)
 
         # TODO: Get user actions for remote users
+        context['github_activity'] = get_github_activity(self.object['github_url'])
         context['user_actions'] = []
         return context
 
@@ -133,11 +91,13 @@ class RemoteProfileView(ServerDetailView):
         profile_image_url = json_response.get('profileImage') or json_response.get('profile_image')
         author_full_name = json_response.get('displayName') or json_response.get('display_name')
         github = json_response.get('github')
+        username = get_github_user_from_url(github)
 
         return {
             'profile_image_url': profile_image_url,
             "get_full_name": author_full_name,
             "github_url": github,
+            "username": username
         }
 
 
@@ -149,7 +109,57 @@ class EditProfileView(UpdateView):
     def get_object(self):
         return self.request.user
 
+    def get_success_url(self) -> str:
+        return reverse('auth_provider:my_profile')
+
 
 def logout_view(request):
     logout(request)
     return redirect('/')
+
+
+def get_github_activity(github_url: str):
+    github_username = get_github_user_from_url(github_url)
+    if not github_username:
+        return None
+
+    def send_get_github_activity(user: str, page: int = 1):
+        return requests.get(
+            f'https://api.github.com/users/{user}/events?accept=application/vnd.github.v3+json&per_page=100&page={page}')
+
+    page = 1
+    activity = {
+        'username': github_username,
+        'commits': 0,
+        'pull_requests': 0,
+        'reviews': 0,
+        'issues': 0,
+    }
+    success = False
+    while True:
+        github_activity_request = send_get_github_activity(github_username, page)
+        if github_activity_request.status_code == 200:
+            parse_github_activity(activity, github_activity_request.json())
+            success |= True
+        else:
+            print('GitHub activity request failed with code ' + github_activity_request.status_code)
+            break
+
+        if 'Link' in github_activity_request.headers and 'rel="next"' in github_activity_request.headers['Link']:
+            page += 1
+        else:
+            break
+
+    return activity if success else None
+
+
+def parse_github_activity(activity: dict, json: dict):
+    for event in json:
+        if event['type'] == GitHub_EventType.PushEvent:
+            activity['commits'] += event['payload']['distinct_size']
+        if event['type'] == GitHub_EventType.PullRequestEvent and event['payload']['action'] == 'opened':
+            activity['pull_requests'] += 1
+        if event['type'] == GitHub_EventType.PullRequestReviewEvent:
+            activity['reviews'] += 1
+        if event['type'] == GitHub_EventType.IssuesEvent:
+            activity['issues'] += 1

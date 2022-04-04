@@ -1,9 +1,18 @@
+{% load post_tags %}
+
 <div class="comment">
     <a href="{{ comment.author.get_absolute_url }}" style="color:inherit">
         <h4>{{ comment.author.get_full_name }}</h4>
     </a>
     <span>{{ comment.date_published }}</span>
-    <p>{{ comment.comment }}</p>
+    
+    {% if comment.content_type == 'text/plain' %}
+        <p>{{ comment.comment }}</p>
+    {% elif comment.content_type == 'text/markdown' %}
+            <div class='markdown-content'>
+                {{ comment.comment|convert_markdown|safe }}
+            </div>
+    {% endif %}
     <ul class="action-bar">
         <li>
             <form method="POST" action="{% url 'posts:like-comment' comment.post.id comment.id %}">
