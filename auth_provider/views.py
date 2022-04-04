@@ -85,9 +85,8 @@ class RemoteProfileView(ServerDetailView):
         context = super().get_context_data(**kwargs)
 
         def remote_action(remote_action_generator: RemoteActionGenerator):
-            print("abcdefg")
-            print(self.get_object())
-            remote_action = remote_action_generator(self.request.user, self.get_object())
+            print(self.get_object()['id'])
+            remote_action = remote_action_generator(self.request.user, self.get_object()['id'])
             if remote_action is None:
                 return None
             return {
@@ -101,7 +100,7 @@ class RemoteProfileView(ServerDetailView):
         actions = [remote_action(remote_action_generator)
                    for remote_action_generator in remote_action_generators]
         try:
-            remote_follow = RemoteFollow.objects.get(from_user=self.request.user, to_user_url=self.get_object())
+            remote_follow = RemoteFollow.objects.get(from_user=self.request.user, to_user_url=self.get_object()[id])
             for server in Server.objects.all():
                 parsed_target_url = urlparse(self.get_object().id)
                 parsed_server_address = urlparse(server.service_address)
