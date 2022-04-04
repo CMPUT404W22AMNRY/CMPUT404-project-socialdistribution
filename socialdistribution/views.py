@@ -7,11 +7,13 @@ from django.db.models import QuerySet
 from requests import Response
 import urllib.parse
 
+from lib.http_helper import is_b64_image_content
 from posts.models import Post
 from servers.views.generic.list_view import ServerListView
 from servers.models import Server
 from follow.models import Follow
 
+DISPLAY_REMOTE_IMG_STREAM = True
 
 def root(request: HttpRequest) -> HttpResponse:
     if request.user.is_anonymous:
@@ -55,14 +57,29 @@ class StreamView(LoginRequiredMixin, ServerListView):
             request_url = response.url
             if not request_url.endswith('/'):
                 request_url += '/'
+
+            content_type = representation.get('contentType') or representation.get('content_type')
+            is_img = is_b64_image_content(content_type)
+            if DISPLAY_REMOTE_IMG_STREAM and is_img:
+                try:
+                    origin = representation.get('origin')
+                    service_address = origin[0:origin.index('/authors')]
+                    service_request = origin[origin.index('/authors'):]
+                    server = Server.objects.get(service_address=service_address)
+                    img_content = server.get(service_request + '/image').content.decode('utf-8')
+                    print('is_img')
+                except Exception as e:
+                    print('warning: ' + e)
+
             # TODO: Update this to source or origin
             post_url = urllib.parse.urljoin(request_url, str(representation['id']))
             absolute_url = reverse('posts:remote-detail', kwargs={'url': post_url})
             return {
+                'id': representation.get('id'),
                 'title': representation.get('title'),
                 'description': representation.get('description'),
-                'content_type': representation.get('contentType') or representation.get('content_type'),
-                'content': representation.get('content'),
+                'content_type': content_type,
+                'content': representation.get('content') if not (DISPLAY_REMOTE_IMG_STREAM and is_img) else img_content,
                 'date_published': representation.get('published'),
                 'get_absolute_url': absolute_url,
                 'author': {

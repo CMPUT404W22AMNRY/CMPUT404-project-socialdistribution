@@ -1,5 +1,4 @@
 {% load post_tags %}
-
 <a href="{{ post.get_absolute_url }}" style="color: inherit">
     <div class="card interactable">
         <h3>{{ post.title }}</h3>
@@ -14,18 +13,27 @@
             <p>
                 {{ post.content }}
             </p>
+        {% elif post.content_type == 'text/markdown' %}
+            <div class='markdown-content'>
+                <div>{{ post.content|convert_markdown_no_links|safe }}</div>
+            </div>
         {% elif post.content_type == 'image/png;base64' or post.content_type == 'image/jpeg;base64' %}
             {% if post.img_content %}
-                <img src="{{ post.img_content.url }}"                     
+                <img src="{{ post.img_content.url }}"
                      height="auto"
                      width="100%"
                      alt=""
                      onerror="this.src='/static/broken-img.jpg'"/>
             {% else %}
-                <img src="{{ post.content }}"
+                {% comment %} <img src="{{ post.content }}"
                      height="auto"
                      width="100%"
                      alt=""
+                     onerror="this.src='/static/broken-img.jpg'"/> {% endcomment %}
+                <img src="data:{{ post.content_type }},{{ post.content }}"
+                     height="auto"
+                     width="100%"
+                     alt="alt"
                      onerror="this.src='/static/broken-img.jpg'"/>
             {% endif %}
         {% endif %}

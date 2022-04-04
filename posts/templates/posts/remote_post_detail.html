@@ -1,41 +1,40 @@
-{% extends "base.html" %} 
-
+{% extends "base.html" %}
 {% load post_tags %}
-
 {% block content %}
-
-<div class="card">
-  <h2>{{ object.title }}</h2>
-  <h3 class="subtitle">{{ object.author.get_full_name }}</h3>
-  {% if object.content_type == 'text' or object.content_type == 'text/plain' %} <!-- TODO: Update this when our friends have updated their contentType field -->
-  	<p>{{ object.content }}</p>
-  {% elif object.content_type == 'text/markdown' %}
-  	<div class='markdown-content'>
-      {{ object.content|convert_markdown|safe }}
+    <div class="card">
+        <h2>{{ object.title }}</h2>
+        <h3 class="subtitle">{{ object.author.get_full_name }}</h3>
+        {% if object.content_type == 'text' or object.content_type == 'text/plain' %}
+            <!-- TODO: Update this when our friends have updated their contentType field -->
+            <p>
+                {{ object.content }}
+            </p>
+        {% elif object.content_type == 'text/markdown' %}
+            <div class='markdown-content'>{{ object.content|convert_markdown|safe }}</div>
+        {% elif object.content_type == 'image/png;base64' or object.content_type == 'image/jpeg;base64' %}
+            <img src="data:{{ object.content_type }},{{ object.content }}"
+                 height="auto"
+                 width="100%"
+                 alt="alt"
+                 onerror="this.src='/static/broken-img.jpg'"/>
+        {% endif %}
+        <p>
+            {{ object.date_published }}
+        </p>
+        <section id="categories">
+            <ol class="horizontal no-indent">
+                {% for category in object.categories.all %}<li class="pill">{{ category.category }}</li>{% endfor %}
+            </ol>
+        </section>
+        <!-- TODO: Re-add comments section -->
+        <!-- TODO: Re-add likes section -->
+        <section>
+            <h3>Comments</h3>
+            <ul class="no-indent">
+                {% for comment in object.comment_set.all|dictsort:'date_published' reversed %}
+                    <li>{% include 'posts/partials/_remote_comment.html' %}</li>
+                {% endfor %}
+            </ul>
+        </section>
     </div>
-  {% elif object.content_type == 'image/png;base64' or object.content_type == 'image/jpeg;base64' %}  
-  	<img src="data:{{ object.content_type }},{{ object.content }}" height="auto" width="100%" alt="alt" />  
-  {% endif %}
-
-  <p>{{ object.date_published }}</p>
-
-  <section id="categories">
-    <ol class="horizontal no-indent">
-      {% for category in object.categories.all %}
-      <li class="pill">{{ category.category }}</li>
-      {% endfor %}
-    </ol>
-  </section>
-
-  <!-- TODO: Re-add comments section -->
-  <!-- TODO: Re-add likes section -->
-  <section>
-    <h3>Comments</h3>
-    <ul class="no-indent">
-      {% for comment in object.comment_set.all|dictsort:'date_published' reversed %}
-      <li>{% include 'posts/partials/_remote_comment.html' %}</li>
-      {% endfor %}
-    </ul>
-  </section>
-</div>
 {% endblock content %}
