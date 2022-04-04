@@ -1,15 +1,32 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
+<style>
+div.user-card {
+    display: grid;
+    grid-template-columns: 15% 85%;
+    column-gap: 20px;
+    position: relative;
+}
+img.profile-pic {
+    width: 100%;
+    border-radius: 50%;
+}
+.grid-item div {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+</style>
 
 <h1>Users</h1>
 
 <ul class="no-indent large-gap">
     {% for object in object_list %}
-    <li>
-        {% include "follow/partials/_user_card.html" %}
-    </li>
+        <li>{% include "follow/partials/_user_card.html" %}</li>
     {% empty %}
-    <li>No one else is here 😢.</li>
+        <li>No one else is here 😢.</li>
     {% endfor %}
 </ul>
-
 {% endblock %}

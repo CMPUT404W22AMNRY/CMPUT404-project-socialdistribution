@@ -14,6 +14,7 @@
     <ul class="no-indent">
       {% for user_action in user_actions %}
       <li>
+        <!-- TODO: Re-add actions section -->
         <form method="post" action="{{ user_action.link }}">
           {% csrf_token %}
           <input type="submit" value="{{ user_action.name }}" class="primarybtn" />

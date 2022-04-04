@@ -1,8 +1,9 @@
+from django.urls import reverse
 from requests import Response
 from urllib.parse import urlparse
 from servers.models import Server
 from follow.models import Follow
-from posts.models import Post, Like, Comment, RemoteLike
+from posts.models import Post, Like, Comment, RemoteComment, RemoteLike
 from posts.models import CommentLike, Post, Like, Comment
 import json
 from django.contrib.auth import get_user_model
@@ -166,3 +167,28 @@ class RemoteLikeSerializer(serializers.ModelSerializer):
             representation['author'] = json_author
             del representation['post']
             return representation
+        return representation
+
+
+class RemoteCommentSerializer(NestedHyperlinkedModelSerializer):
+    class Meta:
+        model = RemoteComment
+        fields = ['comment']
+
+    def to_representation(self, instance: RemoteComment):
+        representation = super().to_representation(instance)
+        for server in Server.objects.all():
+            parsed_author_url = urlparse(instance.author_url)
+            parsed_server_service_address = urlparse(server.service_address)
+            if parsed_author_url.hostname != parsed_server_service_address.hostname:
+                continue
+            author: Response = server.get(parsed_author_url.path)
+            json_author = author.json()
+
+            representation['type'] = 'comment'
+            representation['contentType'] = instance.content_type
+            representation['published'] = instance.date_published
+            representation['author'] = json_author
+            # TODO: Get comment id (absolute url in service)
+            return representation
+        return representation

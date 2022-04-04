@@ -41,6 +41,9 @@
             <h3>Comments</h3>
             <a href="{% url 'posts:new-comment' object.id %}">New comment</a>
             <ul class="no-indent">
+                {% for comment in remote_comments|dictsort:'date_published' reversed %}
+                    <li>{% include 'posts/partials/_remote_comment.html' %}</li>
+                {% endfor %}
                 {% for comment in object.comment_set.all|dictsort:'date_published' reversed %}
                     <li>{% include 'posts/partials/_comment.html' %}</li>
                 {% endfor %}

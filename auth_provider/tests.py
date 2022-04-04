@@ -1,7 +1,13 @@
+from django.urls import reverse
 from django.http import HttpResponse
 from django.test import TestCase, Client
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
+import json
+from requests import Response
+from api.tests.constants import SAMPLE_REMOTE_AUTHOR
+from unittest.mock import MagicMock, patch
+from servers.models import Server
 from api.tests.test_api import TEST_PASSWORD, TEST_USERNAME
 
 
@@ -64,6 +70,41 @@ class ViewsTests(TestCase):
         res = self.client.post(reverse_lazy('auth_provider:login'), data=login_data)
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, 'error')
+
+
+class RemoteProfileViewTests(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.user = get_user_model().objects.create_user(username=TEST_USERNAME, password=TEST_PASSWORD)
+
+    def test_remote_profile_view(self):
+        mock_json_response = json.loads(SAMPLE_REMOTE_AUTHOR)
+        mock_response = Response()
+        mock_response.json = MagicMock(return_value=mock_json_response)
+
+        mock_server = Server(
+            service_address="http://localhost:5555/api/v2",
+            username="hello",
+            password="no",
+        )
+        mock_server.get = MagicMock(return_value=mock_response)
+
+        with patch('servers.models.Server.objects') as MockServerObjects:
+            MockServerObjects.all.return_value = [mock_server]
+
+            self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+            res = self.client.get(
+                reverse(
+                    'auth_provider:remote_profile',
+                    kwargs={
+                        'url': 'http://localhost:5555/api/v2/authors/1/'
+                    }
+                )
+            )
+
+            self.assertEqual(res.status_code, 200)
+            self.assertContains(res, mock_json_response['displayName'])
+            self.assertContains(res, mock_json_response['github'])
 
 
 class ProfileTests(TestCase):

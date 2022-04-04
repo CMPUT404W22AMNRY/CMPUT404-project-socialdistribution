@@ -2,6 +2,7 @@ from typing import Any
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.views.generic.list import ListView
 from follow.models import AlreadyExistsError, Follow, Request
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,6 +10,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from requests import Response
 
+from lib.url import get_github_user_from_url
 from servers.views.generic.list_view import ServerListView
 
 
@@ -85,8 +87,15 @@ class UsersView(LoginRequiredMixin, ServerListView):
 
         def to_internal(representation: dict[str, Any]):
             return {
-                'get_full_name': representation.get('displayName'),
-                'username': representation.get('github'),
+                'get_full_name': representation.get('displayName') or representation.get('display_name'),
+                'profile_image_url': representation.get('profileImage'),
+                'username': get_github_user_from_url(representation.get('github')) or representation.get('github'),
+                'get_absolute_url': reverse(
+                    'auth_provider:remote_profile',
+                    kwargs={
+                        'url': representation.get('id')
+                    }
+                )
             }
 
         return [to_internal(user) for user in jsonResponse['items']]

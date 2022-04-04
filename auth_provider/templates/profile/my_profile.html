@@ -7,29 +7,7 @@
 		}
     </style>
     <div class="card">
-        {% include 'profile/partials/_summary.html' %}
-        <section id="github-activity">
-            <h3>GitHub Activity</h3>
-            {% if github_activity %}
-                <img src="https://ghchart.rshah.org/{{ github_activity.username }}"
-                     width="100%"
-                     height="auto"
-                     alt="GitHub contribution graph"/>
-                <p>
-                    GitHub activity in the last 90 days
-                </p>
-                <ul>
-                    <li>Commits: {{ github_activity.commits }}</li>
-                    <li>Pull Requests: {{ github_activity.pull_requests }}</li>
-                    <li>Reviews: {{ github_activity.reviews }}</li>
-                    <li>Issues Opened: {{ github_activity.issues }}</li>
-                </ul>
-            {% else %}
-                <p>
-                    GitHub activity could not be loaded.
-                </p>
-            {% endif %}
-        </section>
+        {% include 'profile/partials/_summary.html' %}        
         <section id="manage">
             <h3>Manage</h3>
             <ul>
