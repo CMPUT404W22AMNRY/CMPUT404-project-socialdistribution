@@ -1,4 +1,6 @@
 from unittest.mock import MagicMock, patch
+
+from django.urls import reverse
 from servers.models import Server
 from .constants import POST_IMG_DATA, SAMPLE_REMOTE_AUTHOR
 from posts.tests.constants import POST_DATA, COMMENT_DATA
@@ -321,6 +323,49 @@ class CommentsTests(TestCase):
         self.assertIn('contentType', res)
         self.assertIn('published', res)
         self.assertIn('id', res)
+
+    def test_include_remote_comments(self):
+        author = json.loads(SAMPLE_REMOTE_AUTHOR)
+        author_url = author.get('url')
+        remote_like = RemoteLike.objects.create(
+            author_url=author_url,
+            post_id=self.post.id
+        )
+        remote_like.save()
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+
+        mock_response = Response()
+        mock_response.json = MagicMock(return_value=author)
+
+        mock_server = Server(
+            service_address="https://cmput-404-w22-project-group09.herokuapp.com/service",
+            username="hello",
+            password="no",
+        )
+        mock_server.get = MagicMock(return_value=mock_response)
+
+        with patch('servers.models.Server.objects') as MockServerObjects:
+            MockServerObjects.all.return_value = [mock_server]
+
+            author = json.loads(SAMPLE_REMOTE_AUTHOR)
+            remote_comment = RemoteComment.objects.create(
+                author_url=author.get('url'),
+                comment=COMMENT_DATA['comment'],
+                content_type=COMMENT_DATA['content_type'],
+                post_id=self.post.id
+            )
+            remote_comment.save()
+
+            self.client.login(username='bob', password='password')
+            res = self.client.get(f'/api/v1/authors/{self.user.id}/posts/{self.post.id}/comments/')
+            comments = res.json().get('comments')
+
+            for comment in comments:
+                comment_author_url = comment.get('author').get('url')
+                if comment_author_url == author.get('url'):
+                    return
+            self.fail("Could not find remote author's comment")
 
 
 class ImageTests(TestCase):

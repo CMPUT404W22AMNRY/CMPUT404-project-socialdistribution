@@ -1,3 +1,4 @@
+from ast import parse
 from typing import Any, Dict
 from django import forms
 from django.db import transaction
@@ -13,8 +14,9 @@ from django.urls import reverse_lazy
 from requests import Response
 from lib.http_helper import is_b64_image_content
 from django.core.exceptions import PermissionDenied
+from urllib.parse import urlparse
 
-from .models import CommentLike, Post, Category, Comment, Like
+from .models import CommentLike, Post, Category, Comment, Like, RemoteComment, RemoteLike
 from servers.models import Server
 from servers.views.generic.detailed_view import ServerDetailView
 
@@ -85,6 +87,35 @@ class PostDetailView(LoginRequiredMixin, DetailView):
             context['has_liked'] = True
         except Like.DoesNotExist:
             pass
+        remote_comments = []
+        try:
+            remote_comments_queryset = RemoteComment.objects.filter(post=self.get_object())
+        except RemoteComment.DoesNotExist:
+            pass
+        for remote_comment in remote_comments_queryset:
+            parsed_author_url = urlparse(remote_comment.author_url)
+            author_host = parsed_author_url.hostname
+            target_server = None
+            for server in Server.objects.all():
+                parsed_server_url = urlparse(server.service_address)
+                if parsed_server_url.hostname == author_host:
+                    target_server = server
+                    break
+
+            if target_server is None:
+                break
+
+            author_path = remote_comment.author_url[len(target_server.service_address):]
+            author_response: Response = target_server.get(author_path)
+            author_fullname = author_response.json().get('displayName') or author_response.json().get('display_name')
+            remote_comments.append({
+                'author': {
+                    'get_full_name': author_fullname
+                },
+                'comment': remote_comment.comment,
+                'date_published': remote_comment.date_published,
+            })
+        context['remote_comments'] = remote_comments
         return context
 
 
@@ -126,11 +157,10 @@ class RemotePostDetailView(LoginRequiredMixin, ServerDetailView):
         def to_comments_internal(json_body: Dict[str, Any]):
             return {
                 'comment': json_body.get('comment'),
+                'content_type': json_body.get('contentType') or json_body.get('content_type'),
                 'date_published': json_body.get('published'),
                 'author': {
-                    'get_full_name': json_body.get('author').get('displayName') or json_body.get('author').get('display_name')
-                }
-            }
+                    'get_full_name': json_body.get('author').get('displayName') or json_body.get('author').get('display_name')}}
 
         comments = []
         try:

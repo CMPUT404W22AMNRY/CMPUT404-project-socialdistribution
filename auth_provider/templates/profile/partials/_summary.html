@@ -1,9 +1,30 @@
 <section id="intro">
     <div class="center">
-        <img id="profilephoto" class="profile-pic" src="{{ object.profile_image_url }}" alt="profile photo" />
+        <img id="profilephoto"
+             class="profile-pic"
+             src="{{ object.profile_image_url }}"
+             alt="profile photo"
+             onerror="this.src='/static/default.jpg'"/>
     </div>
-
     <h1>{{ object.get_full_name }}</h1>
     <h2 class="subtitle">{{ object.username }}</h2>
-    <span><a href="{{ object.github_url }}">Github profile</a></span>
+    <span><a href="{{ object.github_url }}">GitHub Profile</a></span>
 </section>
+{% if github_activity %}
+    <section id="github-activity">
+        <h3>GitHub Activity</h3>
+        <img src="https://ghchart.rshah.org/{{ github_activity.username }}"
+             width="100%"
+             height="auto"
+             alt="GitHub contribution graph"/>
+        <p>
+            GitHub activity in the last 90 days
+        </p>
+        <ul>
+            <li>Commits: {{ github_activity.commits }}</li>
+            <li>Pull Requests: {{ github_activity.pull_requests }}</li>
+            <li>Reviews: {{ github_activity.reviews }}</li>
+            <li>Issues Opened: {{ github_activity.issues }}</li>
+        </ul>
+    </section>
+{% endif %}

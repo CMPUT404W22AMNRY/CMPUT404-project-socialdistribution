@@ -10,6 +10,7 @@ import urllib.parse
 from posts.models import Post
 from servers.views.generic.list_view import ServerListView
 from servers.models import Server
+from follow.models import Follow
 
 
 def root(request: HttpRequest) -> HttpResponse:
@@ -24,9 +25,11 @@ class StreamView(LoginRequiredMixin, ServerListView):
     template_name = 'stream.html'
 
     def get_queryset(self) -> QuerySet[Post]:
-        return Post.objects.filter(
-            visibility=Post.Visibility.PUBLIC,
-            unlisted=False).order_by('-date_published')
+        public_posts = Post.objects.filter(visibility=Post.Visibility.PUBLIC, unlisted=False)
+        query_set = public_posts
+        for friend in Follow.objects.followers(self.request.user):
+            query_set = query_set.union(friend.post_set.filter(visibility=Post.Visibility.FRIENDS, unlisted=False))
+        return query_set.order_by('-date_published')
 
     def get_server_to_endpoints_mapping(self) -> list[tuple[Server, list[str]]]:
         server_endpoints_tuples = []
@@ -72,3 +75,11 @@ class StreamView(LoginRequiredMixin, ServerListView):
             return [to_internal(post) for post in json_response]
 
         return [to_internal(post) for post in json_response['items']]
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['object_list'] = sorted(
+            context['object_list'], key=lambda x: str(
+                x.date_published) if isinstance(
+                x, Post) else x['date_published'], reverse=True)
+        return context
