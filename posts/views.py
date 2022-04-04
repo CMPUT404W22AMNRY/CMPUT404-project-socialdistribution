@@ -129,9 +129,7 @@ class RemotePostDetailView(LoginRequiredMixin, ServerDetailView):
                 'content_type': json_body.get('contentType') or json_body.get('content_type'),
                 'date_published': json_body.get('published'),
                 'author': {
-                    'get_full_name': json_body.get('author').get('displayName') or json_body.get('author').get('display_name')
-                }
-            }
+                    'get_full_name': json_body.get('author').get('displayName') or json_body.get('author').get('display_name')}}
 
         comments = []
         try:
