@@ -100,7 +100,7 @@ class RemoteProfileView(ServerDetailView):
         actions = [remote_action(remote_action_generator)
                    for remote_action_generator in remote_action_generators]
         try:
-            remote_follow = RemoteFollow.objects.get(from_user=self.request.user, to_user_url=self.get_object().id)
+            remote_follow = RemoteFollow.objects.get(from_user=self.request.user, to_user_url=self.get_object())
             for server in Server.objects.all():
                 parsed_target_url = urlparse(self.get_object().id)
                 parsed_server_address = urlparse(server.service_address)
