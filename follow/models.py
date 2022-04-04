@@ -1,3 +1,5 @@
+from pyexpat import model
+from tkinter import CASCADE
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
@@ -11,6 +13,7 @@ from follow.signals import (
 
 
 USER_MODEL = get_user_model()
+STR_MAX_LENGTH = 512
 
 
 class AlreadyExistsError(IntegrityError):
@@ -168,3 +171,9 @@ class Request(models.Model):
         request_cancel.send(sender=self)
         self.delete()
         return True
+
+
+class RemoteFollow(models.Model):
+    from_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    to_user_url = models.CharField(max_length=STR_MAX_LENGTH)
+    approved = models.BooleanField(default=False)

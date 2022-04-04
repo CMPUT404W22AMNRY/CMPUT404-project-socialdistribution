@@ -1,12 +1,16 @@
+import json
 from typing import Optional
 from django.contrib import admin
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
-from auth_provider import user_resources
+from requests import Response
+from auth_provider import remote_action_generators, user_resources
+from urllib.parse import urlparse
 
 import auth_provider.user_action_generators as user_action_generators
-from .models import Follow, Request
+from .models import Follow, Request, RemoteFollow
+from servers.models import Server
 
 USER_MODEL = get_user_model()
 
@@ -48,6 +52,21 @@ def UnfollowAction(current_user: USER_MODEL, target_user: USER_MODEL) -> Optiona
 
 
 user_action_generators.register(UnfollowAction)
+
+
+def RemoteFriendAction(current_user: USER_MODEL, target_url: str) -> Optional[tuple[str, str]]:
+    
+    return ('Add friend', reverse('follow:remote_request', kwargs={'url': target_url}))
+
+def RemoteUnfollowAction(current_user: USER_MODEL, target_url: str) -> Optional[tuple[str, str]]:
+    
+    return ('Unfollow', reverse('follow:remote_unfollow', kwargs={'url': target_url}))
+
+
+remote_action_generators.register(RemoteFriendAction)
+
+
+remote_action_generators.register(RemoteUnfollowAction)
 
 
 # Register Friends page to my profile page

@@ -1,3 +1,4 @@
+from urllib.parse import urlparse
 import requests
 import json
 from typing import Any, Dict, Optional
@@ -7,6 +8,8 @@ from django.contrib.auth import get_user_model, logout
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from requests import Response
+from follow.models import RemoteFollow
+from servers.models import Server
 
 from servers.views.generic.detailed_view import ServerDetailView
 
@@ -15,6 +18,7 @@ from lib.url import get_github_user_from_url
 from .user_resources import user_resources
 from .forms import SignUpForm, EditProfileForm
 from .user_action_generators import UserActionGenerator, user_action_generators
+from .remote_action_generators import RemoteActionGenerator, remote_action_generators
 
 
 class SignUpView(CreateView):
@@ -101,7 +105,6 @@ class ProfileView(DetailView):
                 'name': user_action[0],
                 'link': user_action[1],
             }
-
         # TODO: Clean this up with a lambda
         actions = [get_action(user_action_generator)
                    for user_action_generator in user_action_generators]
@@ -122,19 +125,47 @@ class RemoteProfileView(ServerDetailView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        def remote_action (remote_action_generator: RemoteActionGenerator):
+            remote_action = remote_action_generator(self.request.user, self.get_object().id)
+            if remote_action is None:
+                return None
+            return {
+                'name': remote_action[0],
+                'link': remote_action[1]
+            }
 
         # TODO: Get user actions for remote users
         context['user_actions'] = []
+        actions = [remote_action(remote_action_generator)
+                   for remote_action_generator in remote_action_generators]
+        try:
+            remote_follow = RemoteFollow.objects.get(from_user=self.request.user, to_user_url=self.get_object().id)
+            for server in Server.objects.all():
+                parsed_target_url = urlparse(self.get_object().id)
+                parsed_server_address = urlparse(server.service_address)
+                if parsed_target_url.hostname != parsed_server_address:
+                    continue
+                follower: Response = server.get(parsed_target_url.path + '/followers/')
+                json_follower = follower.json()
+                if self.request.user.id in json_follower['items'].__str__():
+                    remote_follow.approved = True
+                    context['user_actions'] = actions[1]
+                break
+        except RemoteFollow.DoesNotExist:
+            context['user_actions'] = actions[0]
+
         return context
 
     def to_internal(self, response: Response) -> get_user_model():
         json_response = response.json()
 
+        id = json_response.get('id')
         profile_image_url = json_response.get('profileImage') or json_response.get('profile_image')
         author_full_name = json_response.get('displayName') or json_response.get('display_name')
         github = json_response.get('github')
 
         return {
+            'id': id,
             'profile_image_url': profile_image_url,
             "get_full_name": author_full_name,
             "github_url": github,
