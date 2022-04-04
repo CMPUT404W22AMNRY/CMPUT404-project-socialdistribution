@@ -249,20 +249,20 @@ class CommentLikesViewSet(viewsets.ModelViewSet):
 
 
 def handle_inbox_follow(request: Request, body: dict[str, Any]) -> Response:
-    from_user_id_url: str = body.get('actor').get('id')
-    to_user_id_url: str = body.get('object').get('id')
+    from_user_id: str = body.get('actor').get('id')
+    to_user_id: str = body.get('object').get('id')
 
-    parsed_to_user_id = urlparse(to_user_id_url)
-    parsed_from_user_id = urlparse(from_user_id_url)
+    parsed_to_user_id = urlparse(to_user_id)
+    parsed_from_user_id = urlparse(from_user_id)
 
-    to_user_id = parsed_to_user_id.path.rsplit('/', 1)[-1]
+    local_user_id = parsed_to_user_id.path.rsplit('/', 1)[-1]
     try:
-        to_user = get_user_model().objects.get(id=to_user_id)
+        to_user = get_user_model().objects.get(id=local_user_id)
     except get_user_model().DoesNotExist as e:
         return Http404
 
     if parsed_from_user_id.hostname != request.get_host():
-        remote_request = RemoteRequest.objects.create(from_user_url=from_user_id_url, to_user=to_user)
+        remote_request = RemoteRequest.objects.create(from_user_url=from_user_id, to_user=to_user)
         remote_request.save()
         return HttpResponse({}, status=status.HTTP_204_NO_CONTENT)
 
