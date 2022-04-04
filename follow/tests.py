@@ -76,7 +76,7 @@ class FollowModelTests(TestCase):
 class RemoteFollowerModelTests(TestCase):
     def setUp(self) -> None:
         self.bob = get_user_model().objects.create_user(username='bob', password='password')
-        self.url = 'http://localhost:5454/authors/1d698d25ff008f7538453c120f581471'    
+        self.url = 'http://localhost:5454/authors/1d698d25ff008f7538453c120f581471'
 
     def test_remote_accept_request(self):
         remote_request = RemoteRequest.objects.create(from_user_url=self.url, to_user=self.bob)
