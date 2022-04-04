@@ -93,12 +93,13 @@ def reject_remote_follow_request(request, from_user_url):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
     try:
-       remote_request = RemoteRequest.objects.get(to_user=request.user, from_user_url=from_user_url)
-       remote_request.reject()
+        remote_request = RemoteRequest.objects.get(to_user=request.user, from_user_url=from_user_url)
+        remote_request.reject()
     except RemoteRequest.DoesNotExist:
         pass
     finally:
         return redirect(reverse('auth_provider:remote_profile', kwargs={'url': from_user_url}))
+
 
 def remove_remote_follower(request, from_user_url):
     if request.method != 'POST':
@@ -112,6 +113,7 @@ def remove_remote_follower(request, from_user_url):
         pass
     finally:
         return redirect(reverse('auth_provider:remote_profile', kwargs={'url': from_user_url}))
+
 
 class UsersView(LoginRequiredMixin, ServerListView):
     model = USER_MODEL
