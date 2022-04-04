@@ -14,6 +14,12 @@
             <p>
                 {{ post.content }}
             </p>
+        {% elif post.content_type == 'text/markdown' %}
+            <div class='markdown-content'>
+                <div>
+                    {{ post.content|convert_markdown_no_links|safe }}
+                </div>
+            </div>
         {% elif post.content_type == 'image/png;base64' or post.content_type == 'image/jpeg;base64' %}
             {% if post.img_content %}
                 <img src="{{ post.img_content.url }}"                     
