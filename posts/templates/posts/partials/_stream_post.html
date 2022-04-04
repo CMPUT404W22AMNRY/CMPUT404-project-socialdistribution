@@ -2,6 +2,14 @@
 
 <a href="{{ post.get_absolute_url }}" style="color: inherit">
     <div class="card interactable">
+        {% if post.shared_author %}
+            <div>
+				<p class="post-text">
+                    <a class="text-primary post-link">@{{ post.shared_author }}</a> shared @{{post.author}}'s post on {{ post.date_published }}
+                </p>
+                <hr>
+			</div>
+		{% endif %}
         <h3>{{ post.title }}</h3>
         <p class="subtitle">
             {{ post.author.get_full_name }}
@@ -28,6 +36,7 @@
                      alt=""
                      onerror="this.src='/static/broken-img.jpg'"/>
             {% endif %}
+            
         {% endif %}
         <p>
             {{ post.date_published }}

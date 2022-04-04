@@ -11,6 +11,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from pytz import timezone
 from requests import Response
 from lib.http_helper import is_b64_image_content
 from django.core.exceptions import PermissionDenied
@@ -217,16 +218,22 @@ def unlike_post_view(request: HttpRequest, pk: int):
 
 
 def share_post_view(request: HttpRequest, pk: int):
-
     # duplicate the post
-    shared_post = Post.objects.get(pk=pk)
-    shared_post.pk = None
-    shared_post.save()
-    author = User.objects.get(username=request.user)
-    shared_post.author = author
-    shared_post.source = request_uri
-    shared_post.save()
-    return redirect(shared_post.get_absolute_url())
+    orignal_post = Post.objects.get(pk=pk)
+    author = orignal_post.author
+    print("Original author", author.username)
+    new_post = Post.objects.create(
+        title=orignal_post.title,
+        description=orignal_post.description,
+        content_type=orignal_post.content_type,
+        content=orignal_post.content,
+        author_id=author.id,
+        shared_author=request.user,
+        unlisted=orignal_post.unlisted
+    )
+    new_post.save()
+
+    return redirect(new_post.get_absolute_url())
 
 
 def like_comment_view(request: HttpRequest, post_pk: int, pk: int):
