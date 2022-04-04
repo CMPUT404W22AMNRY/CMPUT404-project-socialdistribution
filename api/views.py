@@ -281,6 +281,7 @@ def handle_inbox_like(request: Request, body: dict[str, Any]) -> Response:
     serialized = LikesSerializer(like, context={'request': request}).data
     return Response(serialized)
 
+
 def handle_inbox_comment(request: Request, body: dict[str, Any]) -> Response:
     author_id: str = body.get('author').get('id')
     post_id: str = body.get('object')

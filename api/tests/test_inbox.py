@@ -10,6 +10,7 @@ from posts.models import Post
 from posts.tests.constants import COMMENT_DATA, POST_DATA
 from posts.tests.constants import POST_DATA
 
+
 class InboxTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
@@ -95,6 +96,7 @@ class InboxTests(TestCase):
 
         self.assertEqual(len(post.remotelike_set.all()), 1)
 
+
 class InboxCommentTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
@@ -107,7 +109,6 @@ class InboxCommentTests(TestCase):
             author_id=self.user.id,
             unlisted=POST_DATA['unlisted'])
         self.post.save()
-
 
     def test_comment(self):
         self.assertEqual(len(self.post.comment_set.all()), 0)

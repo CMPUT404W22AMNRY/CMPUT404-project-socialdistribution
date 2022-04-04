@@ -130,6 +130,7 @@ class RemoteLikeTests(TestCase):
 
         self.assertEqual(len(self.post.remotelike_set.all()), 1)
 
+
 class RemoteCommentTests(TestCase):
     def setUp(self) -> None:
         self.user = get_user_model().objects.create_user(username=CURRENT_USER, password='password')

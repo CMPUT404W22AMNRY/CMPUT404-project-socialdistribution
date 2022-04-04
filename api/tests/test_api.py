@@ -590,4 +590,3 @@ class CommentLikeTests(TestCase):
             self.assertEqual(like['type'], 'Like')
             self.assertIn('summary', like)
             self.assertIn('object', like)
-
