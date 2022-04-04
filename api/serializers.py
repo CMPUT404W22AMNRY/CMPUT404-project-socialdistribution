@@ -1,5 +1,3 @@
-from pyexpat import model
-from attr import field
 from requests import Response
 from urllib.parse import urlparse
 from servers.models import Server
