@@ -91,7 +91,7 @@ class RemoteProfileView(ServerDetailView):
         profile_image_url = json_response.get('profileImage') or json_response.get('profile_image')
         author_full_name = json_response.get('displayName') or json_response.get('display_name')
         github = json_response.get('github')
-        username = get_github_user_from_url(github)
+        username = get_github_user_from_url(github) or ''
 
         return {
             'profile_image_url': profile_image_url,
