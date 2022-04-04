@@ -44,9 +44,7 @@
         {% if post.shared_author %}
         <hr>
             <div>
-				<p>
-                    Original post of <a>@{{ post.shared_author }}</a> shared by <a>@{{ post.author }}</a> 
-                </p>
+				<p>Original post of <a>@{{ post.original_author }}</a> shared by <a>@{{ post.author }}</a></p>
 			</div>
 		{% endif %}
     </div>
