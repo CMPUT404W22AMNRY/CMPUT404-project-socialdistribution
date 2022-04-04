@@ -87,6 +87,7 @@ class UsersView(LoginRequiredMixin, ServerListView):
         def to_internal(representation: dict[str, Any]):
             return {
                 'get_full_name': representation.get('displayName') or representation.get('display_name'),
+                'profile_image_url': representation.get('profileImage'),
                 'username': representation.get('github'),
                 'get_absolute_url': reverse(
                     'auth_provider:remote_profile',
