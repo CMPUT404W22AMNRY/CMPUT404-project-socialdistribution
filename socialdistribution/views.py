@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import QuerySet
 from requests import Response
 import urllib.parse
+from dateutil import parser
 
 from posts.models import Post
 from servers.views.generic.list_view import ServerListView
@@ -89,7 +90,7 @@ class StreamView(LoginRequiredMixin, ServerListView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['object_list'] = sorted(
-            context['object_list'], key=lambda x: str(
-                x.date_published) if isinstance(
-                x, Post) else x['date_published'], reverse=True)
+            context['object_list'], key=lambda x: 
+                x.date_published if isinstance(
+                x, Post) else parser.parse(x['date_published']), reverse=True)
         return context
