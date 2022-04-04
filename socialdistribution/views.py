@@ -10,6 +10,7 @@ import urllib.parse
 from posts.models import Post
 from servers.views.generic.list_view import ServerListView
 from servers.models import Server
+from follow.models import Follow
 
 
 def root(request: HttpRequest) -> HttpResponse:
@@ -24,9 +25,11 @@ class StreamView(LoginRequiredMixin, ServerListView):
     template_name = 'stream.html'
 
     def get_queryset(self) -> QuerySet[Post]:
-        return Post.objects.filter(
-            visibility=Post.Visibility.PUBLIC,
-            unlisted=False).order_by('-date_published')
+        public_posts = Post.objects.filter(visibility=Post.Visibility.PUBLIC, unlisted=False)
+        query_set = public_posts
+        for friend in Follow.objects.followers(self.request.user):
+            query_set = query_set.union(friend.post_set.filter(visibility=Post.Visibility.FRIENDS, unlisted=False))
+        return query_set
 
     def get_server_to_endpoints_mapping(self) -> list[tuple[Server, list[str]]]:
         server_endpoints_tuples = []

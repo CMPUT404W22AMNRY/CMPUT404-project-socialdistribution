@@ -11,6 +11,7 @@ from posts.models import Post
 from posts.tests.constants import POST_DATA
 from servers.models import Server
 from socialdistribution.views import StreamView
+from follow.models import Follow
 
 
 class ViewsTests(TestCase):
@@ -31,7 +32,7 @@ class StreamViewTests(TestCase):
         self.user.last_name = 'Doyle'
         self.user.save()
 
-        self.num_posts = 10
+        self.num_posts = 8
         for i in range(self.num_posts):
             post = Post.objects.create(
                 title=POST_DATA['title'],
@@ -80,3 +81,27 @@ class StreamViewTests(TestCase):
                 self.assertEqual(res.status_code, 200)
 
                 self.assertContains(res, mock_json_response[0]['title'])
+
+    def test_includes_friends_only_posts(self):
+        public_post_count = len(Post.objects.filter(visibility=Post.Visibility.PUBLIC, unlisted=False))
+
+        friend = get_user_model().objects.create_user(username='alice', password=TEST_PASSWORD)
+        Follow.objects.create(followee=friend, follower=self.user)
+        Follow.objects.create(followee=self.user, follower=friend)
+        assert friend in Follow.objects.true_friend(self.user)
+
+        expected_post_count = public_post_count + 1
+        
+        friends_only_post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=friend.id,
+            visibility=Post.Visibility.FRIENDS,
+            unlisted=POST_DATA['unlisted'])
+        friends_only_post.save
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.get(reverse_lazy('stream'))
+        self.assertContains(res, POST_DATA['title'], count=expected_post_count)
