@@ -1,6 +1,4 @@
-from ast import parse
 from typing import Any, Dict
-from wsgiref.util import request_uri
 from django import forms
 from django.db import transaction
 from django.forms import ModelForm
@@ -12,12 +10,10 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from pytz import timezone
 from requests import Response
 from lib.http_helper import is_b64_image_content
 from django.core.exceptions import PermissionDenied
 from urllib.parse import urlparse
-
 from .models import CommentLike, Post, Category, Comment, Like, RemoteComment, RemoteLike
 from servers.models import Server
 from servers.views.generic.detailed_view import ServerDetailView
