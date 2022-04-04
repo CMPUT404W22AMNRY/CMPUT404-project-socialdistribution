@@ -3,7 +3,7 @@ from attr import field
 from requests import Response
 from urllib.parse import urlparse
 from servers.models import Server
-from follow.models import Follow, Request, RemoteFollow, RemoteRequest
+from follow.models import Follow, Request, RemoteFollower, RemoteRequest
 from posts.models import Post, Like, Comment, RemoteLike
 from posts.models import CommentLike, Post, Like, Comment
 import json

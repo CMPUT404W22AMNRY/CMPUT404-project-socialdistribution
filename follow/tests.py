@@ -9,7 +9,7 @@ from api.tests.constants import SAMPLE_REMOTE_AUTHORS
 from servers.models import Server
 from follow.admin import AddFriendAction
 
-from .models import Follow, RemoteFollow, RemoteRequest
+from .models import Follow, RemoteFollower, RemoteRequest
 
 
 class FriendRequestsViewTests(TestCase):
@@ -73,39 +73,39 @@ class FollowModelTests(TestCase):
         self.assertEqual(len(Follow.objects.true_friend(self.alice)), 0)
 
 
-class RemoteFollowmodelTests(TestCase):
+class RemoteFollowermodelTests(TestCase):
     def setUp(self) -> None:
         self.bob = get_user_model().objects.create_user(username='bob', password='password')
         self.url = "http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471"
 
     def test_remote_accept_request(self):
         remote_request = RemoteRequest.objects.create(from_user_url=self.url, to_user=self.bob)
-        self.assertEqual(len(RemoteFollow.objects.all()), 0)
+        self.assertEqual(len(RemoteFollower.objects.all()), 0)
         remote_request.accept()
-        self.assertEqual(len(RemoteFollow.objects.all()), 1)
-        self.assertEqual(len(RemoteRequest.objects.all()), 0)
+        self.assertEqual(len(RemoteFollower.objects.all()), 1)
+        self.assertEqual(len(RemoteRequester.objects.all()), 0)
 
     def test_remote_reject_request(self):
         remote_request = RemoteRequest.objects.create(from_user_url=self.url, to_user=self.bob)
-        self.assertEqual(len(RemoteFollow.objects.all()), 0)
+        self.assertEqual(len(RemoteFollower.objects.all()), 0)
         remote_request.reject()
-        self.assertEqual(len(RemoteFollow.objects.all()), 0)
+        self.assertEqual(len(RemoteFollower.objects.all()), 0)
         self.assertEqual(len(RemoteRequest.objects.all()), 0)
 
     def test_remote_accept_request(self):
         remote_request = RemoteRequest.objects.create(from_user_url=self.url, to_user=self.bob)
-        self.assertEqual(len(RemoteFollow.objects.all()), 0)
+        self.assertEqual(len(RemoteFollower.objects.all()), 0)
         remote_request.accept()
-        self.assertEqual(len(RemoteFollow.objects.all()), 1)
+        self.assertEqual(len(RemoteFollower.objects.all()), 1)
         self.assertEqual(len(RemoteRequest.objects.all()), 0)
 
     def test_remote_remove_follower(self):
         remote_request = RemoteRequest.objects.create(from_user_url=self.url, to_user=self.bob)
-        self.assertEqual(len(RemoteFollow.objects.all()), 0)
+        self.assertEqual(len(RemoteFollower.objects.all()), 0)
         remote_request.accept()
-        self.assertEqual(len(RemoteFollow.objects.all()), 1)
-        RemoteFollow.objects.get(followee=self.bob, follower_url=self.url).unfollow()
-        self.assertEqual(len(RemoteFollow.objects.all()), 0)
+        self.assertEqual(len(RemoteFollower.objects.all()), 1)
+        RemoteFollower.objects.get(followee=self.bob, follower_url=self.url).unfollow()
+        self.assertEqual(len(RemoteFollower.objects.all()), 0)
 
 
 class UsersViewTests(TestCase):

@@ -170,7 +170,7 @@ class Request(models.Model):
         return True
 
 
-class RemoteFollow(models.Model):
+class RemoteFollower(models.Model):
     followee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     follower_url = models.CharField(max_length=STR_MAX_LENGTH)
 
@@ -185,7 +185,7 @@ class RemoteRequest(models.Model):
     from_user_name = models.CharField(max_length=STR_MAX_LENGTH, default='')
 
     def accept(self):
-        relation, created = RemoteFollow.objects.get_or_create(followee=self.to_user, follower_url=self.from_user_url)
+        relation, created = RemoteFollower.objects.get_or_create(followee=self.to_user, follower_url=self.from_user_url)
 
         if created is False:
             raise AlreadyExistsError
