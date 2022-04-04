@@ -250,13 +250,13 @@ def share_post_view(request: HttpRequest, pk: int):
     # duplicate the post
     orignal_post = Post.objects.get(pk=pk)
     author = orignal_post.author
-    print("Original author", author.username)
+    orignal_post.pk = None
     new_post = Post.objects.create(
         title=orignal_post.title,
         description=orignal_post.description,
         content_type=orignal_post.content_type,
         content=orignal_post.content,
-        author_id=author.id,
+        author_id=orignal_post.author.id,
         shared_author=request.user,
         unlisted=orignal_post.unlisted
     )

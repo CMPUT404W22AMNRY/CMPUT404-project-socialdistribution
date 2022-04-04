@@ -2,15 +2,9 @@
 
 <a href="{{ post.get_absolute_url }}" style="color: inherit">
     <div class="card interactable">
-        {% if post.shared_author %}
-            <div>
-				<p class="post-text">
-                    <a class="text-primary post-link">@{{ post.shared_author }}</a> shared @{{post.author}}'s post on {{ post.date_published }}
-                </p>
-                <hr>
-			</div>
-		{% endif %}
+       
         <h3>{{ post.title }}</h3>
+         
         <p class="subtitle">
             {{ post.author.get_full_name }}
         </p>
@@ -41,5 +35,13 @@
         <p>
             {{ post.date_published }}
         </p>
+        {% if post.shared_author %}
+        <hr>
+            <div>
+				<p>
+                    shared by <a>@{{ post.shared_author }}</a> on {{ post.date_published }}
+                </p>
+			</div>
+		{% endif %}
     </div>
 </a>
