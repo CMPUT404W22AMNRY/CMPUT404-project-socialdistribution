@@ -276,7 +276,6 @@ def handle_inbox_follow(request: Request, body: dict[str, Any]) -> Response:
     local_request = Request.objects.create(from_user=local_from_user, to_user=to_user)
     local_request.save()
 
-    serialized = RequestSerializer(local_request, context={'request': request}).data
     return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
