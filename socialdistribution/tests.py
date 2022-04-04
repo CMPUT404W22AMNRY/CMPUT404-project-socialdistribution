@@ -91,7 +91,7 @@ class StreamViewTests(TestCase):
         assert friend in Follow.objects.true_friend(self.user)
 
         expected_post_count = public_post_count + 1
-        
+
         friends_only_post = Post.objects.create(
             title=POST_DATA['title'],
             description=POST_DATA['description'],
@@ -113,7 +113,7 @@ class StreamViewTests(TestCase):
         assert non_friend not in Follow.objects.true_friend(self.user)
 
         expected_post_count = public_post_count
-        
+
         friends_only_post = Post.objects.create(
             title=POST_DATA['title'],
             description=POST_DATA['description'],

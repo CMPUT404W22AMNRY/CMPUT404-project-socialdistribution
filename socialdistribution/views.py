@@ -78,5 +78,8 @@ class StreamView(LoginRequiredMixin, ServerListView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context['object_list'] = sorted(context['object_list'], key=lambda x: str(x.date_published) if isinstance(x, Post) else x['date_published'], reverse=True)
+        context['object_list'] = sorted(
+            context['object_list'], key=lambda x: str(
+                x.date_published) if isinstance(
+                x, Post) else x['date_published'], reverse=True)
         return context
