@@ -1,4 +1,3 @@
-from ast import Str
 from typing import Callable, Optional
 
 from .models import User
