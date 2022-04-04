@@ -11,6 +11,7 @@ urlpatterns = [
     path('<int:pk>/comments/new', views.CreateCommentView.as_view(), name='new-comment'),
     path('<int:pk>/like', views.like_post_view, name='like'),
     path('<int:pk>/unlike', views.unlike_post_view, name='unlike'),
+    path('<int:pk>/share', views.share_post_view, name='share'),
     path('<int:pk>', views.PostDetailView.as_view(), name='detail'),
     path('new', views.CreatePostView.as_view(), name='new'),
     path('', views.MyPostsView.as_view(), name='my-posts'),

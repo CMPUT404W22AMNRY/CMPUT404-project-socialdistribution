@@ -15,7 +15,6 @@ body {
   padding-right: 50px;
   padding-bottom: 20px;
   padding-left: 50px;
-  background-color: white;
 }
 
 /* Full-width input fields */
@@ -57,7 +56,7 @@ form td > * {
 
 /* Overwrite default styles of hr */
 hr {
-  border: 1px solid #f1f1f1;
+  border: 2px solid #f1f1f1;
   margin-bottom: 25px;
 }
 
@@ -154,7 +153,10 @@ h3 {
 }
 
 /* App Bar */
-
+.main_header{
+  font-size: larger;
+  font-weight: bold;
+}
 .app_bar {
   padding-top: 1rem;
   box-shadow: 0 0 2em rgba(0, 0, 0, 0.3);
@@ -211,6 +213,7 @@ section:not(:last-child) {
   padding: 3rem;
   box-shadow: 0 0.5rem 0.5rem hsla(0, 0%, 0%, 0.3);
   transition: 0.2s transform, 0.2s box-shadow;
+  border-radius: 1%;
 }
 
 .card.interactable:hover {
@@ -228,6 +231,15 @@ ol.no-indent {
 ul.large-gap > li {
   margin-bottom: 2rem;
 }
+
+ul#actions li {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: rgb(191, 209, 228);
+  border-radius: 10%;
+  align-items: left;
+}
+
 
 .pill {
   border-radius: 8rem;

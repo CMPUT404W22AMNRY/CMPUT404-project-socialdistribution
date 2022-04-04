@@ -46,6 +46,12 @@ class Post(models.Model):
         upload_to=img_content_filename,
         verbose_name='Image')
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    original_author = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='+', editable=False)
     date_published = models.DateTimeField(auto_now_add=True)
     unlisted = models.BooleanField()
     categories = models.ManyToManyField(Category, blank=True)
