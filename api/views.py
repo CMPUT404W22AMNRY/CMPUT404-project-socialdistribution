@@ -1,26 +1,27 @@
-from urllib.parse import urlparse
 import base64
-from django.http import HttpResponse
 import requests
-from rest_framework.request import Request
+from typing import Any
+from django.http import HttpResponse
+from urllib.parse import urlparse
 from django.http.request import HttpRequest
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from rest_framework.request import Request
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
-from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer
+from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteCommentSerializer, RemoteLikeSerializer
 from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, CommentLikeSerializer
 from rest_framework.exceptions import MethodNotAllowed
-from api.util import page_number_pagination_class_factory
-from posts.models import Post, ContentType, Like, RemoteLike
-from posts.models import Post, ContentType, Like, Comment
 from json import JSONDecodeError, loads as json_loads
-from typing import Any
+
 from follow.models import Follow
+from api.util import page_number_pagination_class_factory
+from posts.models import Post, ContentType, Like, RemoteComment, RemoteLike
+from posts.models import Post, ContentType, Like, Comment
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -62,8 +63,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
                 return handle_inbox_like(request, body)
 
             if post_type == 'comment':
-                # TODO: Handle comment
-                return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+                return handle_inbox_comment(request, body)
 
             return HttpResponse({'detail': 'Unknown type'},
                                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -208,7 +208,7 @@ class LikesViewSet(viewsets.ModelViewSet):
         serialized_remote_likes = RemoteLikeSerializer(remote_like_query_set, many=True, context={'request': request})
 
         if len(serialized_remote_likes.data) > 0:
-            response.data['items'] += (serialized_remote_likes.data)
+            response.data['items'] += serialized_remote_likes.data
         return response
 
 
@@ -234,6 +234,18 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Post.objects.get(pk=self.kwargs['post_pk']).comment_set.all().order_by('-date_published')
+
+    def list(self, request, *args, **kwargs):
+        response: Response = super().list(request, *args, **kwargs)
+
+        remote_comment_query_set = Post.objects.get(
+            pk=self.kwargs['post_pk']).remotecomment_set.all().order_by('-date_published')
+        serialized_remote_comments = RemoteCommentSerializer(
+            remote_comment_query_set, many=True, context={'request': request})
+
+        if len(serialized_remote_comments.data) > 0:
+            response.data['comments'] += serialized_remote_comments.data
+        return response
 
 
 class CommentLikesViewSet(viewsets.ModelViewSet):
@@ -279,4 +291,40 @@ def handle_inbox_like(request: Request, body: dict[str, Any]) -> Response:
     like.save()
 
     serialized = LikesSerializer(like, context={'request': request}).data
+    return Response(serialized)
+
+
+def handle_inbox_comment(request: Request, body: dict[str, Any]) -> Response:
+    author_id: str = body.get('author').get('id')
+    post_id: str = body.get('object')
+
+    parsed_post_id = urlparse(post_id)
+    parsed_author_id = urlparse(author_id)
+
+    local_post_id = parsed_post_id.path.rsplit('/', 1)[-1]
+
+    if not parsed_author_id.hostname == request.get_host():
+        remote_comment = RemoteComment.objects.create(
+            author_url=author_id,
+            comment=body.get('comment'),
+            content_type=body.get('contentType'),
+            post_id=local_post_id,
+        )
+        remote_comment.save()
+
+        return HttpResponse({}, status=status.HTTP_204_NO_CONTENT)
+
+    # Get last path of url
+    # https://stackoverflow.com/questions/7253803/how-to-get-everything-after-last-slash-in-a-url
+    local_author_id = parsed_author_id.path.rsplit('/', 1)[-1]
+
+    comment = Comment.objects.create(
+        comment=body.get('comment'),
+        author_id=local_author_id,
+        post_id=local_post_id,
+        content_type=body.get('contentType')
+    )
+    comment.save()
+
+    serialized = CommentSerializer(comment, context={'request': request}).data
     return Response(serialized)

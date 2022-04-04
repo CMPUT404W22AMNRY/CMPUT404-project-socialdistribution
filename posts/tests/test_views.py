@@ -2,12 +2,12 @@ import json
 from unittest.mock import MagicMock, patch
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
-from posts.models import CommentLike, Post, Category, ContentType, Comment, Like
+from posts.models import CommentLike, Post, Category, ContentType, Comment, Like, RemoteComment
 from django.urls import reverse
 from requests import Response
 
 from servers.models import Server
-from api.tests.constants import SAMPLE_REMOTE_POST
+from api.tests.constants import SAMPLE_REMOTE_AUTHOR, SAMPLE_REMOTE_POST
 from api.tests.test_api import TEST_PASSWORD, TEST_USERNAME
 from .constants import COMMENT_DATA, COMMONMARK_POST_DATA, POST_DATA
 
@@ -230,6 +230,38 @@ class PostDetailViewTests(TestCase):
         res = self.client.post(reverse('posts:unlike-comment', kwargs={'post_pk': self.post.id, 'pk': comment.id}))
         self.assertEqual(res.status_code, 302)
         self.assertEqual(len(comment.commentlike_set.all()), 0)
+
+    def test_contains_remote_comments(self):
+        author = json.loads(SAMPLE_REMOTE_AUTHOR)
+        author_url = author.get('url')
+        remote_comment = RemoteComment.objects.create(
+            comment=COMMENT_DATA['comment'],
+            author_url=author_url,
+            content_type=COMMENT_DATA['content_type'],
+            post=self.post,
+        )
+        remote_comment.save()
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+
+        mock_response = Response()
+        mock_response.json = MagicMock(return_value=author)
+
+        mock_server = Server(
+            service_address="https://cmput-404-w22-project-group09.herokuapp.com/service",
+            username="hello",
+            password="no",
+        )
+        mock_server.get = MagicMock(return_value=mock_response)
+
+        with patch('servers.models.Server.objects') as MockServerObjects:
+            MockServerObjects.all.return_value = [mock_server]
+
+            self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+            res = self.client.get(reverse('posts:detail', kwargs={'pk': self.post.id}))
+
+            remote_comment_count = len(RemoteComment.objects.filter(post=self.post))
+            self.assertTemplateUsed(res, 'posts/partials/_remote_comment.html', count=remote_comment_count)
 
 
 class RemotePostDetailView(TestCase):

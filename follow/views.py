@@ -13,6 +13,7 @@ from django.db.models import Q
 from requests import Response
 from servers.models import Server
 
+from lib.url import get_github_user_from_url
 from servers.views.generic.list_view import ServerListView
 
 
@@ -138,7 +139,8 @@ class UsersView(LoginRequiredMixin, ServerListView):
         def to_internal(representation: dict[str, Any]):
             return {
                 'get_full_name': representation.get('displayName') or representation.get('display_name'),
-                'username': representation.get('github'),
+                'profile_image_url': representation.get('profileImage'),
+                'username': get_github_user_from_url(representation.get('github')) or representation.get('github'),
                 'get_absolute_url': reverse(
                     'auth_provider:remote_profile',
                     kwargs={

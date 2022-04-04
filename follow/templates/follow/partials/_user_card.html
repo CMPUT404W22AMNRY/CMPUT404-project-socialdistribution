@@ -1,6 +1,17 @@
 <a href="{{ object.get_absolute_url }}" style="color: inherit">
-    <div class="card interactable">
-        <h3>{{ object.get_full_name }}</h3>
-        <h4 class="subtitle">{{ object.username }}</h4>
+    <div class="card interactable user-card">
+        <div class="grid-item">
+            <img id="profilephoto"
+                class="profile-pic"
+                src="{{ object.profile_image_url }}"
+                alt="profile photo"
+                onerror="this.src='/static/default.jpg'"/>
+        </div>
+        <div class="grid-item">
+            <div>
+                <h3>{{ object.get_full_name }}</h3>
+                <h4 class="subtitle">{{ object.username }}</h4>
+            </div>
+        </div>
     </div>
 </a>
