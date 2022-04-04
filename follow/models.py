@@ -205,4 +205,3 @@ class RemoteRequest(models.Model):
     def reject(self):
         self.delete()
         return True
-
