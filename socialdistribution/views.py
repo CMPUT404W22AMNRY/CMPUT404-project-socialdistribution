@@ -37,7 +37,7 @@ class StreamView(LoginRequiredMixin, ServerListView):
         for server in Server.objects.all():
             resp = server.get('/authors')
             if resp.status_code != 200:
-                stderr.write(f'Request to {server.service_address}/authors failed with status code {resp.status_code}')
+                print(f'Request to {server.service_address}/authors failed with status code {resp.status_code}', file=stderr)
                 continue
             authors_endpoint = server.service_address + '/authors/'
             try:
