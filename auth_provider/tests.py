@@ -75,7 +75,7 @@ class ViewsTests(TestCase):
 class RemoteProfileViewTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
-        get_user_model().objects.create_user(username='bob', password='password')
+        self.user = get_user_model().objects.create_user(username='bob', password='password')
 
     def test_remote_profile_view(self):
         mock_json_response = json.loads(SAMPLE_REMOTE_AUTHOR)
