@@ -79,6 +79,7 @@ def unfollow_request(request, from_username):
     finally:
         return redirect(from_user.get_absolute_url())
 
+
 def remote_friend_request(request, target_url):
     def serialize(actor, object):
         object_dict = json.loads(object)
@@ -111,6 +112,7 @@ def remote_friend_request(request, target_url):
         server.post(parsed_target_url.path + '/inbox/', data)
         break
     return redirect(reverse('auth_provider:remote_profile', kwargs={'url': target_url}))
+
 
 def remote_unfollow(request, target_url):
     try:

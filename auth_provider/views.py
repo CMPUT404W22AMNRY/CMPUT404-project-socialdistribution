@@ -83,7 +83,8 @@ class RemoteProfileView(ServerDetailView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        def remote_action (remote_action_generator: RemoteActionGenerator):
+
+        def remote_action(remote_action_generator: RemoteActionGenerator):
             remote_action = remote_action_generator(self.request.user, self.get_object().id)
             if remote_action is None:
                 return None
