@@ -1,15 +1,15 @@
+from .constants import COMMENT_DATA, COMMONMARK_POST_DATA, POST_DATA
+from api.tests.test_api import TEST_PASSWORD, TEST_USERNAME
+from api.tests.constants import SAMPLE_REMOTE_AUTHOR, SAMPLE_REMOTE_POST
+from servers.models import Server
+from requests import Response
+from django.urls import reverse
+from posts.models import CommentLike, Post, Category, ContentType, Comment, Like, RemoteComment
 import json
 from unittest.mock import MagicMock, patch
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
-from posts.models import CommentLike, Post, Category, ContentType, Comment, Like, RemoteComment
-from django.urls import reverse
-from requests import Response
 
-from servers.models import Server
-from api.tests.constants import SAMPLE_REMOTE_AUTHOR, SAMPLE_REMOTE_POST
-from api.tests.test_api import TEST_PASSWORD, TEST_USERNAME
-from .constants import COMMENT_DATA, COMMONMARK_POST_DATA, POST_DATA
 
 EDITED_POST_DATA = POST_DATA.copy()
 EDITED_POST_DATA['content_type'] = ContentType.MARKDOWN
@@ -230,6 +230,33 @@ class PostDetailViewTests(TestCase):
         res = self.client.post(reverse('posts:unlike-comment', kwargs={'post_pk': self.post.id, 'pk': comment.id}))
         self.assertEqual(res.status_code, 302)
         self.assertEqual(len(comment.commentlike_set.all()), 0)
+
+    def test_share_post(self):
+        alice = get_user_model().objects.create_user(username='alice', password='password')
+        self.client.login(username=alice.username, password=alice.password)
+        self.post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=alice.id,
+            unlisted=True)
+        self.post.save()
+        initial_post_count = len(Post.objects.all())
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        self.shared_post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=alice.id,
+            shared_author=self.user,
+            unlisted=True)
+        self.shared_post.save()
+        res = self.client.get(reverse('posts:my-posts'))
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(Post.objects.all()), initial_post_count + 1)
 
     def test_contains_remote_comments(self):
         author = json.loads(SAMPLE_REMOTE_AUTHOR)
