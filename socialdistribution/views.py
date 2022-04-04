@@ -35,6 +35,8 @@ class StreamView(LoginRequiredMixin, ServerListView):
         server_endpoints_tuples = []
         for server in Server.objects.all():
             resp = server.get('/authors')
+            if resp.status_code != 200:
+                continue
             authors_endpoint = server.service_address + '/authors/'
             authors = resp.json()['items']
             endpoints = []
