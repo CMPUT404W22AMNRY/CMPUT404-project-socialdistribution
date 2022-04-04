@@ -1,0 +1,28 @@
+{% extends "base.html" %} {% block content %}
+<style>
+  img {
+    max-width: 250px;
+    border-radius: 50%;
+  }
+</style>
+<div class="card">
+  {% include 'profile/partials/_summary.html' %}
+
+  {% if user_actions|length > 0 %}
+  <section id="actions">
+    <h3>Actions</h3>
+    <ul class="no-indent">
+      {% for user_action in user_actions %}
+      <li>
+        <!-- TODO: Re-add actions section -->
+        <form method="post" action="{{ user_action.link }}">
+          {% csrf_token %}
+          <input type="submit" value="{{ user_action.name }}" class="primarybtn" />
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</div>
+{% endblock content %}

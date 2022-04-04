@@ -2,6 +2,7 @@ from typing import Any
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.views.generic.list import ListView
 from follow.models import AlreadyExistsError, Follow, Request
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -85,8 +86,14 @@ class UsersView(LoginRequiredMixin, ServerListView):
 
         def to_internal(representation: dict[str, Any]):
             return {
-                'get_full_name': representation.get('displayName'),
+                'get_full_name': representation.get('displayName') or representation.get('display_name'),
                 'username': representation.get('github'),
+                'get_absolute_url': reverse(
+                    'auth_provider:remote_profile',
+                    kwargs={
+                        'url': representation.get('id')
+                    }
+                )
             }
 
         return [to_internal(user) for user in jsonResponse['items']]
