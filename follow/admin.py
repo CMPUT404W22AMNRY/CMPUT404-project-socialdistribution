@@ -55,11 +55,10 @@ user_action_generators.register(UnfollowAction)
 
 
 def RemoteFriendAction(current_user: USER_MODEL, target_url: str) -> Optional[tuple[str, str]]:
-
     return ('Add friend', reverse('follow:remote_request', kwargs={'url': target_url}))
 
-def RemoteUnfollowAction(current_user: USER_MODEL, target_url: str) -> Optional[tuple[str, str]]:
 
+def RemoteUnfollowAction(current_user: USER_MODEL, target_url: str) -> Optional[tuple[str, str]]:
     return ('Unfollow', reverse('follow:remote_unfollow', kwargs={'url': target_url}))
 
 

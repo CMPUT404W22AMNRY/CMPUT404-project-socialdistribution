@@ -13,6 +13,7 @@ from django.db.models import Q
 from requests import Response
 from servers.models import Server
 
+from lib.url import get_github_user_from_url
 from servers.views.generic.list_view import ServerListView
 
 
@@ -78,6 +79,7 @@ def unfollow_request(request, from_username):
     finally:
         return redirect(from_user.get_absolute_url())
 
+
 def remote_friend_request(request, target_url):
     def serialize(actor, object):
         object_dict = json.loads(object)
@@ -111,6 +113,7 @@ def remote_friend_request(request, target_url):
         break
     return redirect(reverse('auth_provider:remote_profile', kwargs={'url': target_url}))
 
+
 def remote_unfollow(request, target_url):
     try:
         remote_follow = RemoteFollow.objects.get(from_user=request.user, to_user_url=target_url)
@@ -138,7 +141,8 @@ class UsersView(LoginRequiredMixin, ServerListView):
         def to_internal(representation: dict[str, Any]):
             return {
                 'get_full_name': representation.get('displayName') or representation.get('display_name'),
-                'username': representation.get('github'),
+                'profile_image_url': representation.get('profileImage'),
+                'username': get_github_user_from_url(representation.get('github')) or representation.get('github'),
                 'get_absolute_url': reverse(
                     'auth_provider:remote_profile',
                     kwargs={

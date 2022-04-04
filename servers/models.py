@@ -18,11 +18,11 @@ class Server(models.Model):
     def get(self, endpoint: str, params: Dict[str, str] = []) -> requests.Response:
         full_endpoint = self.service_address + endpoint
         return requests.get(full_endpoint, params, auth=HTTPBasicAuth(self.username, self.password))
-    
-    def post(self, endpoint:str, data: Dict[str, str] = []) -> requests.Response:
+
+    def post(self, endpoint: str, data: Dict[str, str] = []) -> requests.Response:
         full_endpoint = self.service_address + endpoint
         return requests.post(full_endpoint, json=data, auth=HTTPBasicAuth(self.username, self.password))
 
-    def delete(self, endpoint:str, params: Dict[str, str] = []) -> requests.Response:
+    def delete(self, endpoint: str, params: Dict[str, str] = []) -> requests.Response:
         full_endpoint = self.service_address + endpoint
         return requests.post(full_endpoint, params, auth=HTTPBasicAuth(self.username, self.password))
