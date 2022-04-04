@@ -46,7 +46,7 @@ class Post(models.Model):
         upload_to=img_content_filename,
         verbose_name='Image')
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    shared_author = models.ForeignKey(
+    original_author = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         null=True,
