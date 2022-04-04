@@ -85,6 +85,7 @@ class UsersView(LoginRequiredMixin, ServerListView):
         jsonResponse = response.json()
 
         def to_internal(representation: dict[str, Any]):
+            print(representation)
             return {
                 'get_full_name': representation.get('displayName') or representation.get('display_name'),
                 'username': representation.get('github'),
