@@ -1,4 +1,5 @@
 from typing import Any, Dict
+from wsgiref.util import request_uri
 from django import forms
 from django.db import transaction
 from django.forms import ModelForm
@@ -220,10 +221,11 @@ def share_post_view(request: HttpRequest, pk: int):
     # duplicate the post
     shared_post = Post.objects.get(pk=pk)
     shared_post.pk = None
-    print(shared_post)
     shared_post.save()
     author = User.objects.get(username=request.user)
     shared_post.author = author
+    shared_post.source = request_uri
+    shared_post.save()
     return redirect(shared_post.get_absolute_url())
 
 
