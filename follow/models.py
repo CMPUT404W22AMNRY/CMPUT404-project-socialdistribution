@@ -174,8 +174,26 @@ class RemoteFollow(models.Model):
     followee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     follower_url = models.CharField(max_length=STR_MAX_LENGTH)
 
+    def unfollow(self):
+        self.delete()
+        return True
+
 
 class RemoteRequest(models.Model):
     from_user_url = models.CharField(max_length=STR_MAX_LENGTH)
     to_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     from_user_name = models.CharField(max_length=STR_MAX_LENGTH, default='')
+
+    def accept(self):
+        relation, created = RemoteFollow.objects.get_or_create(followee=self.to_user, follower_url=self.from_user_url)
+
+        if created is False:
+            raise AlreadyExistsError
+
+        relation.save()
+        self.delete()
+        return True
+    
+    def reject(self):
+        self.delete()
+        return True
