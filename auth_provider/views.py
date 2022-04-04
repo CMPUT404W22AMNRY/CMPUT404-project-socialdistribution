@@ -110,6 +110,8 @@ class RemoteProfileView(ServerDetailView):
                 if self.request.user.id in json_follower['items'].__str__():
                     remote_follow.approved = True
                     context['user_actions'] = actions[1]
+                else:
+                    context['user_actions'] = actions[0]
                 break
         except RemoteFollow.DoesNotExist:
             context['user_actions'] = actions[0]
