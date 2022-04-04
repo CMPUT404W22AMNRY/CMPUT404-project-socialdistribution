@@ -36,7 +36,7 @@ class MyProfileView(DetailView):
         context['github_activity'] = get_github_activity(self.object.github_url)
         context['user_resources'] = [{'name': user_resource[0], 'link': user_resource[1]}
                                      for user_resource in user_resources]
-        return context    
+        return context
 
 
 class ProfileView(DetailView):
@@ -91,11 +91,13 @@ class RemoteProfileView(ServerDetailView):
         profile_image_url = json_response.get('profileImage') or json_response.get('profile_image')
         author_full_name = json_response.get('displayName') or json_response.get('display_name')
         github = json_response.get('github')
+        username = get_github_user_from_url(github)
 
         return {
             'profile_image_url': profile_image_url,
             "get_full_name": author_full_name,
             "github_url": github,
+            "username": username
         }
 
 
@@ -114,6 +116,7 @@ class EditProfileView(UpdateView):
 def logout_view(request):
     logout(request)
     return redirect('/')
+
 
 def get_github_activity(github_url: str):
     github_username = get_github_user_from_url(github_url)
@@ -148,6 +151,7 @@ def get_github_activity(github_url: str):
             break
 
     return activity if success else None
+
 
 def parse_github_activity(activity: dict, json: dict):
     for event in json:
