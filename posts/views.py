@@ -247,18 +247,17 @@ def unlike_post_view(request: HttpRequest, pk: int):
 
 
 def share_post_view(request: HttpRequest, pk: int):
-    # duplicate the post
     orignal_post = Post.objects.get(pk=pk)
-    author = orignal_post.author
     orignal_post.pk = None
     new_post = Post.objects.create(
         title=orignal_post.title,
         description=orignal_post.description,
         content_type=orignal_post.content_type,
         content=orignal_post.content,
-        author_id=orignal_post.author.id,
-        shared_author=request.user,
-        unlisted=orignal_post.unlisted
+        author_id=request.user.id,
+        shared_author=orignal_post.author,
+        unlisted=orignal_post.unlisted,
+        date_published=orignal_post.date_published
     )
     new_post.save()
 
