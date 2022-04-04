@@ -85,7 +85,8 @@ class RemoteProfileView(ServerDetailView):
         context = super().get_context_data(**kwargs)
 
         def remote_action(remote_action_generator: RemoteActionGenerator):
-            remote_action = remote_action_generator(self.request.user, self.get_object().id)
+            print(self.get_object())
+            remote_action = remote_action_generator(self.request.user, self.get_object())
             if remote_action is None:
                 return None
             return {
