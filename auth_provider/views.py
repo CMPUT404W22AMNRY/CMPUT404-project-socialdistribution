@@ -2,7 +2,7 @@ import requests
 import json
 from typing import Any, Dict, Optional
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.contrib.auth import get_user_model, logout
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
@@ -106,6 +106,9 @@ class EditProfileView(UpdateView):
 
     def get_object(self):
         return self.request.user
+
+    def get_success_url(self) -> str:
+        return reverse('auth_provider:my_profile')
 
 
 def logout_view(request):
