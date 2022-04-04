@@ -86,3 +86,10 @@ class RemoteLike(models.Model):
 class CommentLike(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+
+class RemoteComment(models.Model):
+    author_url = models.CharField(max_length=STR_MAX_LENGTH)
+    comment = models.TextField()
+    content_type = models.CharField(max_length=18, default=ContentType.PLAIN, choices=ContentType.choices)
+    date_published = models.DateTimeField(auto_now_add=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
