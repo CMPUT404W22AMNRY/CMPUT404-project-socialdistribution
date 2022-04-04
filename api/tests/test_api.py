@@ -108,7 +108,7 @@ class PostTests(TestCase):
             self.assertIn('origin', post)
             self.assertIn('count', post)
             self.assertIn('categories', post)
-            self.assertNotIn('shared_author', post)
+            self.assertNotIn('original_author', post)
 
     def test_posts_require_login(self):
         res = self.client.get(f'/api/v1/authors/{self.user.id}/posts/')
