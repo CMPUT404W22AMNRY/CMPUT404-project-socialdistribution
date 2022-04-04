@@ -75,7 +75,7 @@ class ViewsTests(TestCase):
 class RemoteProfileViewTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
-        self.user = get_user_model().objects.create_user(username='bob', password='password')
+        self.user = get_user_model().objects.create_user(username=TEST_USERNAME, password=TEST_PASSWORD)
 
     def test_remote_profile_view(self):
         mock_json_response = json.loads(SAMPLE_REMOTE_AUTHOR)
@@ -92,7 +92,7 @@ class RemoteProfileViewTests(TestCase):
         with patch('servers.models.Server.objects') as MockServerObjects:
             MockServerObjects.all.return_value = [mock_server]
 
-            self.client.login(username='bob', password='password')
+            self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
             res = self.client.get(
                 reverse(
                     'auth_provider:remote_profile',
@@ -101,9 +101,9 @@ class RemoteProfileViewTests(TestCase):
                     }
                 )
             )
-            print(res)
+
             self.assertEqual(res.status_code, 200)
-            self.assertContains(res, mock_json_response['display_name'])
+            self.assertContains(res, mock_json_response['displayName'])
             self.assertContains(res, mock_json_response['github'])
 
 
