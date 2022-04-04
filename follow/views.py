@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.views.generic.list import ListView
-from follow.models import AlreadyExistsError, Follow, RemoteFollow, Request, RemoteRequest
+from follow.models import AlreadyExistsError, Follow, RemoteFollower, Request, RemoteRequest
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -105,7 +105,7 @@ def remove_remote_follower(request, from_user_url):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
     try:
-        follow = RemoteFollow.objects.get(followee=request.user, follower_url=from_user_url)
+        follow = RemoteFollower.objects.get(followee=request.user, follower_url=from_user_url)
         follow.unfollow()
     except AlreadyExistsError as e1:
         pass
