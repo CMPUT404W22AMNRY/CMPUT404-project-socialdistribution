@@ -120,17 +120,14 @@ class RemoteProfileView(ServerDetailView):
     def to_internal(self, response: Response) -> get_user_model():
         json_response = response.json()
 
-        id = json_response.get('id')
         profile_image_url = json_response.get('profileImage') or json_response.get('profile_image')
         author_full_name = json_response.get('displayName') or json_response.get('display_name')
         github = json_response.get('github')
-        username = get_github_user_from_url(github)
 
         return {
             'profile_image_url': profile_image_url,
             "get_full_name": author_full_name,
-            "github_url": github,
-            "username": username
+            "github_url": github
         }
 
 
