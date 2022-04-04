@@ -13,7 +13,6 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
 from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer, RequestSerializer, RemoteRequestSerializer
 from rest_framework.exceptions import PermissionDenied
-from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer
 
 from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, CommentLikeSerializer
 from rest_framework.exceptions import MethodNotAllowed
