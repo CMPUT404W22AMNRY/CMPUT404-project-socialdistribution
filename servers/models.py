@@ -1,4 +1,3 @@
-from ast import Delete
 from typing import Dict
 from django.db import models
 from requests.auth import HTTPBasicAuth
