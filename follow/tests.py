@@ -84,13 +84,13 @@ class RemoteFollowmodelTests(TestCase):
         remote_request.accept()
         self.assertEqual(len(RemoteFollow.objects.all()), 1)
         self.assertEqual(len(RemoteRequest.objects.all()), 0)
-    
+
     def test_remote_reject_request(self):
         remote_request = RemoteRequest.objects.create(from_user_url=self.url, to_user=self.bob)
         self.assertEqual(len(RemoteFollow.objects.all()), 0)
         remote_request.reject()
         self.assertEqual(len(RemoteFollow.objects.all()), 0)
-        self.assertEqual(len(RemoteRequest.objects.all()), 0) 
+        self.assertEqual(len(RemoteRequest.objects.all()), 0)
 
     def test_remote_accept_request(self):
         remote_request = RemoteRequest.objects.create(from_user_url=self.url, to_user=self.bob)
@@ -105,7 +105,7 @@ class RemoteFollowmodelTests(TestCase):
         remote_request.accept()
         self.assertEqual(len(RemoteFollow.objects.all()), 1)
         RemoteFollow.objects.get(followee=self.bob, follower_url=self.url).unfollow()
-        self.assertEqual(len(RemoteFollow.objects.all()), 0)     
+        self.assertEqual(len(RemoteFollow.objects.all()), 0)
 
 
 class UsersViewTests(TestCase):
