@@ -5,7 +5,7 @@ from .models import User
 # Holds the name, and link of an action
 RemoteAction = Optional[tuple[str, str]]
 # Generates a UserAction when called with current_user and target_user
-RemoteActionGenerator = Callable[[User, Str], RemoteAction]
+RemoteActionGenerator = Callable[[User, str], RemoteAction]
 
 remote_action_generators: list[RemoteActionGenerator] = []
 

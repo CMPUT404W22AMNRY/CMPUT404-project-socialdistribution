@@ -84,7 +84,7 @@ def remote_friend_request(request, target_url):
     def serialize(actor, object):
         object_dict = json.loads(object)
         object_name = object.get('displayName') or object.get('display_name') or ''
-        acotr_host = urlparse(actor.get_absolute_url()).hostname
+        actor_host = urlparse(actor.get_absolute_url()).hostname
         return {
             'type': 'Follow',
             'summary': actor.get_full_name + ' wants to follow ' + object_name,
@@ -92,7 +92,7 @@ def remote_friend_request(request, target_url):
                 "type": 'author',
                 "id": actor.id,
                 "url": actor.get_absolute_url(),
-                "host": 'http://' + acotr_host,
+                "host": 'http://' + actor_host,
                 "displayName": actor.get_full_name(),
                 "github": actor.github_url,
                 "profileImage": actor.profile_image_url
