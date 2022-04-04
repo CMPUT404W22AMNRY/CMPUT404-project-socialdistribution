@@ -28,7 +28,7 @@ class FriendRequestsViewTests(TestCase):
         Follow.objects.follow_request(from_user=self.alice, to_user=self.bob)
         self.client.login(username='bob', password='password')
         res = self.client.get(reverse('follow:friend_requests'))
-        self.assertContains(res, self.alice.username)
+        self.assertContains(res, self.alice.get_full_name)
 
     def test_remote_friend_request(self):
         url = "http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471"
