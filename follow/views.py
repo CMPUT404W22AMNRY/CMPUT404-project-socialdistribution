@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from requests import Response
 
+from lib.url import get_github_user_from_url
 from servers.views.generic.list_view import ServerListView
 
 
@@ -88,7 +89,7 @@ class UsersView(LoginRequiredMixin, ServerListView):
             return {
                 'get_full_name': representation.get('displayName') or representation.get('display_name'),
                 'profile_image_url': representation.get('profileImage'),
-                'username': representation.get('github'),
+                'username': get_github_user_from_url(representation.get('github')) or representation.get('github'),
                 'get_absolute_url': reverse(
                     'auth_provider:remote_profile',
                     kwargs={
