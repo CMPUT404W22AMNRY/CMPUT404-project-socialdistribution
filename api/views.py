@@ -1,12 +1,13 @@
-from urllib.parse import urlparse
 import base64
-from django.http import HttpResponse
 import requests
-from rest_framework.request import Request
+from typing import Any
+from django.http import HttpResponse
+from urllib.parse import urlparse
 from django.http.request import HttpRequest
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from rest_framework.request import Request
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
@@ -15,12 +16,12 @@ from rest_framework.exceptions import PermissionDenied
 from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer
 from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, CommentLikeSerializer
 from rest_framework.exceptions import MethodNotAllowed
-from api.util import page_number_pagination_class_factory
-from posts.models import Post, ContentType, Like, RemoteLike
-from posts.models import Post, ContentType, Like, Comment
 from json import JSONDecodeError, loads as json_loads
-from typing import Any
+
 from follow.models import Follow
+from api.util import page_number_pagination_class_factory
+from posts.models import Post, ContentType, Like, RemoteComment, RemoteLike
+from posts.models import Post, ContentType, Like, Comment
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -290,8 +291,15 @@ def handle_inbox_comment(request: Request, body: dict[str, Any]) -> Response:
     local_post_id = parsed_post_id.path.rsplit('/', 1)[-1]
 
     if not parsed_author_id.hostname == request.get_host():
-        # TODO: Handle remote comments
-        return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        remote_comment = RemoteComment.objects.create(
+            author_url=author_id,
+            comment=body.get('comment'),
+            content_type=body.get('contentType'),
+            post_id=local_post_id,
+        )
+        remote_comment.save()
+
+        return HttpResponse({}, status=status.HTTP_204_NO_CONTENT)
 
     # Get last path of url
     # https://stackoverflow.com/questions/7253803/how-to-get-everything-after-last-slash-in-a-url

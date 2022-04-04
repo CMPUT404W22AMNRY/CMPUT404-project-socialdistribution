@@ -95,21 +95,25 @@ class InboxTests(TestCase):
 
         self.assertEqual(len(post.remotelike_set.all()), 1)
 
-    def test_comment(self):
-        post = Post.objects.create(
+class InboxCommentTests(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.user = get_user_model().objects.create_user(username=TEST_USERNAME, password=TEST_PASSWORD)
+        self.post = Post.objects.create(
             title=POST_DATA['title'],
             description=POST_DATA['description'],
             content_type=POST_DATA['content_type'],
             content=POST_DATA['content'],
             author_id=self.user.id,
             unlisted=POST_DATA['unlisted'])
-        post.save()
+        self.post.save()
 
 
-        self.assertEqual(len(post.comment_set.all()), 0)
+    def test_comment(self):
+        self.assertEqual(len(self.post.comment_set.all()), 0)
 
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
-        post_response = self.client.get(f'/api/v1/authors/{self.user.id}/posts/{post.id}').content
+        post_response = self.client.get(f'/api/v1/authors/{self.user.id}/posts/{self.post.id}').content
         post_url = json.loads(post_response).get('id')
 
         author_response = self.client.get(f'/api/v1/authors/{self.user.id}/').content
@@ -128,5 +132,28 @@ class InboxTests(TestCase):
             json.dumps(payload),
             content_type='application/json')
         self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(self.post.comment_set.all()), 1)
 
-        self.assertEqual(len(post.comment_set.all()), 1)
+    def test_remote_comment(self):
+        self.assertEqual(len(self.post.remotecomment_set.all()), 0)
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        post_response = self.client.get(f'/api/v1/authors/{self.user.id}/posts/{self.post.id}').content
+        post_url = json.loads(post_response).get('id')
+
+        author_json = json.loads(SAMPLE_REMOTE_AUTHOR)
+
+        payload = {
+            'type': 'comment',
+            'author': author_json,
+            'comment': COMMENT_DATA['comment'],
+            'contentType': COMMENT_DATA['content_type'],
+            'object': post_url
+        }
+
+        resp = self.client.post(
+            f'/api/v1/authors/{self.user.id}/inbox',
+            json.dumps(payload),
+            content_type='application/json')
+        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(len(self.post.remotecomment_set.all()), 1)
