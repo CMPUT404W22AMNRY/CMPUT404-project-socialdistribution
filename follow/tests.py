@@ -9,7 +9,7 @@ from api.tests.constants import SAMPLE_REMOTE_AUTHORS
 from servers.models import Server
 from follow.admin import AddFriendAction
 
-from .models import Follow, RemoteFollow
+from .models import Follow, RemoteFollow, RemoteRequest
 
 
 class FriendRequestsViewTests(TestCase):
@@ -32,7 +32,7 @@ class FriendRequestsViewTests(TestCase):
 
     def test_remote_friend_request(self):
         url = "http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471"
-        RemoteFollow.objects.create(follower_url=url, followee=self.bob)
+        RemoteRequest.objects.create(follower_url=url, followee=self.bob)
         self.client.login(username='bob', password='password')
         res = self.client.get(reverse('follow:friend_requests'))
         self.assertTemplateUsed(res, 'follow/request_list.html')
