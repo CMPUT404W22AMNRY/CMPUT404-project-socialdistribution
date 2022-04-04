@@ -51,7 +51,7 @@
         </section>
         <section>
             <h3>Actions</h3>
-            <ul>
+            <ul class="no-indent" id="actions">
                 {% if object.author.id == user.id %}
                     <li>
                         <a href="{% url 'posts:edit' object.id %}">Edit post</a>
@@ -75,6 +75,12 @@
                         </form>
                     </li>
                 {% endif %}
+                {% if object.author.id != user.id %}
+                    <li>
+                        <a href="{% url 'posts:share' object.id %}">Share</a>
+                    </li>
+                {% endif %}
+
             </ul>
         </section>
     </div>

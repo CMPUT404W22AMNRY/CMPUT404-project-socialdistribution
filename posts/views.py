@@ -1,4 +1,3 @@
-from ast import parse
 from typing import Any, Dict
 from django import forms
 from django.db import transaction
@@ -15,7 +14,6 @@ from requests import Response
 from lib.http_helper import is_b64_image_content
 from django.core.exceptions import PermissionDenied
 from urllib.parse import urlparse
-
 from .models import CommentLike, Post, Category, Comment, Like, RemoteComment, RemoteLike
 from servers.models import Server
 from servers.views.generic.detailed_view import ServerDetailView
@@ -242,6 +240,23 @@ def unlike_post_view(request: HttpRequest, pk: int):
     except Like.DoesNotExist:
         pass
     return redirect(Post.objects.get(pk=pk).get_absolute_url())
+
+
+def share_post_view(request: HttpRequest, pk: int):
+    orignal_post = Post.objects.get(pk=pk)
+    new_post = Post.objects.create(
+        title=orignal_post.title,
+        description=orignal_post.description,
+        content_type=orignal_post.content_type,
+        content=orignal_post.content,
+        author_id=request.user.id,
+        original_author=orignal_post.author,
+        unlisted=orignal_post.unlisted,
+        date_published=orignal_post.date_published
+    )
+    new_post.save()
+
+    return redirect(new_post.get_absolute_url())
 
 
 def like_comment_view(request: HttpRequest, post_pk: int, pk: int):

@@ -12,16 +12,17 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
+from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer, RequestSerializer, RemoteRequestSerializer
 from rest_framework.exceptions import PermissionDenied
-from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteCommentSerializer, RemoteLikeSerializer
-from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, CommentLikeSerializer
+
+from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, CommentLikeSerializer, RemoteCommentSerializer, RemoteLikeSerializer
 from rest_framework.exceptions import MethodNotAllowed
 from json import JSONDecodeError, loads as json_loads
 
-from follow.models import Follow
+from typing import Any
+from follow.models import Follow, Request, RemoteRequest
 from api.util import page_number_pagination_class_factory
-from posts.models import Post, ContentType, Like, RemoteComment, RemoteLike
-from posts.models import Post, ContentType, Like, Comment
+from posts.models import Post, ContentType, Like, Comment, RemoteComment, RemoteLike
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -56,8 +57,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
                 return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
 
             if post_type == 'follow':
-                # TODO: Handle follow request
-                return HttpResponse({}, status=status.HTTP_501_NOT_IMPLEMENTED)
+                return handle_inbox_follow(request, body)
 
             if post_type == 'like':
                 return handle_inbox_like(request, body)
@@ -258,6 +258,37 @@ class CommentLikesViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Comment.objects.get(pk=self.kwargs['comment_pk']).commentlike_set.all().order_by('author_id')
+
+
+def handle_inbox_follow(request: Request, body: dict[str, Any]) -> Response:
+    from_user_id: str = body.get('actor').get('id')
+    to_user_id: str = body.get('object').get('id')
+
+    parsed_to_user_id = urlparse(to_user_id)
+    parsed_from_user_id = urlparse(from_user_id)
+
+    local_user_id = parsed_to_user_id.path.rsplit('/', 1)[-1]
+    try:
+        to_user = get_user_model().objects.get(id=local_user_id)
+    except get_user_model().DoesNotExist as e:
+        return Http404
+
+    if parsed_from_user_id.hostname != request.get_host():
+        remote_request = RemoteRequest.objects.create(from_user_url=from_user_id, to_user=to_user)
+        remote_request.save()
+        return HttpResponse({}, status=status.HTTP_204_NO_CONTENT)
+
+    local_from_user_id = parsed_from_user_id.path.rsplit('/', 1)[-1]
+
+    try:
+        local_from_user = get_user_model().objects.get(id=local_from_user_id)
+    except get_user_model().DoesNotExist:
+        return Http404
+
+    local_request = Request.objects.create(from_user=local_from_user, to_user=to_user)
+    local_request.save()
+
+    return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
 def handle_inbox_like(request: Request, body: dict[str, Any]) -> Response:

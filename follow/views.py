@@ -1,12 +1,13 @@
 import json
 from typing import Any
 from urllib.parse import urlparse
+from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.list import ListView
-from follow.models import AlreadyExistsError, Follow, RemoteFollow, Request
+from follow.models import AlreadyExistsError, Follow, RemoteFollow, RemoteFollower, Request, RemoteRequest
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -130,6 +131,44 @@ def remote_unfollow(request, target_url):
     return redirect(reverse('auth_provider:remote_profile', kwargs={'url': target_url}))
 
 
+def accept_remote_follow_request(request, from_user_url):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    try:
+        remote_request = RemoteRequest.objects.get(to_user=request.user, from_user_url=from_user_url)
+        remote_request.accept()
+    except AlreadyExistsError:
+        pass
+    finally:
+        return redirect(reverse('auth_provider:remote_profile', kwargs={'url': from_user_url}))
+
+
+def reject_remote_follow_request(request, from_user_url):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    try:
+        remote_request = RemoteRequest.objects.get(to_user=request.user, from_user_url=from_user_url)
+        remote_request.reject()
+    except RemoteRequest.DoesNotExist:
+        pass
+    finally:
+        return redirect(reverse('auth_provider:remote_profile', kwargs={'url': from_user_url}))
+
+
+def remove_remote_follower(request, from_user_url):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    try:
+        follow = RemoteFollower.objects.get(followee=request.user, follower_url=from_user_url)
+        follow.unfollow()
+    except AlreadyExistsError as e1:
+        pass
+    except ValidationError as e2:
+        pass
+    finally:
+        return redirect(reverse('auth_provider:remote_profile', kwargs={'url': from_user_url}))
+
+
 class UsersView(LoginRequiredMixin, ServerListView):
     model = USER_MODEL
     template_name = 'follow/user_list.html'
@@ -159,10 +198,16 @@ class UsersView(LoginRequiredMixin, ServerListView):
 
 class FriendRequestsView(LoginRequiredMixin, ListView):
     model = Request
+    context_object_name = 'requests'
     template_name = 'follow/request_list.html'
 
     def get_queryset(self):
         return Request.objects.filter(to_user=self.request.user)
+
+    def get_context_data(self, **kwargs: Any):
+        context = super(FriendRequestsView, self).get_context_data(**kwargs)
+        context['remote_requests'] = RemoteRequest.objects.filter(to_user=self.request.user)
+        return context
 
 
 class MyFriendsView(LoginRequiredMixin, ListView):

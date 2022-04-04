@@ -1,3 +1,4 @@
+from sys import stderr
 from typing import Any
 from django.urls import reverse_lazy, reverse
 from django.http import HttpRequest, HttpResponse
@@ -6,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import QuerySet
 from requests import Response
 import urllib.parse
+from dateutil import parser
 
 from posts.models import Post
 from servers.views.generic.list_view import ServerListView
@@ -35,8 +37,17 @@ class StreamView(LoginRequiredMixin, ServerListView):
         server_endpoints_tuples = []
         for server in Server.objects.all():
             resp = server.get('/authors')
+            if resp.status_code != 200:
+                print(
+                    f'Request to {server.service_address}/authors failed with status code {resp.status_code}',
+                    file=stderr)
+                continue
             authors_endpoint = server.service_address + '/authors/'
-            authors = resp.json()['items']
+            try:
+                authors = resp.json()['items']
+            except Exception as e:
+                print(e, file=stderr)
+                continue
             endpoints = []
             for author in authors:
                 # TODO: Update this to author_url once our groupmates are ready (have the URL field)
@@ -79,7 +90,7 @@ class StreamView(LoginRequiredMixin, ServerListView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['object_list'] = sorted(
-            context['object_list'], key=lambda x: str(
-                x.date_published) if isinstance(
-                x, Post) else x['date_published'], reverse=True)
+            context['object_list'], key=lambda x:
+                x.date_published if isinstance(
+                x, Post) else parser.parse(x['date_published']), reverse=True)
         return context
