@@ -41,7 +41,7 @@
         <p>
             {{ post.date_published }}
         </p>
-        {% if post.shared_author %}
+        {% if post.original_author %}
         <hr>
             <div>
 				<p>Original post of <a>@{{ post.original_author }}</a> shared by <a>@{{ post.author }}</a></p>

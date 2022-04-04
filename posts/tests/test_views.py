@@ -251,7 +251,7 @@ class PostDetailViewTests(TestCase):
             content_type=POST_DATA['content_type'],
             content=POST_DATA['content'],
             author_id=alice.id,
-            shared_author=self.user,
+            original_author=self.user,
             unlisted=True)
         self.shared_post.save()
         res = self.client.get(reverse('posts:my-posts'))
