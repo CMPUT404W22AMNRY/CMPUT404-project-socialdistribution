@@ -81,7 +81,8 @@ def accept_remote_follow_request(request, from_user_url):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
     try:
-        RemoteFollow.objects.create(followee=request.user, follower_url=from_user_url)
+        remote_request = RemoteRequest.objects.get(to_user=request.user, from_user_url=from_user_url)
+        remote_request.accept()
     except AlreadyExistsError:
         pass
     finally:
@@ -92,12 +93,25 @@ def reject_remote_follow_request(request, from_user_url):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
     try:
-        RemoteRequest.objects.delete(to_user=request.user, from_user_url=from_user_url)
+       remote_request = RemoteRequest.objects.get(to_user=request.user, from_user_url=from_user_url)
+       remote_request.reject()
     except RemoteRequest.DoesNotExist:
         pass
     finally:
         return redirect(reverse('auth_provider:remote_profile', kwargs={'url': from_user_url}))
 
+def remove_remote_follower(request, from_user_url):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    try:
+        follow = RemoteFollow.objects.get(followee=request.user, follower_url=from_user_url)
+        follow.unfollow()
+    except AlreadyExistsError as e1:
+        pass
+    except ValidationError as e2:
+        pass
+    finally:
+        return redirect(reverse('auth_provider:remote_profile', kwargs={'url': from_user_url}))
 
 class UsersView(LoginRequiredMixin, ServerListView):
     model = USER_MODEL
