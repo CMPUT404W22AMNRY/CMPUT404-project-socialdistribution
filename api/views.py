@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
-from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteLikeSerializer
+from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, RemoteCommentSerializer, RemoteLikeSerializer
 from api.serializers import AuthorSerializer, CommentSerializer, FollowersSerializer, PostSerializer, LikesSerializer, CommentLikeSerializer
 from rest_framework.exceptions import MethodNotAllowed
 from json import JSONDecodeError, loads as json_loads
@@ -208,7 +208,7 @@ class LikesViewSet(viewsets.ModelViewSet):
         serialized_remote_likes = RemoteLikeSerializer(remote_like_query_set, many=True, context={'request': request})
 
         if len(serialized_remote_likes.data) > 0:
-            response.data['items'] += (serialized_remote_likes.data)
+            response.data['items'] += serialized_remote_likes.data
         return response
 
 
@@ -234,6 +234,18 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Post.objects.get(pk=self.kwargs['post_pk']).comment_set.all().order_by('-date_published')
+
+    def list(self, request, *args, **kwargs):
+        response: Response = super().list(request, *args, **kwargs)
+
+        remote_comment_query_set = Post.objects.get(
+            pk=self.kwargs['post_pk']).remotecomment_set.all().order_by('-date_published')
+        serialized_remote_comments = RemoteCommentSerializer(
+            remote_comment_query_set, many=True, context={'request': request})
+
+        if len(serialized_remote_comments.data) > 0:
+            response.data['comments'] += serialized_remote_comments.data
+        return response
 
 
 class CommentLikesViewSet(viewsets.ModelViewSet):
