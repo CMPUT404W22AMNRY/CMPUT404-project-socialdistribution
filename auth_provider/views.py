@@ -127,7 +127,6 @@ class RemoteProfileView(ServerDetailView):
         username = get_github_user_from_url(github)
 
         return {
-            'id': id,
             'profile_image_url': profile_image_url,
             "get_full_name": author_full_name,
             "github_url": github,
