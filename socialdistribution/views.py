@@ -1,3 +1,4 @@
+from sys import stderr
 from typing import Any
 from django.urls import reverse_lazy, reverse
 from django.http import HttpRequest, HttpResponse
@@ -36,9 +37,14 @@ class StreamView(LoginRequiredMixin, ServerListView):
         for server in Server.objects.all():
             resp = server.get('/authors')
             if resp.status_code != 200:
+                stderr.write(f'Request to {server.service_address}/authors failed with status code {resp.status_code}')
                 continue
             authors_endpoint = server.service_address + '/authors/'
-            authors = resp.json()['items']
+            try:
+                authors = resp.json()['items']
+            except Exception as e:
+                stderr.write(e)
+                continue
             endpoints = []
             for author in authors:
                 # TODO: Update this to author_url once our groupmates are ready (have the URL field)
