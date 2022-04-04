@@ -43,7 +43,7 @@ class StreamView(LoginRequiredMixin, ServerListView):
             try:
                 authors = resp.json()['items']
             except Exception as e:
-                stderr.write(e)
+                print(e, file=stderr)
                 continue
             endpoints = []
             for author in authors:
