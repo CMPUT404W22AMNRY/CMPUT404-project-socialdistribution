@@ -105,3 +105,25 @@ class StreamViewTests(TestCase):
         self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
         res = self.client.get(reverse_lazy('stream'))
         self.assertContains(res, POST_DATA['title'], count=expected_post_count)
+
+    def test_does_not_include_non_friends_friends_only_post(self):
+        public_post_count = len(Post.objects.filter(visibility=Post.Visibility.PUBLIC, unlisted=False))
+
+        non_friend = get_user_model().objects.create_user(username='alice', password=TEST_PASSWORD)
+        assert non_friend not in Follow.objects.true_friend(self.user)
+
+        expected_post_count = public_post_count
+        
+        friends_only_post = Post.objects.create(
+            title=POST_DATA['title'],
+            description=POST_DATA['description'],
+            content_type=POST_DATA['content_type'],
+            content=POST_DATA['content'],
+            author_id=non_friend.id,
+            visibility=Post.Visibility.FRIENDS,
+            unlisted=POST_DATA['unlisted'])
+        friends_only_post.save
+
+        self.client.login(username=TEST_USERNAME, password=TEST_PASSWORD)
+        res = self.client.get(reverse_lazy('stream'))
+        self.assertContains(res, POST_DATA['title'], count=expected_post_count)

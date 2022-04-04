@@ -29,7 +29,7 @@ class StreamView(LoginRequiredMixin, ServerListView):
         query_set = public_posts
         for friend in Follow.objects.followers(self.request.user):
             query_set = query_set.union(friend.post_set.filter(visibility=Post.Visibility.FRIENDS, unlisted=False))
-        return query_set
+        return query_set.order_by('-date_published')
 
     def get_server_to_endpoints_mapping(self) -> list[tuple[Server, list[str]]]:
         server_endpoints_tuples = []
